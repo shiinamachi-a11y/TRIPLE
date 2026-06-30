@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>高校受験 理社一問一答</title>
+    <style>
+        body { font-family: sans-serif; background-color: #f0f2f5; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+        .quiz-container { background: white; padding: 30px; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); width: 400px; text-align: center; }
+        .question { font-size: 1.2rem; font-weight: bold; margin-bottom: 20px; text-align: left; }
+        
+        .btn { display: block; width: 100%; padding: 12px; margin: 10px 0; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 1rem; box-sizing: border-box; }
+        .nav-btn { background-color: #28a745; text-align: center; }
+        .nav-btn:hover { background-color: #218838; }
+        
+        .ans-btn { background-color: #007bff; text-align: left; padding-left: 20px; }
+        .ans-btn:hover { background-color: #0056b3; }
+        
+        .back-btn { background-color: #6c757d; text-align: center; margin-top: 20px; }
+        .back-btn:hover { background-color: #5a6268; }
+
+        .result { font-size: 1.4rem; font-weight: bold; margin-top: 20px; }
+        h2 { margin-top: 0; color: #333; }
+        .loading { font-size: 1.2rem; color: #666; }
+    </style>
+</head>
+<body>
+
+<div class="quiz-container">
+    
+    <div id="loading-screen" class="screen">
+        <div class="loading">問題を読み込んでいます...</div>
+    </div>
+    
+    <div id="subject-screen" class="screen" style="display: none;">
+        <h2>教科を選んでね</h2>
+        <button class="btn nav-btn" onclick="selectSubject('science')">理科</button>
+        <button class="btn nav-btn" onclick="selectSubject('social')">社会</button>
+    </div>
+
+    <div id="grade-screen" class="screen" style="display: none;">
+        <h2>学年を選んでね</h2>
+        <button class="btn nav-btn" onclick="selectGrade('1')">中学1年</button>
+        <button class="btn nav-btn" onclick="selectGrade('2')">中学2年</button>
+        <button class="btn nav-btn" onclick="selectGrade('3')">中学3年</button>
+        <button class="btn back-btn" onclick="backToSubject()">戻る</button>
+    </div>
+
+    <div id="quiz-screen" class="screen" style="display: none;">
+        <div id="question" class="question">問題がここに表示されます</div>
+        <div id="answers">
+            <button class="btn ans-btn" onclick="checkAnswer(0)">選択肢1</button>
+            <button class="btn ans-btn" onclick="checkAnswer(1)">選択肢2</button>
+            <button class="btn ans-btn" onclick="checkAnswer(2)">選択肢3</button>
+            <button class="btn ans-btn" onclick="checkAnswer(3)">選択肢4</button>
+        </div>
+        <div id="result" class="result"></div>
+    </div>
+
+</div>
+
+<script>
+    // ユーザー様が用意してくださった正しい公開用URLを設定済みです
+    const SPREADSHEET_TSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQ6RAVBjmqZyuxiuKluc_EJfUpWlAyIt213A_YnTUTo-YHG2skF0ZyvbO11Qc1JLVNjwzVgR9vCo7_e/pub?gid=874795216&single=true&output=tsv";       
+    let quizData = [];         // スプレッドシートから読み込んだ全データが入る
+    let selectedSubject = ""; 
+    let selectedGrade = "";   
+    let filteredQuizData = []; 
+    let currentQuestionIndex = 0;
+
+    // ページが開かれたら自動でスプレッドシートのデータを読み込む
+    async function loadQuizData() {
+        try {
+            const response = await fetch(SPREADSHEET_TSV_URL);
+            const text = await response.text();
+            
+            // 行ごとに分割
+            const lines = text.split("\n");
+            
+            // 1行目は見出しなので、2行目（i = 1）から処理する
+            for (let i = 1; i < lines.length; i++) {
+                const line = lines[i].trim();
+                if (!line) continue; // 空行はスキップ
+                
+                // タブ（\t）で列に分解
+                const cols = line.split("\t");
+                
+                // データが足りない行はスキップ
+                if (cols.length < 8) continue; 
+                
+                // データをアプリ用の形式に変換して追加
+                quizData.push({
+                    subject: cols[0].trim(),
+                    grade: cols[1].trim(),
+                    question: cols[2].trim(),
+                    choices: [cols[3].trim(), cols[4].trim(), cols[5].trim(), cols[6].trim()],
+                    correct: parseInt(cols[7].trim()) - 1 // スプシの 1~4 をプログラム用の 0~3 に変換
+                });
+            }
+            
+            // 読み込みが終わったらローディングを消して教科選択を出す
+            document.getElementById('loading-screen').style.display = 'none';
+            document.getElementById('subject-screen').style.display = 'block';
+            
+        } catch (error) {
+            alert("データの読み込みに失敗しました。URLが正しいか、ウェブに公開されているか確認してください。");
+            console.error(error);
+        }
+    }
+
+    // 教科選択
+    function selectSubject(subject) {
+        selectedSubject = subject;
+        document.getElementById('subject-screen').style.display = 'none';
+        document.getElementById('grade-screen').style.display = 'block';
+    }
+
+    // 戻るボタン
+    function backToSubject() {
+        document.getElementById('grade-screen').style.display = 'none';
+        document.getElementById('subject-screen').style.display = 'block';
+    }
+
+    // 学年選択（フィルター機能）
+    function selectGrade(grade) {
+        selectedGrade = grade;
+        
+        // 条件に合う問題をスプシデータから抽出
+        filteredQuizData = quizData.filter(q => q.subject === selectedSubject && q.grade === selectedGrade);
+        
+        if (filteredQuizData.length === 0) {
+            alert("該当する問題がスプレッドシートに登録されていません！");
+            return;
+        }
+
+        document.getElementById('grade-screen').style.display = 'none';
+        document.getElementById('quiz-screen').style.display = 'block';
+        
+        currentQuestionIndex = 0;
+        showQuestion();
+    }
+
+    // 問題表示
+    function showQuestion() {
+        const currentQuiz = filteredQuizData[currentQuestionIndex];
+        document.getElementById('question').innerText = currentQuiz.question;
+        
+        const buttons = document.querySelectorAll('.ans-btn');
+        buttons.forEach((button, index) => {
+            button.innerText = `${index + 1}. ${currentQuiz.choices[index]}`;
+            button.disabled = false;
+        });
+        document.getElementById('result').innerText = "";
+    }
+
+    // 答え合わせ
+    function checkAnswer(selectedIndex) {
+        const currentQuiz = filteredQuizData[currentQuestionIndex];
+        const resultDiv = document.getElementById('result');
+        
+        const buttons = document.querySelectorAll('.ans-btn');
+        buttons.forEach(button => button.disabled = true);
+
+        if (selectedIndex === currentQuiz.correct) {
+            resultDiv.innerText = "⭕ 正解！";
+            resultDiv.style.color = "green";
+        } else {
+            resultDiv.innerText = "❌ 不正解...";
+            resultDiv.style.color = "red";
+        }
+
+        setTimeout(() => {
+            currentQuestionIndex++;
+            if (currentQuestionIndex < filteredQuizData.length) {
+                showQuestion();
+            } else {
+                document.getElementById('quiz-screen').innerHTML = "<h2>すべての問題が終了しました！🎉</h2><button class='btn nav-btn' onclick='location.reload()'>最初に戻る</button>";
+            }
+        }, 2000);
+    }
+
+    // アプリ起動時にスプシデータを読み込む
+    loadQuizData();
+</script>
+
+</body>
+</html>

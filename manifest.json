@@ -1,0 +1,15 @@
+{
+  "short_name": "TRIPLE",
+  "name": "高校受験 理社英一問一答 TRIPLE",
+  "icons": [
+    {
+      "src": "https://i.ibb.co/RGx3mgyq/triple-png.png",
+      "type": "image/png",
+      "sizes": "512x512"
+    }
+  ],
+  "start_url": "index.html",
+  "background_color": "#f0f2f5",
+  "display": "standalone",
+  "theme-color": "#4a5568"
+}
