@@ -479,7 +479,7 @@
         if (rate <= 30) return "#dc3545"; 
         if (rate <= 70) return "#eab308"; 
         if (rate <= 90) return "#28a745"; 
-        return "#007bff";                                                                                                                                                                                                                                                                                                                                        
+        return "#007bff"; 
     }
 
     function hideAllScreens() {
@@ -539,7 +539,7 @@
 
                 allStudentsList.push({ id: sId, name: sName, grade: sGrade, scienceRate: sScienceRate, socialRate: sSocialRate, englishRate: sEnglishRate, campus: sCampus });
 
-                if (sId === idInput && sName === nameInput) {
+                if (Number(sId) === Number(idInput) && sName === nameInput) {
                     studentId = sId;
                     studentName = sName;
                     studentGrade = sGrade; 
@@ -667,6 +667,15 @@
         document.getElementById('user-badge-3').innerText = badgeText;
         document.getElementById('user-badge-4').innerText = badgeText;
         document.getElementById('user-badge-5').innerText = badgeText;
+
+        // 🔥【追加】アプリ再起動・リロード時に、今日の成果データをストレージから安全に復元する
+        const savedSummary = localStorage.getItem(`quiz_daily_summary_${studentKey}`);
+        if (savedSummary) {
+            dailySummaryData = JSON.parse(savedSummary);
+        } else {
+            dailySummaryData = {};
+        }
+
         loadAllQuizData();
     }
 
@@ -675,6 +684,7 @@
         localStorage.removeItem('quiz_saved_name'); 
         localStorage.removeItem('quiz_saved_grade');
         localStorage.removeItem('quiz_saved_campus'); 
+        localStorage.removeItem(`quiz_daily_summary_${studentKey}`); // ログアウト時も今日のデータをクリア
         currentCombo = 0; maxCombo = 0; dailySummaryData = {};
         dailyRateChangeScience = 0; dailyRateChangeSocial = 0; dailyRateChangeEnglish = 0;
         document.getElementById('student-id-input').value = "";
@@ -998,6 +1008,9 @@
             localStorage.setItem(`quiz_wrong_counts_${studentKey}`, JSON.stringify(wrongCounts));
         }
         
+        // 🔥【追加】1問回答するごとに、成果データをローカルストレージへリアルタイムで退避保存
+        localStorage.setItem(`quiz_daily_summary_${studentKey}`, JSON.stringify(dailySummaryData));
+        
         document.getElementById('next-btn').style.display = 'block';
     }
 
@@ -1181,7 +1194,6 @@
         }
     }
 
-    // 正しい関数名に修正
     function toggleRateView(subView) {
         const mySec = document.getElementById('rate-my-section');
         const rankSec = document.getElementById('rate-ranking-section');
@@ -1217,6 +1229,8 @@
     }
 
     function confirmFinishLearning() {
+        // 🔥【追加】「学習を終了する」を能動的に選択したときのみ、成果データをクリアして初期状態に戻す
+        localStorage.removeItem(`quiz_daily_summary_${studentKey}`);
         location.reload(); 
     }
 
@@ -1379,49 +1393,6 @@
         });
     }
 
-    function showWrongQuestionsDetail(apiKey, sectionName, isEnglish = false, grade = "") {
-        hideAllScreens();
-        document.getElementById('wrong-details-screen').style.display = 'block';
-        document.getElementById('wrong-details-title').innerText = `❌ 過去の間違い (${sectionName})`;
-        
-        const container = document.getElementById('wrong-details-list');
-        container.innerHTML = "";
-        
-        const wrongCounts = JSON.parse(localStorage.getItem(`quiz_wrong_counts_${studentKey}`) || '{}');
-        
-        let data = [];
-        if (isEnglish) {
-            ["1", "2", "3"].forEach(g => {
-                const wordData = allQuizData[`english_word_${g}`] || [];
-                const grammarData = allQuizData[`english_grammar_${g}`] || [];
-                data = [...data, ...wordData, ...grammarData];
-            });
-        } else {
-            data = allQuizData[apiKey] || [];
-        }
-        
-        const wrongQuestions = data.filter(q => q.section === sectionName && wrongCounts[q.question] > 0);
-        
-        if (wrongQuestions.length === 0) {
-            container.innerHTML = "<div style='text-align:center; color:#28a745; font-weight:bold; padding:40px 0;'>✨ この分野で一度も間違えた問題はありません！</div>";
-            return;
-        }
-        
-        wrongQuestions.forEach((q, index) => {
-            const card = document.createElement('div');
-            card.className = "review-card";
-            const correctText = q.type === "en_to_ja" || q.type === "ja_to_en" ? q.correctText : q.choices[q.correct];
-            const count = wrongCounts[q.question];
-            
-            card.innerHTML = `
-                <div class="review-q">問${index + 1}: ${q.question}</div>
-                <div class="review-ans review-wrong" style="font-size:0.85rem; margin-bottom:5px;">⚠️ 過去のミス回数: ${count} 回</div>
-                <div class="review-ans review-correct">⭕ 正しい正解: ${correctText}</div>
-            `;
-            container.appendChild(card);
-        });
-    }
-
     function showRateScreen() {
         hideAllScreens();
         document.getElementById('rate-screen').style.display = 'block';
@@ -1474,13 +1445,13 @@
             else if (subject === 'social') currentRateVal = s.socialRate;
             else if (subject === 'english') currentRateVal = s.englishRate; 
 
-            if (s.id === studentId && s.name === studentName) {
+            if (Number(s.id) === Number(studentId) && s.name === studentName) {
                 currentRateVal = myRate;
             }
             return { ...s, activeRate: currentRateVal };
         });
 
-        const hasMe = rankingList.some(s => s.id === studentId && s.name === studentName);
+        const hasMe = rankingList.some(s => Number(s.id) === Number(studentId) && s.name === studentName);
         if (!hasMe && studentId) {
             rankingList.push({ id: studentId, name: studentName, grade: studentGrade, campus: studentCampus, activeRate: myRate });
         }
@@ -1497,7 +1468,7 @@
                 lastRate = s.activeRate;
             }
             s.computedRank = displayRank;
-            if (s.id === studentId && s.name === studentName) {
+            if (Number(s.id) === Number(studentId) && s.name === studentName) {
                 myRankNum = displayRank;
             }
         });
@@ -1516,7 +1487,7 @@
             item.style.margin = "4px 0";
             item.style.borderRadius = "4px";
             
-            if (s.id === studentId && s.name === studentName) {
+            if (Number(s.id) === Number(studentId) && s.name === studentName) {
                 item.style.backgroundColor = "#feebc8"; 
                 item.style.fontWeight = "bold";
                 item.style.color = "#c05621";
@@ -1608,7 +1579,7 @@
         if (sectionsSet.size === 0) {
             const opt = document.createElement('option');
             opt.value = "共通・その他";
-            opt.innerText = "共通・その他";
+            opt.innerText = "共通・other";
             sectionSelect.appendChild(opt);
         } else {
             sectionsSet.forEach(sec => {
