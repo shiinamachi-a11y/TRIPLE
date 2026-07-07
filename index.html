@@ -214,7 +214,7 @@
                 <div class="progress-bar-bg" style="height: 6px; margin-top:3px;"><div id="player-live-fill" class="progress-bar-fill" style="width:0%; background-color:#007bff;"></div></div>
             </div>
             <div class="vs-bar-container" style="background-color: #fff5f5; border-color: #fed7d7;">
-                <div>🤖 对戦相手: <span id="rival-live-txt" style="font-weight:bold;">0 / 10問</span> (正解: <span id="rival-live-score">0</span>)</div>
+                <div>🤖 対戦相手: <span id="rival-live-txt" style="font-weight:bold;">0 / 10問</span> (正解: <span id="rival-live-score">0</span>)</div>
                 <div class="progress-bar-bg" style="height: 6px; margin-top:3px;"><div id="rival-live-fill" class="progress-bar-fill" style="width:0%; background-color:#e53e3e;"></div></div>
             </div>
         </div>
@@ -392,8 +392,8 @@
 </div>
 
 <script>
-    // 🔗 【更新済み】新しいウェブアプリのデプロイURL
-    const GAS_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxayU7KsoYD71Yfn47gNL0CoPMEOP4sHVG7wwyS4gFBzxBCiAQIxaRTsa4inFkR6OruBw/exec";
+    // 🔗 【更新済み】新しいウェブアプリのデプロイURLを埋め込み完了
+    const GAS_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbyCnbJcejfOojnn0Vd2SZTqbHO5pQixnTn2lZkvHQ73g5-MikuNuTUvcuMEjkMnTmFR4A/exec";
     const STUDENT_LIST_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQ6RAVBjmqZyuxiuKluc_EJfUpWlAyIt213A_YnTUTo-YHG2skF0ZyvbO11Qc1JLVNjwzVgR9vCo7_e/pub?gid=690286817&single=true&output=tsv";
 
     const SPREADSHEET_URLS = {
@@ -579,14 +579,13 @@
 
     function backToMainMenu() { hideAllScreens(); document.getElementById('main-menu-screen').style.display = 'block'; }
 
-    // --- 🚀 【重要】ここから下データ送信関連の修正反映エリア ---
+    // --- 🚀 【通信安全化】FormData 形式データ送信処理群 ---
 
     function sendRateToSpreadsheet(subject, newRate) {
         if (!GAS_WEB_APP_URL || GAS_WEB_APP_URL.includes("ここに")) return;
         
-        // 安全で確実な FormData 形式で送信するよう修正
         const formData = new FormData();
-        formData.append("action", "update_rate"); // GAS側の処理判別用にactionを明記
+        formData.append("action", "update_rate"); 
         formData.append("studentId", studentId);
         formData.append("subject", subject);
         formData.append("rate", newRate);
@@ -612,7 +611,6 @@
             ghostLog: currentPlayerRoundLogs 
         };
         
-        // 安全で確実な FormData 形式で送信するよう修正
         const formData = new FormData();
         formData.append("action", "update_field_summary");
         formData.append("data", JSON.stringify(payload));
@@ -627,7 +625,6 @@
     function sendDataToGoogleForm() {
         if (!GOOGLE_FORM_ACTION_URL || GOOGLE_FORM_ACTION_URL.includes("ここに")) return;
         
-        // 安全で確実な FormData 形式で送信するよう修正（Googleフォームの受取拒否防止）
         const formData = new FormData();
         formData.append(FORM_ENTRY_IDS.studentGrade, studentGrade);
         formData.append(FORM_ENTRY_IDS.studentName, studentName);
@@ -644,7 +641,7 @@
         }).catch((e) => { console.error("Googleフォーム送信エラー:", e); });
     }
 
-    // --- 🌿 ここから下はゲーム進行用ロジックの続き ---
+    // --- 🌿 ゲーム進行・制御ロジック群 ---
 
     function selectSubject(subject) { 
         selectedSubject = subject; 
@@ -695,7 +692,7 @@
         else {
             titleEl.innerText = currentMode === "battle" ? "対戦分野を選択 ⚔️" : "分野・弱点診断 📊"; 
             if(currentMode !== "battle") {
-                const allBtn = document.createElement('button'); allBtn.className = "btn nav-btn"; allBtn.style.backgroundColor = "#007bff"; allBtn.style.setValue = "15px"; allBtn.innerText = "🌟 全範囲からランダム"; allBtn.onclick = () => prepareModeFlow("全範囲"); container.appendChild(allBtn);
+                const allBtn = document.createElement('button'); allBtn.className = "btn nav-btn"; allBtn.style.backgroundColor = "#007bff"; allBtn.style.marginBottom = "15px"; allBtn.innerText = "🌟 全範囲からランダム"; allBtn.onclick = () => prepareModeFlow("全範囲"); container.appendChild(allBtn);
             }
         }
         const sectionsSet = new Set(); quizData.forEach(q => { if(q.section) sectionsSet.add(q.section) });
@@ -1013,7 +1010,7 @@
 
         if (typeof sendDataToTeacher === "function") { sendDataToTeacher(clearedCount, totalCount); }
         
-        // 🚀 データの確実な外部送信処理を実行
+        // 🚀 開通した新しい宛先URLへ、FormData形式でのデータ送信処理を実行
         sendRateToSpreadsheet(selectedSubject, myRate); 
         sendFieldSummaryToSpreadsheet(); 
         sendDataToGoogleForm();
@@ -1149,7 +1146,6 @@
     function submitReport() {
         const subject = document.getElementById('report-subject').value; const section = document.getElementById('report-section').value; const content = document.getElementById('report-content').value.trim(); if (!content) { alert("報告内容を入力してください。"); return; }
         
-        // 報告用フォーム送信も FormData 形式に安全化
         const formData = new FormData();
         let subjectText = subject === "social" ? "社会" : (subject === "english" ? "英語" : "理科");
         formData.append(REPORT_FORM_ENTRY_IDS.studentInfo, `${studentId}_${studentName} (${studentGrade})`); 
