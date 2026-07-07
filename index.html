@@ -97,7 +97,7 @@
             <div>
                 <h2>メニューを選んでね</h2>
                 <button class="btn nav-btn" style="background-color: #007bff; margin-top: 15px; font-size: 1.15rem; font-weight: bold; padding: 14px;" onclick="setMode('test')">📝 テストをする</button>
-                <button class="btn nav-btn" style="background-color: #6b46c1; margin-top: 12px; font-size: 1.15rem; font-weight: bold; padding: 14px;" onclick="setMode('battle')">⚔️ 对战</button>
+                <button class="btn nav-btn" style="background-color: #6b46c1; margin-top: 12px; font-size: 1.15rem; font-weight: bold; padding: 14px;" onclick="setMode('battle')">⚔️ 対戦</button>
                 <button class="btn nav-btn" style="background-color: #ed8936; margin-top: 12px; font-size: 1.15rem; font-weight: bold; padding: 14px;" onclick="setMode('report')">📊 成績をみる</button>
                 <button class="btn nav-btn" style="background-color: #eab308; margin-top: 12px; font-size: 1.15rem; font-weight: bold; padding: 14px; color: #212529;" onclick="showRateScreen()">🏆 レートをみる</button>
                 <button class="btn nav-btn" style="background-color: #dc3545; margin-top: 12px; font-size: 1.15rem; font-weight: bold; padding: 14px;" onclick="showReportIssueScreen()">⚠️ 誤答・誤植を報告する</button>
@@ -214,7 +214,7 @@
                 <div class="progress-bar-bg" style="height: 6px; margin-top:3px;"><div id="player-live-fill" class="progress-bar-fill" style="width:0%; background-color:#007bff;"></div></div>
             </div>
             <div class="vs-bar-container" style="background-color: #fff5f5; border-color: #fed7d7;">
-                <div>🤖 对战对手: <span id="rival-live-txt" style="font-weight:bold;">0 / 10問</span> (正解: <span id="rival-live-score">0</span>)</div>
+                <div>🤖 対戦相手: <span id="rival-live-txt" style="font-weight:bold;">0 / 10問</span> (正解: <span id="rival-live-score">0</span>)</div>
                 <div class="progress-bar-bg" style="height: 6px; margin-top:3px;"><div id="rival-live-fill" class="progress-bar-fill" style="width:0%; background-color:#e53e3e;"></div></div>
             </div>
         </div>
@@ -432,7 +432,7 @@
     let questionStartTime = 0;
     let roundTotalTimeMs = 0;
 
-    // 对战用管理变量
+    // 対戦用管理変数
     let activeGhostData = null;  
     let ghostTimerInterval = null;
     let ghostCurrentQuestion = 0;
@@ -519,6 +519,9 @@
                 for (let i = 1; i < lines.length; i++) {
                     const line = lines[i].trim(); if (!line) continue; const cols = line.split("\t");
                     if (key.startsWith("english_word")) {
+                        // ★【修正箇所 3】列数が足りない行を安全にスキップ（クラッシュ防止ガード句）
+                        if (cols.length < 2 || !cols[0] || !cols[1]) continue; 
+                        
                         const en = cols[0].trim(); const ja = cols[1].trim(); if (!en || !ja) continue;
                         let stage = "Stage 1"; if (cols[8] && cols[8].trim()) stage = cols[8].trim(); else if (cols[2] && cols[2].trim()) stage = cols[2].trim();
                         allQuizData[key].push({ type: "en_to_ja", question: en, correctText: ja, section: `英単語⇒日本語 (${stage})`, explanation: "" });
@@ -605,7 +608,7 @@
             totalTimeMs: roundTotalTimeMs, 
             correctCount: score, 
             maxCombo: maxCombo,
-            ghostLog: currentPlayerRoundLogs 
+            ghostLog: currentPlayerRoundLogs     
         };
         
         const params = new URLSearchParams();
@@ -796,30 +799,52 @@
             let randomValue = Math.random() * totalWeight; let weightSum = 0;
             for (let j = 0; j < weightedPool.length; j++) {
                 weightSum += weightedPool[j].weight;
-                // 【修正箇所】タイポ「Break;」を「break;」に直し、pushの閉じカッコ「)」を追加
                 if (randomValue <= weightSum) { filteredQuizData.push(weightedPool.splice(j, 1)[0].questionData); break; }
             }
         }
 
+        // ★【修正箇所 1】英単語ダミー選択肢の言語混ざり防止ロジック
         filteredQuizData.forEach(quiz => {
             if (quiz.type === "en_to_ja" || quiz.type === "ja_to_en") { 
-                const targetWord = (quiz.type === "ja_to_en") ? quiz.correctText : quiz.question; const targetChar = targetWord.trim()[0].toLowerCase();
-                let sameInitialTexts = currentSectionAllQuestions.filter(q => { const word = (q.type === "ja_to_en") ? q.correctText : q.question; return word.trim()[0].toLowerCase() === targetChar; }).map(q => q.correctText).filter(txt => txt !== quiz.correctText);
+                const targetWord = (quiz.type === "ja_to_en") ? quiz.correctText : quiz.question; 
+                const targetChar = targetWord.trim()[0].toLowerCase();
+                
+                let sameInitialTexts = currentSectionAllQuestions.filter(q => { 
+                    // 出題形式（英日 / 日英）が完全に一致するものだけに絞り込む条件を追加
+                    if (q.type !== quiz.type) return false; 
+                    
+                    const word = (q.type === "ja_to_en") ? q.correctText : q.question; 
+                    return word.trim()[0].toLowerCase() === targetChar; 
+                }).map(q => q.correctText).filter(txt => txt !== quiz.correctText);
+                
                 let dummyPool = Array.from(new Set(sameInitialTexts));
-                for (let i = dummyPool.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [dummyPool[i], dummyPool[j]] = [dummyPool[j], dummyPool[i]]; }
+                for (let i = dummyPool.length - 1; i > 0; i--) { 
+                    const j = Math.floor(Math.random() * (i + 1)); 
+                    [dummyPool[i], dummyPool[j]] = [dummyPool[j], dummyPool[i]]; 
+                }
                 let dummies = dummyPool.slice(0, 3);
                 if (dummies.length < 3) {
-                    let backupPool = Array.from(new Set(currentSectionAllQuestions.map(q => q.correctText))).filter(txt => txt !== quiz.correctText && !dummies.includes(txt));
-                    for (let i = backupPool.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [backupPool[i], backupPool[j]] = [backupPool[j], backupPool[i]]; }
+                    let backupPool = Array.from(new Set(currentSectionAllQuestions.filter(q => q.type === quiz.type).map(q => q.correctText))).filter(txt => txt !== quiz.correctText && !dummies.includes(txt));
+                    for (let i = backupPool.length - 1; i > 0; i--) { 
+                        const j = Math.floor(Math.random() * (i + 1)); 
+                        [backupPool[i], backupPool[j]] = [backupPool[j], backupPool[i]]; 
+                    }
                     while (dummies.length < 3 && backupPool.length > 0) { dummies.push(backupPool.shift()); }
                 }
                 while(dummies.length < 3) { dummies.push("---"); }
                 let choices = [quiz.correctText, ...dummies];
-                for (let i = choices.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [choices[i], choices[j]] = [choices[j], choices[i]]; }
-                quiz.choices = choices; quiz.correct = choices.indexOf(quiz.correctText);
+                for (let i = choices.length - 1; i > 0; i--) { 
+                    const j = Math.floor(Math.random() * (i + 1)); 
+                    [choices[i], choices[j]] = [choices[j], choices[i]]; 
+                }
+                quiz.choices = choices; 
+                quiz.correct = choices.indexOf(quiz.correctText);
             } else {
                 const correctText = quiz.choices[quiz.correct];
-                for (let i = quiz.choices.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [quiz.choices[i], quiz.choices[j]] = [quiz.choices[j], quiz.choices[i]]; }
+                for (let i = quiz.choices.length - 1; i > 0; i--) { 
+                    const j = Math.floor(Math.random() * (i + 1)); 
+                    [quiz.choices[i], quiz.choices[j]] = [quiz.choices[j], quiz.choices[i]]; 
+                }
                 quiz.correct = quiz.choices.indexOf(correctText);
             }
         });
@@ -934,6 +959,10 @@
         const screenTitle = document.getElementById('result-screen-title');
         
         let totalRateChange = 0;
+        
+        let comboBonus = 0;
+        let fieldBonus = 0;
+        let uniqueSectionsCount = 0;
 
         if (currentMode === "battle" && activeGhostData) {
             screenTitle.style.marginTop = "5px";
@@ -973,9 +1002,10 @@
         } else {
             screenTitle.style.marginTop = "45px"; rivalLine.style.display = 'none'; banner.style.display = 'none';
             const baseRateChange = score - 5;
-            let comboBonus = currentCombo >= 30 ? 6 : (currentCombo >= 5 ? Math.floor(currentCombo / 5) : 0);
-            const uniqueSectionsCount = Object.keys(dailySummaryData).length;
-            const fieldBonus = uniqueSectionsCount > 1 ? Math.min(uniqueSectionsCount - 1, 5) : 0; 
+            
+            comboBonus = maxCombo >= 30 ? 6 : (maxCombo >= 5 ? Math.floor(maxCombo / 5) : 0);
+            uniqueSectionsCount = Object.keys(dailySummaryData).length;
+            fieldBonus = uniqueSectionsCount > 1 ? Math.min(uniqueSectionsCount - 1, 5) : 0; 
             totalRateChange = baseRateChange + comboBonus + fieldBonus;
         }
 
@@ -992,7 +1022,7 @@
         const breakdownBox = document.getElementById('bonus-breakdown-box');
         if (currentMode !== "battle" && (comboBonus > 0 || fieldBonus > 0)) {
             breakdownBox.style.display = 'block';
-            document.getElementById('combo-bonus-line').innerHTML = comboBonus > 0 ? `<span class="bonus-tag bg-combo">🔥 COMBO</span> ${currentCombo}連鎖ボーナス: <b>+${comboBonus}</b>` : '';
+            document.getElementById('combo-bonus-line').innerHTML = comboBonus > 0 ? `<span class="bonus-tag bg-combo">🔥 COMBO</span> 最高コンボボーナス: <b>+${comboBonus}</b>` : '';
             document.getElementById('field-bonus-line').innerHTML = fieldBonus > 0 ? `<span class="bonus-tag bg-field">✨ FIELD</span> 複数分野ボーナス (${uniqueSectionsCount}分野目): <b>+${fieldBonus}</b>` : '';
         } else { breakdownBox.style.display = 'none'; }
 
@@ -1006,7 +1036,6 @@
 
         if (typeof sendDataToTeacher === "function") { sendDataToTeacher(clearedCount, totalCount); }
         
-        // 🚀 新しいURL・最適化形式で確実なデータ送信を実行
         sendRateToSpreadsheet(selectedSubject, myRate); 
         sendFieldSummaryToSpreadsheet(); 
         sendDataToGoogleForm();
@@ -1021,11 +1050,21 @@
         if (summaryKeys.length === 0) { listContainer.innerHTML = "<div class='score-line' style='text-align:center; color:#666;'>まだ本日解答した問題はありません。</div>"; } 
         else {
             summaryKeys.forEach(key => {
-                const data = dailySummaryData[key]; const totalInSection = quizData.filter(q => q.section === data.section).length;
+                const data = dailySummaryData[key]; 
+                
+                let totalInSection = 0;
+                for (const sKey in allQuizData) {
+                    if (allQuizData[sKey]) {
+                        totalInSection += allQuizData[sKey].filter(q => q.section === data.section).length;
+                    }
+                }
+                if (totalInSection === 0) totalInSection = data.total;
+
                 const rate = totalInSection > 0 ? Math.round((data.correct / totalInSection) * 100) : 0; const barColor = getGaugeColor(rate); 
                 let statusText = "🚨 弱点 (要対策)"; if (rate > 90) statusText = "👑 完璧！"; else if (rate > 70) statusText = "🍏 克服！"; else if (rate > 30) statusText = "⚠️ あと少し";
                 const line = document.createElement('div'); line.className = "score-line"; line.style.borderBottom = "1px dashed #cbd5e0"; line.style.paddingBottom = "10px"; line.style.marginBottom = "10px";
-                line.innerHTML = `<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;"><span style="font-weight:bold; color:#2d3748;">📌 分野：${data.section} <span style="color:#718096; font-size:0.9rem;">(教科：${data.grade})</span></span><span class="section-status-badge" style="background-color: ${barColor}; font-size: 0.75rem; padding: 2px 8px;">${statusText}</span></div>成果：<b>${totalInSection}</b> 問中 <span style="font-weight:bold; color:${barColor}; font-size:1.1rem;">${data.correct}</span> 問正解<div class="progress-bar-bg"><div class="progress-bar-fill" style="width: ${rate}%; background-color: ${barColor};"></div></div><div style="text-align: right; font-size: 0.8rem; color: #718096; margin-top: 2px;">正解率: ${rate}%</div>`;
+                
+                line.innerHTML = `<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;"><span style="font-weight:bold; color:#2d3748;">📌 分野：${data.section} <span style="color:#718096; font-size:0.9rem;">(教科：${data.grade})</span></span><span class="section-status-badge" style="background-color: ${barColor}; font-size: 0.75rem; padding: 2px 8px;">${statusText}</span></div>本日正解：<b>${data.correct}</b> 問 / 分野総数：${totalInSection} 問<div class="progress-bar-bg"><div class="progress-bar-fill" style="width: ${rate}%; background-color: ${barColor};"></div></div><div style="text-align: right; font-size: 0.8rem; color: #718096; margin-top: 2px;">全体のクリア率: ${rate}%</div>`;
                 listContainer.appendChild(line);
             });
         }
