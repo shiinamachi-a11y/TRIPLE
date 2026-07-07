@@ -97,7 +97,7 @@
             <div>
                 <h2>メニューを選んでね</h2>
                 <button class="btn nav-btn" style="background-color: #007bff; margin-top: 15px; font-size: 1.15rem; font-weight: bold; padding: 14px;" onclick="setMode('test')">📝 テストをする</button>
-                <button class="btn nav-btn" style="background-color: #6b46c1; margin-top: 12px; font-size: 1.15rem; font-weight: bold; padding: 14px;" onclick="setMode('battle')">⚔️ 对戦</button>
+                <button class="btn nav-btn" style="background-color: #6b46c1; margin-top: 12px; font-size: 1.15rem; font-weight: bold; padding: 14px;" onclick="setMode('battle')">⚔️ 対戦</button>
                 <button class="btn nav-btn" style="background-color: #ed8936; margin-top: 12px; font-size: 1.15rem; font-weight: bold; padding: 14px;" onclick="setMode('report')">📊 成績をみる</button>
                 <button class="btn nav-btn" style="background-color: #eab308; margin-top: 12px; font-size: 1.15rem; font-weight: bold; padding: 14px; color: #212529;" onclick="showRateScreen()">🏆 レートをみる</button>
                 <button class="btn nav-btn" style="background-color: #dc3545; margin-top: 12px; font-size: 1.15rem; font-weight: bold; padding: 14px;" onclick="showReportIssueScreen()">⚠️ 誤答・誤植を報告する</button>
@@ -214,7 +214,7 @@
                 <div class="progress-bar-bg" style="height: 6px; margin-top:3px;"><div id="player-live-fill" class="progress-bar-fill" style="width:0%; background-color:#007bff;"></div></div>
             </div>
             <div class="vs-bar-container" style="background-color: #fff5f5; border-color: #fed7d7;">
-                <div>🤖 対戦相手: <span id="rival-live-txt" style="font-weight:bold;">0 / 10問</span> (正解: <span id="rival-live-score">0</span>)</div>
+                <div>🤖 对戦相手: <span id="rival-live-txt" style="font-weight:bold;">0 / 10問</span> (正解: <span id="rival-live-score">0</span>)</div>
                 <div class="progress-bar-bg" style="height: 6px; margin-top:3px;"><div id="rival-live-fill" class="progress-bar-fill" style="width:0%; background-color:#e53e3e;"></div></div>
             </div>
         </div>
@@ -318,7 +318,7 @@
             <button class="btn back-btn" onclick="backToMainMenu()">トップに戻る</button>
         </div>
         <div id="rate-detail-view" style="display: none;">
-            <div style="flex: 1; display: flex; gap: 10px; margin-bottom: 15px;">
+            <div style="display: flex; gap: 10px; margin-bottom: 15px;">
                 <button id="cmd-show-my-rate" class="btn nav-btn" style="margin: 0; flex: 1; font-weight: bold; font-size: 0.95rem; padding: 10px;" onclick="toggleRateView('my')">個人レートを確認</button>
                 <button id="cmd-show-ranking" class="btn nav-btn" style="margin: 0; flex: 1; font-weight: bold; font-size: 0.95rem; padding: 10px;" onclick="toggleRateView('ranking')">全体ランキングを見る</button>
             </div>
@@ -579,6 +579,73 @@
 
     function backToMainMenu() { hideAllScreens(); document.getElementById('main-menu-screen').style.display = 'block'; }
 
+    // --- 🚀 【重要】ここから下データ送信関連の修正反映エリア ---
+
+    function sendRateToSpreadsheet(subject, newRate) {
+        if (!GAS_WEB_APP_URL || GAS_WEB_APP_URL.includes("ここに")) return;
+        
+        // 安全で確実な FormData 形式で送信するよう修正
+        const formData = new FormData();
+        formData.append("action", "update_rate"); // GAS側の処理判別用にactionを明記
+        formData.append("studentId", studentId);
+        formData.append("subject", subject);
+        formData.append("rate", newRate);
+        
+        fetch(GAS_WEB_APP_URL, { 
+            method: 'POST', 
+            body: formData, 
+            mode: 'no-cors' 
+        }).catch((e) => { console.error("レート同期エラー:", e); });
+    }
+
+    function sendFieldSummaryToSpreadsheet() {
+        if (!GAS_WEB_APP_URL || GAS_WEB_APP_URL.includes("ここに")) return;
+        const payload = { 
+            studentId: studentId, 
+            studentName: studentName, 
+            campus: studentCampus, 
+            subject: selectedSubject, 
+            section: selectedSectionName, 
+            totalTimeMs: roundTotalTimeMs, 
+            correctCount: score, 
+            maxCombo: maxCombo,
+            ghostLog: currentPlayerRoundLogs 
+        };
+        
+        // 安全で確実な FormData 形式で送信するよう修正
+        const formData = new FormData();
+        formData.append("action", "update_field_summary");
+        formData.append("data", JSON.stringify(payload));
+        
+        fetch(GAS_WEB_APP_URL, { 
+            method: 'POST', 
+            body: formData, 
+            mode: 'no-cors' 
+        }).catch(e => console.error("統計データ送信失敗:", e));
+    }
+
+    function sendDataToGoogleForm() {
+        if (!GOOGLE_FORM_ACTION_URL || GOOGLE_FORM_ACTION_URL.includes("ここに")) return;
+        
+        // 安全で確実な FormData 形式で送信するよう修正（Googleフォームの受取拒否防止）
+        const formData = new FormData();
+        formData.append(FORM_ENTRY_IDS.studentGrade, studentGrade);
+        formData.append(FORM_ENTRY_IDS.studentName, studentName);
+        formData.append(FORM_ENTRY_IDS.studentId, studentId);
+        formData.append(FORM_ENTRY_IDS.subject, selectedSubject);
+        formData.append(FORM_ENTRY_IDS.section, selectedSectionName);
+        formData.append(FORM_ENTRY_IDS.score, score);
+        formData.append(FORM_ENTRY_IDS.total, filteredQuizData.length);
+        
+        fetch(GOOGLE_FORM_ACTION_URL, { 
+            method: 'POST', 
+            body: formData, 
+            mode: 'no-cors' 
+        }).catch((e) => { console.error("Googleフォーム送信エラー:", e); });
+    }
+
+    // --- 🌿 ここから下はゲーム進行用ロジックの続き ---
+
     function selectSubject(subject) { 
         selectedSubject = subject; 
         if (subject === 'english') { showEnglishSubScreen(); } 
@@ -628,7 +695,7 @@
         else {
             titleEl.innerText = currentMode === "battle" ? "対戦分野を選択 ⚔️" : "分野・弱点診断 📊"; 
             if(currentMode !== "battle") {
-                const allBtn = document.createElement('button'); allBtn.className = "btn nav-btn"; allBtn.style.backgroundColor = "#007bff"; allBtn.style.marginBottom = "15px"; allBtn.innerText = "🌟 全範囲からランダム"; allBtn.onclick = () => prepareModeFlow("全範囲"); container.appendChild(allBtn);
+                const allBtn = document.createElement('button'); allBtn.className = "btn nav-btn"; allBtn.style.backgroundColor = "#007bff"; allBtn.style.setValue = "15px"; allBtn.innerText = "🌟 全範囲からランダム"; allBtn.onclick = () => prepareModeFlow("全範囲"); container.appendChild(allBtn);
             }
         }
         const sectionsSet = new Set(); quizData.forEach(q => { if(q.section) sectionsSet.add(q.section) });
@@ -859,48 +926,6 @@
     }
 
     function nextQuestion() { currentQuestionIndex++; if (currentQuestionIndex < filteredQuizData.length) { showQuestion(); } else { if (ghostTimerInterval) { clearTimeout(ghostTimerInterval); ghostTimerInterval = null; } showFinalResult(); } }
-    
-    function sendRateToSpreadsheet(subject, newRate) {
-        if (!GAS_WEB_APP_URL || GAS_WEB_APP_URL.includes("ここに")) return;
-        const params = new URLSearchParams(); params.append("studentId", studentId); params.append("subject", subject); params.append("rate", newRate);
-        fetch(GAS_WEB_APP_URL, { method: 'POST', body: params, mode: 'no-cors' }).catch((e) => { console.error("レート同期エラー:", e); });
-    }
-
-    function sendFieldSummaryToSpreadsheet() {
-        if (!GAS_WEB_APP_URL || GAS_WEB_APP_URL.includes("ここに")) return;
-        const payload = { 
-            studentId: studentId, 
-            studentName: studentName, 
-            campus: studentCampus, 
-            subject: selectedSubject, 
-            section: selectedSectionName, 
-            totalTimeMs: roundTotalTimeMs, 
-            correctCount: score, 
-            maxCombo: maxCombo,
-            ghostLog: currentPlayerRoundLogs 
-        };
-        const params = new URLSearchParams(); params.append("action", "update_field_summary"); params.append("data", JSON.stringify(payload));
-        fetch(GAS_WEB_APP_URL, { method: 'POST', body: params, mode: 'no-cors' }).catch(e => console.error("統計データ送信失敗:", e));
-    }
-
-    // 💡 Googleフォーム（別シート・ドキュメント自動生成用）に結果を送信する関数
-    function sendDataToGoogleForm() {
-        if (!GOOGLE_FORM_ACTION_URL || GOOGLE_FORM_ACTION_URL.includes("ここに")) return;
-        const params = new URLSearchParams();
-        params.append(FORM_ENTRY_IDS.studentGrade, studentGrade);
-        params.append(FORM_ENTRY_IDS.studentName, studentName);
-        params.append(FORM_ENTRY_IDS.studentId, studentId);
-        params.append(FORM_ENTRY_IDS.subject, selectedSubject);
-        params.append(FORM_ENTRY_IDS.section, selectedSectionName);
-        params.append(FORM_ENTRY_IDS.score, score);
-        params.append(FORM_ENTRY_IDS.total, filteredQuizData.length);
-        
-        fetch(GOOGLE_FORM_ACTION_URL, { 
-            method: 'POST', 
-            body: params, 
-            mode: 'no-cors' 
-        }).catch((e) => { console.error("Googleフォーム送信エラー:", e); });
-    }
 
     function showFinalResult() {
         hideAllScreens(); document.getElementById('result-screen').style.display = 'block';
@@ -923,12 +948,9 @@
             document.getElementById('battle-rival-score-val').innerText = ghostCurrentScore;
             banner.style.display = 'block';
             
-            // ⚔️ バトルポイント（Pt）計算ロジック
             const calculateBattlePoints = (log) => {
                 return log.reduce((total, q) => {
                     if (!q.isCorrect) return total;
-                    // 正解ベース点: 1000点
-                    // スピードボーナス: 5秒(5000ms)以内なら、早さに応じて最大500点上乗せ
                     const speedBonus = Math.max(0, Math.floor((5000 - q.timeMs) / 10));
                     return total + 1000 + speedBonus;
                 }, 0);
@@ -938,7 +960,6 @@
             const ghostPoints = calculateBattlePoints(activeGhostData.ghostLog);
 
             let isPlayerWin = playerPoints > ghostPoints;
-            // 万が一ポイントまで完全に同点なら、合計解答タイムが短い方の勝ち
             if (playerPoints === ghostPoints) {
                 const ghostTotalTime = activeGhostData.ghostLog.reduce((sum, item) => sum + item.timeMs, 0);
                 isPlayerWin = roundTotalTimeMs < ghostTotalTime;
@@ -992,10 +1013,10 @@
 
         if (typeof sendDataToTeacher === "function") { sendDataToTeacher(clearedCount, totalCount); }
         
-        // 🚀 各種データベースへ結果を自動送信
+        // 🚀 データの確実な外部送信処理を実行
         sendRateToSpreadsheet(selectedSubject, myRate); 
         sendFieldSummaryToSpreadsheet(); 
-        sendDataToGoogleForm(); // 👈 【新規追加】Googleドキュメント連携用フォームへの自動送信を実行
+        sendDataToGoogleForm();
     }
 
     function showDailySummary() {
@@ -1021,7 +1042,7 @@
     function backToSectionSelectFromSummary() { hideAllScreens(); if (selectedSubject === "english") { showEnglishSubScreen(); } else { renderSectionScreen(); document.getElementById('section-screen').style.display = 'block'; } }
     function toggleRateView(subView) {
         const mySec = document.getElementById('rate-my-section'); const rankSec = document.getElementById('rate-ranking-section'); const myBtn = document.getElementById('cmd-show-my-rate'); const rankBtn = document.getElementById('cmd-show-ranking');
-        if (subView === 'my') { mySec.style.display = 'block'; rankSec.style.display = 'none'; myBtn.style.backgroundColor = '#007bff'; rankBtn.style.backgroundColor = '#6c757d'; } else { mySec.style.display = 'none'; rankSec.style.display = 'block'; myBtn.style.backgroundColor = '#6c757d'; rnkBtn.style.backgroundColor = '#007bff'; }
+        if (subView === 'my') { mySec.style.display = 'block'; rankSec.style.display = 'none'; myBtn.style.backgroundColor = '#007bff'; rankBtn.style.backgroundColor = '#6c757d'; } else { mySec.style.display = 'none'; rankSec.style.display = 'block'; myBtn.style.backgroundColor = '#6c757d'; rankBtn.style.backgroundColor = '#007bff'; }
     }
     function tryFinishLearning() { hideAllScreens(); document.getElementById('confirm-screen').style.display = 'block'; }
     function cancelFinishLearning() { hideAllScreens(); if (selectedSubject === "english") { showEnglishSubScreen(); } else { renderSectionScreen(); document.getElementById('section-screen').style.display = 'block'; } }
@@ -1127,10 +1148,29 @@
     }
     function submitReport() {
         const subject = document.getElementById('report-subject').value; const section = document.getElementById('report-section').value; const content = document.getElementById('report-content').value.trim(); if (!content) { alert("報告内容を入力してください。"); return; }
-        const params = new URLSearchParams(); let subjectText = subject === "social" ? "社会" : (subject === "english" ? "英語" : "理科");
-        params.append(REPORT_FORM_ENTRY_IDS.studentInfo, `${studentId}_${studentName} (${studentGrade})`); params.append(REPORT_FORM_ENTRY_IDS.subject, subjectText); params.append(REPORT_FORM_ENTRY_IDS.section, section); params.append(REPORT_FORM_ENTRY_IDS.content, content);
+        
+        // 報告用フォーム送信も FormData 形式に安全化
+        const formData = new FormData();
+        let subjectText = subject === "social" ? "社会" : (subject === "english" ? "英語" : "理科");
+        formData.append(REPORT_FORM_ENTRY_IDS.studentInfo, `${studentId}_${studentName} (${studentGrade})`); 
+        formData.append(REPORT_FORM_ENTRY_IDS.subject, subjectText); 
+        formData.append(REPORT_FORM_ENTRY_IDS.section, section); 
+        formData.append(REPORT_FORM_ENTRY_IDS.content, content);
+        
         const submitBtn = document.querySelector("#report-issue-screen .nav-btn"); submitBtn.disabled = true; submitBtn.innerText = "送信中...";
-        fetch(REPORT_FORM_ACTION_URL, { method: 'POST', body: params, mode: 'no-cors' }).then(() => { alert("誤答・誤植の報告を送信しました。ご協力ありがとうございました！"); submitBtn.disabled = false; submitBtn.innerText = "報告を送信する"; backToMainMenu(); }).catch((e) => { console.error("送信エラー:", e); alert("送信に失敗しました。"); submitBtn.disabled = false; submitBtn.innerText = "報告を送信する"; });
+        fetch(REPORT_FORM_ACTION_URL, { 
+            method: 'POST', 
+            body: formData, 
+            mode: 'no-cors' 
+        }).then(() => { 
+            alert("誤答・誤植の報告を送信しました。ご協力ありがとうございました！"); 
+            submitBtn.disabled = false; submitBtn.innerText = "報告を送信する"; 
+            backToMainMenu(); 
+        }).catch((e) => { 
+            console.error("送信エラー:", e); 
+            alert("送信に失敗しました。"); 
+            submitBtn.disabled = false; submitBtn.innerText = "報告を送信する"; 
+        });
     }
 
     checkAutoLogin();
