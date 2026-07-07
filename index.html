@@ -277,7 +277,7 @@
                 <div>🔤 英語: <span id="daily-total-rate-eng">±0</span></div>
             </div>
         </div>
-        <p style="font-size: 0.9rem; color: #555; margin-bottom: 15px;">今日正解した問題の、分野総問題数に対する割合（ゲージ）です。</p>
+        <p style="font-size: 0.9rem; color: #555; margin-bottom: 15px;">今日正解した問題の、分野総問題数に対する割合（ゲージ） Certified です。</p>
         <div class="score-box" id="summary-list" style="max-height: 240px; overflow-y: auto; padding-right: 5px;"></div>
         <button class="btn nav-btn" style="background-color: #28a745; margin-top: 15px;" onclick="backToSectionSelectFromSummary()">テストを続ける</button>
         <button class="btn" style="background-color: #dc3545; color: white; font-weight: bold;" onclick="tryFinishLearning()">学習を終了する</button>
@@ -883,6 +883,25 @@
         fetch(GAS_WEB_APP_URL, { method: 'POST', body: params, mode: 'no-cors' }).catch(e => console.error("統計データ送信失敗:", e));
     }
 
+    // 💡 Googleフォーム（別シート・ドキュメント自動生成用）に結果を送信する関数
+    function sendDataToGoogleForm() {
+        if (!GOOGLE_FORM_ACTION_URL || GOOGLE_FORM_ACTION_URL.includes("ここに")) return;
+        const params = new URLSearchParams();
+        params.append(FORM_ENTRY_IDS.studentGrade, studentGrade);
+        params.append(FORM_ENTRY_IDS.studentName, studentName);
+        params.append(FORM_ENTRY_IDS.studentId, studentId);
+        params.append(FORM_ENTRY_IDS.subject, selectedSubject);
+        params.append(FORM_ENTRY_IDS.section, selectedSectionName);
+        params.append(FORM_ENTRY_IDS.score, score);
+        params.append(FORM_ENTRY_IDS.total, filteredQuizData.length);
+        
+        fetch(GOOGLE_FORM_ACTION_URL, { 
+            method: 'POST', 
+            body: params, 
+            mode: 'no-cors' 
+        }).catch((e) => { console.error("Googleフォーム送信エラー:", e); });
+    }
+
     function showFinalResult() {
         hideAllScreens(); document.getElementById('result-screen').style.display = 'block';
         const totalQ = filteredQuizData.length; const currentAccuracy = Math.round((score / totalQ) * 100);
@@ -972,8 +991,11 @@
         let totalCount = currentSectionAllQuestions.length; let clearedCount = currentSectionAllQuestions.filter(q => perfStats[q.question] && perfStats[q.question].status.includes('correct')).length;
 
         if (typeof sendDataToTeacher === "function") { sendDataToTeacher(clearedCount, totalCount); }
+        
+        // 🚀 各種データベースへ結果を自動送信
         sendRateToSpreadsheet(selectedSubject, myRate); 
         sendFieldSummaryToSpreadsheet(); 
+        sendDataToGoogleForm(); // 👈 【新規追加】Googleドキュメント連携用フォームへの自動送信を実行
     }
 
     function showDailySummary() {
@@ -999,7 +1021,7 @@
     function backToSectionSelectFromSummary() { hideAllScreens(); if (selectedSubject === "english") { showEnglishSubScreen(); } else { renderSectionScreen(); document.getElementById('section-screen').style.display = 'block'; } }
     function toggleRateView(subView) {
         const mySec = document.getElementById('rate-my-section'); const rankSec = document.getElementById('rate-ranking-section'); const myBtn = document.getElementById('cmd-show-my-rate'); const rankBtn = document.getElementById('cmd-show-ranking');
-        if (subView === 'my') { mySec.style.display = 'block'; rankSec.style.display = 'none'; myBtn.style.backgroundColor = '#007bff'; rankBtn.style.backgroundColor = '#6c757d'; } else { mySec.style.display = 'none'; rankSec.style.display = 'block'; myBtn.style.backgroundColor = '#6c757d'; rankBtn.style.backgroundColor = '#007bff'; }
+        if (subView === 'my') { mySec.style.display = 'block'; rankSec.style.display = 'none'; myBtn.style.backgroundColor = '#007bff'; rankBtn.style.backgroundColor = '#6c757d'; } else { mySec.style.display = 'none'; rankSec.style.display = 'block'; myBtn.style.backgroundColor = '#6c757d'; rnkBtn.style.backgroundColor = '#007bff'; }
     }
     function tryFinishLearning() { hideAllScreens(); document.getElementById('confirm-screen').style.display = 'block'; }
     function cancelFinishLearning() { hideAllScreens(); if (selectedSubject === "english") { showEnglishSubScreen(); } else { renderSectionScreen(); document.getElementById('section-screen').style.display = 'block'; } }
