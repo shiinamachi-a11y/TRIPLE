@@ -277,7 +277,7 @@
                 <div>🔤 英語: <span id="daily-total-rate-eng">±0</span></div>
             </div>
         </div>
-        <p style="font-size: 0.9rem; color: #555; margin-bottom: 15px;">今日正解した問題の、分野総問題数に対する割合（ゲージ） Certified です。</p>
+        <p style="font-size: 0.9rem; color: #555; margin-bottom: 15px;">今日正解した問題 of 分野総問題数に対する割合（ゲージ） Certified です。</p>
         <div class="score-box" id="summary-list" style="max-height: 240px; overflow-y: auto; padding-right: 5px;"></div>
         <button class="btn nav-btn" style="background-color: #28a745; margin-top: 15px;" onclick="backToSectionSelectFromSummary()">テストを続ける</button>
         <button class="btn" style="background-color: #dc3545; color: white; font-weight: bold;" onclick="tryFinishLearning()">学習を終了する</button>
@@ -355,7 +355,7 @@
             <div class="score-box" style="background-color: #f0fff4; border: 1px solid #c6f6d5; margin-bottom: 15px;">
                 <div style="font-weight: bold; color: #22543d; margin-bottom: 5px; font-size: 1rem;">🔥 3. コンボ（連続正解）ボーナス</div>
                 <div style="font-size: 0.9rem; color: #4a5568; line-height: 1.5; text-align: left;">
-                    ミスせずに連続で正解（コンボ）を繋げると、テスト終了時にボーナス加算！
+                    ミスせずに連続で正解（コンボ）を繋げるると、テスト終了時にボーナス加算！
                     <br>・5コンボ以上 ➡️ **コンボ数に応じたボーナス加算！**
                     <br>・30コンボ以上 ➡️ **最大コンボボーナス（+6）が炸裂！**
                 </div>
@@ -579,7 +579,7 @@
 
     function backToMainMenu() { hideAllScreens(); document.getElementById('main-menu-screen').style.display = 'block'; }
 
-    // --- 🛠️ 【超重要】GASが読める URLSearchParams (x-www-form-urlencoded) 形式へ修正完了 ---
+    // --- 🚀 【安定通信】GAS解析用の URLSearchParams (x-www-form-urlencoded) 処理群 ---
 
     function sendRateToSpreadsheet(subject, newRate) {
         if (!GAS_WEB_APP_URL || GAS_WEB_APP_URL.includes("ここに")) return;
