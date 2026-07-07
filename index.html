@@ -392,7 +392,7 @@
 </div>
 
 <script>
-    // 🔗 【更新済み】新しいウェブアプリのデプロイURLを埋め込み完了
+    // 🔗 最新のデプロイURLに固定
     const GAS_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbyCnbJcejfOojnn0Vd2SZTqbHO5pQixnTn2lZkvHQ73g5-MikuNuTUvcuMEjkMnTmFR4A/exec";
     const STUDENT_LIST_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQ6RAVBjmqZyuxiuKluc_EJfUpWlAyIt213A_YnTUTo-YHG2skF0ZyvbO11Qc1JLVNjwzVgR9vCo7_e/pub?gid=690286817&single=true&output=tsv";
 
@@ -579,20 +579,20 @@
 
     function backToMainMenu() { hideAllScreens(); document.getElementById('main-menu-screen').style.display = 'block'; }
 
-    // --- 🚀 【通信安全化】FormData 形式データ送信処理群 ---
+    // --- 🛠️ 【超重要】GASが読める URLSearchParams (x-www-form-urlencoded) 形式へ修正完了 ---
 
     function sendRateToSpreadsheet(subject, newRate) {
         if (!GAS_WEB_APP_URL || GAS_WEB_APP_URL.includes("ここに")) return;
         
-        const formData = new FormData();
-        formData.append("action", "update_rate"); 
-        formData.append("studentId", studentId);
-        formData.append("subject", subject);
-        formData.append("rate", newRate);
+        const params = new URLSearchParams();
+        params.append("action", "update_rate"); 
+        params.append("studentId", studentId);
+        params.append("subject", subject);
+        params.append("rate", newRate);
         
         fetch(GAS_WEB_APP_URL, { 
             method: 'POST', 
-            body: formData, 
+            body: params, 
             mode: 'no-cors' 
         }).catch((e) => { console.error("レート同期エラー:", e); });
     }
@@ -611,13 +611,13 @@
             ghostLog: currentPlayerRoundLogs 
         };
         
-        const formData = new FormData();
-        formData.append("action", "update_field_summary");
-        formData.append("data", JSON.stringify(payload));
+        const params = new URLSearchParams();
+        params.append("action", "update_field_summary");
+        params.append("data", JSON.stringify(payload));
         
         fetch(GAS_WEB_APP_URL, { 
             method: 'POST', 
-            body: formData, 
+            body: params, 
             mode: 'no-cors' 
         }).catch(e => console.error("統計データ送信失敗:", e));
     }
@@ -625,18 +625,18 @@
     function sendDataToGoogleForm() {
         if (!GOOGLE_FORM_ACTION_URL || GOOGLE_FORM_ACTION_URL.includes("ここに")) return;
         
-        const formData = new FormData();
-        formData.append(FORM_ENTRY_IDS.studentGrade, studentGrade);
-        formData.append(FORM_ENTRY_IDS.studentName, studentName);
-        formData.append(FORM_ENTRY_IDS.studentId, studentId);
-        formData.append(FORM_ENTRY_IDS.subject, selectedSubject);
-        formData.append(FORM_ENTRY_IDS.section, selectedSectionName);
-        formData.append(FORM_ENTRY_IDS.score, score);
-        formData.append(FORM_ENTRY_IDS.total, filteredQuizData.length);
+        const params = new URLSearchParams();
+        params.append(FORM_ENTRY_IDS.studentGrade, studentGrade);
+        params.append(FORM_ENTRY_IDS.studentName, studentName);
+        params.append(FORM_ENTRY_IDS.studentId, studentId);
+        params.append(FORM_ENTRY_IDS.subject, selectedSubject);
+        params.append(FORM_ENTRY_IDS.section, selectedSectionName);
+        params.append(FORM_ENTRY_IDS.score, score);
+        params.append(FORM_ENTRY_IDS.total, filteredQuizData.length);
         
         fetch(GOOGLE_FORM_ACTION_URL, { 
             method: 'POST', 
-            body: formData, 
+            body: params, 
             mode: 'no-cors' 
         }).catch((e) => { console.error("Googleフォーム送信エラー:", e); });
     }
@@ -1010,7 +1010,7 @@
 
         if (typeof sendDataToTeacher === "function") { sendDataToTeacher(clearedCount, totalCount); }
         
-        // 🚀 開通した新しい宛先URLへ、FormData形式でのデータ送信処理を実行
+        // 🚀 新しいURL・最適化形式で確実なデータ送信を実行
         sendRateToSpreadsheet(selectedSubject, myRate); 
         sendFieldSummaryToSpreadsheet(); 
         sendDataToGoogleForm();
@@ -1146,17 +1146,17 @@
     function submitReport() {
         const subject = document.getElementById('report-subject').value; const section = document.getElementById('report-section').value; const content = document.getElementById('report-content').value.trim(); if (!content) { alert("報告内容を入力してください。"); return; }
         
-        const formData = new FormData();
+        const params = new URLSearchParams();
         let subjectText = subject === "social" ? "社会" : (subject === "english" ? "英語" : "理科");
-        formData.append(REPORT_FORM_ENTRY_IDS.studentInfo, `${studentId}_${studentName} (${studentGrade})`); 
-        formData.append(REPORT_FORM_ENTRY_IDS.subject, subjectText); 
-        formData.append(REPORT_FORM_ENTRY_IDS.section, section); 
-        formData.append(REPORT_FORM_ENTRY_IDS.content, content);
+        params.append(REPORT_FORM_ENTRY_IDS.studentInfo, `${studentId}_${studentName} (${studentGrade})`); 
+        params.append(REPORT_FORM_ENTRY_IDS.subject, subjectText); 
+        params.append(REPORT_FORM_ENTRY_IDS.section, section); 
+        params.append(REPORT_FORM_ENTRY_IDS.content, content);
         
         const submitBtn = document.querySelector("#report-issue-screen .nav-btn"); submitBtn.disabled = true; submitBtn.innerText = "送信中...";
         fetch(REPORT_FORM_ACTION_URL, { 
             method: 'POST', 
-            body: formData, 
+            body: params, 
             mode: 'no-cors' 
         }).then(() => { 
             alert("誤答・誤植の報告を送信しました。ご協力ありがとうございました！"); 
