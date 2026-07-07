@@ -568,7 +568,7 @@
                     ⚔️ <b>対戦ルール（スピードボーナス制）</b><br>
                     ・勝利: レート <b>+20</b> / 敗北: レート <b>-20</b><br>
                     ・判定: 正解時の<b>スピードPt</b>が高い方の勝ち！<br>
-                    ・1問につきベース1000点。5秒以内に答えれば早さに応じて<b>最大500点のボーナス！</b><br>
+                    ・1問につきベース 1000点。5秒以内に答えれば早さに応じて<b>最大500点のボーナス！</b><br>
                     ・1日3回限定（残り可能数: <b>${remCount}回</b>）
                 </div>
             `;
@@ -579,7 +579,7 @@
 
     function backToMainMenu() { hideAllScreens(); document.getElementById('main-menu-screen').style.display = 'block'; }
 
-    // --- 🚀 【安定通信】GAS解析用の URLSearchParams (x-www-form-urlencoded) 処理群 ---
+    // --- 🛠️ 【超重要】GASが読める URLSearchParams (x-www-form-urlencoded) 形式へ修正完了 ---
 
     function sendRateToSpreadsheet(subject, newRate) {
         if (!GAS_WEB_APP_URL || GAS_WEB_APP_URL.includes("ここに")) return;
@@ -801,7 +801,7 @@
             let randomValue = Math.random() * totalWeight; let weightSum = 0;
             for (let j = 0; j < weightedPool.length; j++) {
                 weightSum += weightedPool[j].weight;
-                if (randomValue <= weightSum) { filteredQuizData.push(weightedPool.splice(j, 1)[0].questionData); break; }
+                if (randomValue <= weightSum) { filteredQuizData.push(weightedPool.splice(j, 1)[0].questionData Break; }
             }
         }
 
