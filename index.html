@@ -97,7 +97,7 @@
             <div>
                 <h2>メニューを選んでね</h2>
                 <button class="btn nav-btn" style="background-color: #007bff; margin-top: 15px; font-size: 1.15rem; font-weight: bold; padding: 14px;" onclick="setMode('test')">📝 テストをする</button>
-                <button class="btn nav-btn" style="background-color: #6b46c1; margin-top: 12px; font-size: 1.15rem; font-weight: bold; padding: 14px;" onclick="setMode('battle')">⚔️ 対戦</button>
+                <button class="btn nav-btn" style="background-color: #6b46c1; margin-top: 12px; font-size: 1.15rem; font-weight: bold; padding: 14px;" onclick="setMode('battle')">⚔️ 对战</button>
                 <button class="btn nav-btn" style="background-color: #ed8936; margin-top: 12px; font-size: 1.15rem; font-weight: bold; padding: 14px;" onclick="setMode('report')">📊 成績をみる</button>
                 <button class="btn nav-btn" style="background-color: #eab308; margin-top: 12px; font-size: 1.15rem; font-weight: bold; padding: 14px; color: #212529;" onclick="showRateScreen()">🏆 レートをみる</button>
                 <button class="btn nav-btn" style="background-color: #dc3545; margin-top: 12px; font-size: 1.15rem; font-weight: bold; padding: 14px;" onclick="showReportIssueScreen()">⚠️ 誤答・誤植を報告する</button>
@@ -214,7 +214,7 @@
                 <div class="progress-bar-bg" style="height: 6px; margin-top:3px;"><div id="player-live-fill" class="progress-bar-fill" style="width:0%; background-color:#007bff;"></div></div>
             </div>
             <div class="vs-bar-container" style="background-color: #fff5f5; border-color: #fed7d7;">
-                <div>🤖 対戦相手: <span id="rival-live-txt" style="font-weight:bold;">0 / 10問</span> (正解: <span id="rival-live-score">0</span>)</div>
+                <div>🤖 对战对手: <span id="rival-live-txt" style="font-weight:bold;">0 / 10問</span> (正解: <span id="rival-live-score">0</span>)</div>
                 <div class="progress-bar-bg" style="height: 6px; margin-top:3px;"><div id="rival-live-fill" class="progress-bar-fill" style="width:0%; background-color:#e53e3e;"></div></div>
             </div>
         </div>
@@ -382,7 +382,7 @@
             <label style="font-weight: bold; color: #4a5568; font-size: 0.95rem; margin-top: 10px; display: block;">2. 分野を選択</label>
             <select id="report-section" class="input-style"></select>
             <label style="font-weight: bold; color: #4a5568; font-size: 0.95rem; margin-top: 10px; display: block;">3. 報告内容</label>
-            <select id="report-content" class="input-style" style="height: 120px; text-align: left; resize: none; font-size: 0.95rem; padding: 10px;" placeholder="間違っている問題の内容や、正しいと思われる解答を詳しく書いてください。"></select>
+            <textarea id="report-content" class="input-style" style="height: 120px; text-align: left; resize: none; font-size: 0.95rem; padding: 10px;" placeholder="間違っている問題の内容や、正しいと思われる解答を詳しく書いてください。"></textarea>
         </div>
         <button class="btn nav-btn" style="background-color: #dc3545; margin-top: 15px; font-weight: bold;" onclick="submitReport()">報告を送信する</button>
         <button class="btn back-btn" onclick="backToMainMenu()">キャンセル</button>
