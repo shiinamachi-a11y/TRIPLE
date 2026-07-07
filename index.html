@@ -27,7 +27,7 @@
         .back-btn { background-color: #6c757d; text-align: center; margin-top: 20px; }
         .back-btn:hover { background-color: #5a6268; }
         .result { font-size: 1.4rem; font-weight: bold; margin-top: 20px; min-height: 30px; }
-        h2 { margin-top: 0; color: #333; }
+        .quiz-container h2 { margin-top: 0; color: #333; }
         .loading { font-size: 1.2rem; color: #666; }
         .progress-text { font-size: 0.9rem; color: #666; margin-bottom: 10px; text-align: right; font-weight: bold; }
         .score-box { background-color: #e9ecef; padding: 15px; border-radius: 8px; margin: 20px 0; text-align: left; }
@@ -77,7 +77,7 @@
 </head>
 <body>
 
-<div id="correct-overlay" class="correct-overlay">〇</div>
+<div id="correct-overlay" class="correct-overlay">⭕</div>
 
 <div class="quiz-container">
     
@@ -97,7 +97,7 @@
             <div>
                 <h2>メニューを選んでね</h2>
                 <button class="btn nav-btn" style="background-color: #007bff; margin-top: 15px; font-size: 1.15rem; font-weight: bold; padding: 14px;" onclick="setMode('test')">📝 テストをする</button>
-                <button class="btn nav-btn" style="background-color: #6b46c1; margin-top: 12px; font-size: 1.15rem; font-weight: bold; padding: 14px;" onclick="setMode('battle')">⚔️ 対戦</button>
+                <button class="btn nav-btn" style="background-color: #6b46c1; margin-top: 12px; font-size: 1.15rem; font-weight: bold; padding: 14px;" onclick="setMode('battle')">⚔️ 对戦</button>
                 <button class="btn nav-btn" style="background-color: #ed8936; margin-top: 12px; font-size: 1.15rem; font-weight: bold; padding: 14px;" onclick="setMode('report')">📊 成績をみる</button>
                 <button class="btn nav-btn" style="background-color: #eab308; margin-top: 12px; font-size: 1.15rem; font-weight: bold; padding: 14px; color: #212529;" onclick="showRateScreen()">🏆 レートをみる</button>
                 <button class="btn nav-btn" style="background-color: #dc3545; margin-top: 12px; font-size: 1.15rem; font-weight: bold; padding: 14px;" onclick="showReportIssueScreen()">⚠️ 誤答・誤植を報告する</button>
@@ -234,7 +234,7 @@
     </div>
 
     <div id="result-screen" class="screen" style="display: none;">
-        <div id="battle-result-banner" style="display: none; font-size: 2.2rem; font-weight: bold; margin-top: 40px; text-shadow: 0 2px 4px rgba(0,0,0,0.1);">WIN 👑</div>
+        <div id="battle-result-banner" style="display: none; font-size: 1.8rem; font-weight: bold; margin-top: 30px; text-shadow: 0 2px 4px rgba(0,0,0,0.1); line-height: 1.3;">WIN 👑</div>
         
         <h2 id="result-screen-title" style="margin-top: 15px;">結果発表 🎉</h2>
         <div class="student-badge">👤 <span id="user-badge-2"></span></div>
@@ -392,6 +392,7 @@
 </div>
 
 <script>
+    // 🔗 【更新済み】新しいウェブアプリのデプロイURL
     const GAS_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxayU7KsoYD71Yfn47gNL0CoPMEOP4sHVG7wwyS4gFBzxBCiAQIxaRTsa4inFkR6OruBw/exec";
     const STUDENT_LIST_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQ6RAVBjmqZyuxiuKluc_EJfUpWlAyIt213A_YnTUTo-YHG2skF0ZyvbO11Qc1JLVNjwzVgR9vCo7_e/pub?gid=690286817&single=true&output=tsv";
 
@@ -410,7 +411,7 @@
     const GOOGLE_FORM_ACTION_URL = "https://docs.google.com/forms/d/e/1FAIpQLSeUlfCjG2sm3AnzYUm2E4m5K-ppJQ1Af9yTULfWj0kz93WQYQ/formResponse"; 
     const FORM_ENTRY_IDS = {
         studentGrade: "entry.778118025", studentName: "entry.1910034637", studentId: "entry.1113201872",   
-        subject: "entry.1144846119", section: "entry.765540622", score: "entry.503101077", total: "entry.203688342"         
+        subject: "entry.1144846119", section: "entry.765540622", score: "entry.503101077", total: "entry.203688342"          
     };
 
     const REPORT_FORM_ACTION_URL = "https://docs.google.com/forms/d/e/1FAIpQLScnEZk3HjZ9H3uVZw50UcNQgnBcW75QI1lZa0XkZ95cgiq_5A/formResponse";
@@ -564,9 +565,10 @@
             const remCount = getBattleRemainingCount();
             ruleBox.innerHTML = `
                 <div class="section-screen-desc" style="background: #faf5ff; border-left-color: #6b46c1; color: #44337a; margin-bottom: 15px;">
-                    ⚔️ <b>対戦ルール</b><br>
-                    ・勝利: レート <b>+20</b> / 敗気: レート <b>-20</b> (引き分けなし)<br>
-                    ・同点の場合: <b>合計解答秒数が短い方の勝ち！</b><br>
+                    ⚔️ <b>対戦ルール（スピードボーナス制）</b><br>
+                    ・勝利: レート <b>+20</b> / 敗北: レート <b>-20</b><br>
+                    ・判定: 正解時の<b>スピードPt</b>が高い方の勝ち！<br>
+                    ・1問につきベース1000点。5秒以内に答えれば早さに応じて<b>最大500点のボーナス！</b><br>
                     ・1日3回限定（残り可能数: <b>${remCount}回</b>）
                 </div>
             `;
@@ -686,20 +688,16 @@
         }, 150);
     }
 
-    // 💡 【本番通信切り替え】スプシ（GAS）から条件に合うリアルゴーストデータを引っこ抜く
     function fetchGhostAndReveal(myRate) {
         document.getElementById('matching-status-area').style.display = 'none';
-
-        // 新しいGASエンドポイントを呼び出し
         const url = `${GAS_WEB_APP_URL}?action=get_battle_ghost&studentId=${studentId}&myRate=${myRate}&subject=${selectedSubject}&section=${encodeURIComponent(selectedSectionName)}`;
         
         fetch(url)
         .then(res => res.json())
         .then(data => {
             if (data && data.ghostLog && data.ghostLog.length > 0) {
-                activeGhostData = data; // スプシから届いた匿名ラップデータをアサイン
+                activeGhostData = data; 
             } else {
-                // 万が一の通信エラー用フォールバック
                 activeGhostData = {
                     id: "9999",
                     name: "対戦相手",
@@ -707,7 +705,6 @@
                     ghostLog: Array.from({length:10}, () => ({isCorrect: Math.random() > 0.4, timeMs: Math.round(3500 + (Math.random() * 2000 - 1000))}))
                 };
             }
-            // 表示画面をアンロック
             document.getElementById('rival-profile-rate').innerText = activeGhostData.rate;
             document.getElementById('matched-rival-card').style.display = 'block';
         })
@@ -907,26 +904,34 @@
             document.getElementById('battle-rival-score-val').innerText = ghostCurrentScore;
             banner.style.display = 'block';
             
-            let isPlayerWin = false;
-            
-            if (score > ghostCurrentScore) {
-                isPlayerWin = true;
-            } else if (score < ghostCurrentScore) {
-                isPlayerWin = false;
-            } else {
+            // ⚔️ バトルポイント（Pt）計算ロジック
+            const calculateBattlePoints = (log) => {
+                return log.reduce((total, q) => {
+                    if (!q.isCorrect) return total;
+                    // 正解ベース点: 1000点
+                    // スピードボーナス: 5秒(5000ms)以内なら、早さに応じて最大500点上乗せ
+                    const speedBonus = Math.max(0, Math.floor((5000 - q.timeMs) / 10));
+                    return total + 1000 + speedBonus;
+                }, 0);
+            };
+
+            const playerPoints = calculateBattlePoints(currentPlayerRoundLogs);
+            const ghostPoints = calculateBattlePoints(activeGhostData.ghostLog);
+
+            let isPlayerWin = playerPoints > ghostPoints;
+            // 万が一ポイントまで完全に同点なら、合計解答タイムが短い方の勝ち
+            if (playerPoints === ghostPoints) {
                 const ghostTotalTime = activeGhostData.ghostLog.reduce((sum, item) => sum + item.timeMs, 0);
-                if (roundTotalTimeMs < ghostTotalTime) {
-                    isPlayerWin = true; 
-                } else {
-                    isPlayerWin = false; 
-                }
+                isPlayerWin = roundTotalTimeMs < ghostTotalTime;
             }
 
             if (isPlayerWin) {
-                banner.innerText = "👑 キミの勝ち！ 👑"; banner.style.color = "#28a745";
+                banner.innerHTML = `👑 キミの勝ち！ 👑<br><span style="font-size:1.1rem; font-weight:normal; color:#4a5568;">キミ: ${playerPoints} Pt vs 相手: ${ghostPoints} Pt</span>`; 
+                banner.style.color = "#28a745";
                 totalRateChange = 20; 
             } else {
-                banner.innerText = "☠️ キミの負け... ☠️"; banner.style.color = "#dc3545";
+                banner.innerHTML = `☠️ キミの負け... ☠️<br><span style="font-size:1.1rem; font-weight:normal; color:#4a5568;">キミ: ${playerPoints} Pt vs 相手: ${ghostPoints} Pt</span>`; 
+                banner.style.color = "#dc3545";
                 totalRateChange = -20; 
             }
 
@@ -954,7 +959,7 @@
         const breakdownBox = document.getElementById('bonus-breakdown-box');
         if (currentMode !== "battle" && (comboBonus > 0 || fieldBonus > 0)) {
             breakdownBox.style.display = 'block';
-            document.getElementById('combo-bonus-line').innerHTML = comboBonus > 0 ? `<span class="bonus-tag bg-combo">🔥 CONBO</span> ${currentCombo}連鎖ボーナス: <b>+${comboBonus}</b>` : '';
+            document.getElementById('combo-bonus-line').innerHTML = comboBonus > 0 ? `<span class="bonus-tag bg-combo">🔥 COMBO</span> ${currentCombo}連鎖ボーナス: <b>+${comboBonus}</b>` : '';
             document.getElementById('field-bonus-line').innerHTML = fieldBonus > 0 ? `<span class="bonus-tag bg-field">✨ FIELD</span> 複数分野ボーナス (${uniqueSectionsCount}分野目): <b>+${fieldBonus}</b>` : '';
         } else { breakdownBox.style.display = 'none'; }
 
@@ -966,7 +971,7 @@
         const perfStats = JSON.parse(localStorage.getItem(`quiz_perf_stats_` + studentKey) || '{}');
         let totalCount = currentSectionAllQuestions.length; let clearedCount = currentSectionAllQuestions.filter(q => perfStats[q.question] && perfStats[q.question].status.includes('correct')).length;
 
-        sendDataToTeacher(clearedCount, totalCount);
+        if (typeof sendDataToTeacher === "function") { sendDataToTeacher(clearedCount, totalCount); }
         sendRateToSpreadsheet(selectedSubject, myRate); 
         sendFieldSummaryToSpreadsheet(); 
     }
@@ -994,7 +999,7 @@
     function backToSectionSelectFromSummary() { hideAllScreens(); if (selectedSubject === "english") { showEnglishSubScreen(); } else { renderSectionScreen(); document.getElementById('section-screen').style.display = 'block'; } }
     function toggleRateView(subView) {
         const mySec = document.getElementById('rate-my-section'); const rankSec = document.getElementById('rate-ranking-section'); const myBtn = document.getElementById('cmd-show-my-rate'); const rankBtn = document.getElementById('cmd-show-ranking');
-        if (subView === 'my') { mySec.style.display = 'block'; rankSec.style.display = 'none'; myBtn.style.backgroundColor = '#007bff'; rankBtn.style.backgroundColor = '#6c757d'; } else { mySec.style.display = 'none'; rankSec.style.display = 'block'; myBtn.style.backgroundColor = '#6c757d'; myBtn.style.backgroundColor = '#007bff'; }
+        if (subView === 'my') { mySec.style.display = 'block'; rankSec.style.display = 'none'; myBtn.style.backgroundColor = '#007bff'; rankBtn.style.backgroundColor = '#6c757d'; } else { mySec.style.display = 'none'; rankSec.style.display = 'block'; myBtn.style.backgroundColor = '#6c757d'; rankBtn.style.backgroundColor = '#007bff'; }
     }
     function tryFinishLearning() { hideAllScreens(); document.getElementById('confirm-screen').style.display = 'block'; }
     function cancelFinishLearning() { hideAllScreens(); if (selectedSubject === "english") { showEnglishSubScreen(); } else { renderSectionScreen(); document.getElementById('section-screen').style.display = 'block'; } }
