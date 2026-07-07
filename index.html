@@ -97,7 +97,7 @@
             <div>
                 <h2>メニューを選んでね</h2>
                 <button class="btn nav-btn" style="background-color: #007bff; margin-top: 15px; font-size: 1.15rem; font-weight: bold; padding: 14px;" onclick="setMode('test')">📝 テストをする</button>
-                <button class="btn nav-btn" style="background-color: #6b46c1; margin-top: 12px; font-size: 1.15rem; font-weight: bold; padding: 14px;" onclick="setMode('battle')">⚔️ 对戦</button>
+                <button class="btn nav-btn" style="background-color: #6b46c1; margin-top: 12px; font-size: 1.15rem; font-weight: bold; padding: 14px;" onclick="setMode('battle')">⚔️ 対戦</button>
                 <button class="btn nav-btn" style="background-color: #ed8936; margin-top: 12px; font-size: 1.15rem; font-weight: bold; padding: 14px;" onclick="setMode('report')">📊 成績をみる</button>
                 <button class="btn nav-btn" style="background-color: #eab308; margin-top: 12px; font-size: 1.15rem; font-weight: bold; padding: 14px; color: #212529;" onclick="showRateScreen()">🏆 レートをみる</button>
                 <button class="btn nav-btn" style="background-color: #dc3545; margin-top: 12px; font-size: 1.15rem; font-weight: bold; padding: 14px;" onclick="showReportIssueScreen()">⚠️ 誤答・誤植を報告する</button>
@@ -299,8 +299,7 @@
     </div>
 
     <div id="wrong-details-screen" class="screen" style="display: none;">
-        <h2>間違えた問題一覧</h2>
-        <div id="wrong-details-list" class="review-container" style="max-height: 360px;"></div>
+        <h2 id="wrong-details-title">間違えた問題一覧</h2> <div id="wrong-details-list" class="review-container" style="max-height: 360px;"></div>
         <button class="btn back-btn" onclick="backFromWrongDetails()">戻る</button>
     </div>
 
@@ -363,7 +362,7 @@
             <div class="score-box" style="background-color: #edf2f7; border: 1px solid #e2e8f0; margin-bottom: 15px;">
                 <div style="font-weight: bold; color: #4a5568; margin-bottom: 5px; font-size: 1rem;">✨ 4. 複数フィールド（分野）ボーナス</div>
                 <div style="font-size: 0.9rem; color: #4a5568; line-height: 1.5; text-align: left;">
-                    同じ分野ばかりでなく、1日のうちに色々な分野의テストに挑戦すると、新しい分野を開くたびに**最大+5まで**の「複数分野ボーナス」がリザルトに毎回上乗せされます！
+                    同じ分野ばかりでなく、1日のうちに色々な分野のテストに挑戦すると、新しい分野を開くたびに**最大+5まで**の「複数分野ボーナス」がリザルトに毎回上乗せされます！
                 </div>
             </div>
         </div>
@@ -383,7 +382,7 @@
             <label style="font-weight: bold; color: #4a5568; font-size: 0.95rem; margin-top: 10px; display: block;">2. 分野を選択</label>
             <select id="report-section" class="input-style"></select>
             <label style="font-weight: bold; color: #4a5568; font-size: 0.95rem; margin-top: 10px; display: block;">3. 報告内容</label>
-            <textarea id="report-content" class="input-style" style="height: 120px; text-align: left; resize: none; font-size: 0.95rem; padding: 10px;" placeholder="間違っている問題の内容や、正しいと思われる解答を詳しく書いてください。"></textarea>
+            <select id="report-content" class="input-style" style="height: 120px; text-align: left; resize: none; font-size: 0.95rem; padding: 10px;" placeholder="間違っている問題の内容や、正しいと思われる解答を詳しく書いてください。"></select>
         </div>
         <button class="btn nav-btn" style="background-color: #dc3545; margin-top: 15px; font-weight: bold;" onclick="submitReport()">報告を送信する</button>
         <button class="btn back-btn" onclick="backToMainMenu()">キャンセル</button>
@@ -433,7 +432,7 @@
     let questionStartTime = 0;
     let roundTotalTimeMs = 0;
 
-    // 対戦用管理変数
+    // 对战用管理变量
     let activeGhostData = null;  
     let ghostTimerInterval = null;
     let ghostCurrentQuestion = 0;
@@ -579,8 +578,6 @@
 
     function backToMainMenu() { hideAllScreens(); document.getElementById('main-menu-screen').style.display = 'block'; }
 
-    // --- 🛠️ 【超重要】GASが読める URLSearchParams (x-www-form-urlencoded) 形式へ修正完了 ---
-
     function sendRateToSpreadsheet(subject, newRate) {
         if (!GAS_WEB_APP_URL || GAS_WEB_APP_URL.includes("ここに")) return;
         
@@ -640,8 +637,6 @@
             mode: 'no-cors' 
         }).catch((e) => { console.error("Googleフォーム送信エラー:", e); });
     }
-
-    // --- 🌿 ゲーム進行・制御ロジック群 ---
 
     function selectSubject(subject) { 
         selectedSubject = subject; 
@@ -801,7 +796,8 @@
             let randomValue = Math.random() * totalWeight; let weightSum = 0;
             for (let j = 0; j < weightedPool.length; j++) {
                 weightSum += weightedPool[j].weight;
-                if (randomValue <= weightSum) { filteredQuizData.push(weightedPool.splice(j, 1)[0].questionData Break; }
+                // 【修正箇所】タイポ「Break;」を「break;」に直し、pushの閉じカッコ「)」を追加
+                if (randomValue <= weightSum) { filteredQuizData.push(weightedPool.splice(j, 1)[0].questionData); break; }
             }
         }
 
