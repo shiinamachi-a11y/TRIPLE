@@ -409,6 +409,7 @@
 
     const STUDENT_LIST_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQ6RAVBjmqZyuxiuKluc_EJfUpWlAyIt213A_YnTUTo-YHG2skF0ZyvbO11Qc1JLVNjwzVgR9vCo7_e/pub?gid=690286817&single=true&output=tsv";
 
+    // 💡 修正箇所：一本化した統合スプシの2重読み込みを防ぐため「_1」のみに集約
     const SPREADSHEET_URLS = {
         "science_1": "https://docs.google.com/spreadsheets/d/e/2PACX-1vQ6RAVBjmqZyuxiuKluc_EJfUpWlAyIt213A_YnTUTo-YHG2skF0ZyvbO11Qc1JLVNjwzVgR9vCo7_e/pub?gid=874795216&single=true&output=tsv",
         "science_2": "https://docs.google.com/spreadsheets/d/e/2PACX-1vQ6RAVBjmqZyuxiuKluc_EJfUpWlAyIt213A_YnTUTo-YHG2skF0ZyvbO11Qc1JLVNjwzVgR9vCo7_e/pub?gid=1432685944&single=true&output=tsv",
@@ -421,10 +422,10 @@
         "english_grammar_1": "https://docs.google.com/spreadsheets/d/e/2PACX-1vQ6RAVBjmqZyuxiuKluc_EJfUpWlAyIt213A_YnTUTo-YHG2skF0ZyvbO11Qc1JLVNjwzVgR9vCo7_e/pub?gid=228416641&single=true&output=tsv",
         
         "english_word_2": "https://docs.google.com/spreadsheets/d/e/2PACX-1vQ6RAVBjmqZyuxiuKluc_EJfUpWlAyIt213A_YnTUTo-YHG2skF0ZyvbO11Qc1JLVNjwzVgR9vCo7_e/pub?gid=1929383758&single=true&output=tsv",
-        "english_grammar_2": "https://docs.google.com/spreadsheets/d/e/2PACX-1vQ6RAVBjmqZyuxiuKluc_EJfUpWlAyIt213A_YnTUTo-YHG2skF0ZyvbO11Qc1JLVNjwzVgR9vCo7_e/pub?gid=228416641&single=true&output=tsv",
+        "english_grammar_2": "",
         
         "english_word_3": "https://docs.google.com/spreadsheets/d/e/2PACX-1vQ6RAVBjmqZyuxiuKluc_EJfUpWlAyIt213A_YnTUTo-YHG2skF0ZyvbO11Qc1JLVNjwzVgR9vCo7_e/pub?gid=1929383758&single=true&output=tsv",
-        "english_grammar_3": "https://docs.google.com/spreadsheets/d/e/2PACX-1vQ6RAVBjmqZyuxiuKluc_EJfUpWlAyIt213A_YnTUTo-YHG2skF0ZyvbO11Qc1JLVNjwzVgR9vCo7_e/pub?gid=228416641&single=true&output=tsv"
+        "english_grammar_3": ""
     };
 
     const GOOGLE_FORM_ACTION_URL = "https://docs.google.com/forms/d/e/1FAIpQLSeUlfCjG2sm3AnzYUm2E4m5K-ppJQ1Af9yTULfWj0kz93WQYQ/formResponse"; 
@@ -585,7 +586,7 @@
         
         try {
             const keys = Object.keys(SPREADSHEET_URLS);
-            const quizPromises = keys.map(key => fetch(SPREADSHEET_URLS[key]).then(res => res.text()));
+            const quizPromises = keys.map(key => SPREADSHEET_URLS[key] ? fetch(SPREADSHEET_URLS[key]).then(res => res.text()) : Promise.resolve(""));
             const studentPromise = fetch(STUDENT_LIST_URL).then(res => res.text());
             
             const [studentText, ...quizTexts] = await Promise.all([studentPromise, ...quizPromises]);
@@ -609,6 +610,7 @@
 
             keys.forEach((key, index) => {
                 const text = quizTexts[index];
+                if (!text) return;
                 const lines = text.split("\n");
                 allQuizData[key] = [];
                 
@@ -636,7 +638,8 @@
                         qText = cols[2].trim();
                         qChoices = [cols[3].trim(), cols[4].trim(), cols[5].trim(), cols[6].trim()];
                         qCorrect = parseInt(cols[7].trim()) - 1;
-                        qSection = key.startsWith("english_grammar") ? "空欄補充" : (cols[8] ? cols[8].trim() : "その他");
+                        // 💡 修正箇所：英語空欄補充（統合スプシ）でもI列（cols[8]）にSTAGE名の記載があれば最優先で取得する
+                        qSection = (cols[8] && cols[8].trim()) ? cols[8].trim() : (key.startsWith("english_grammar") ? "空欄補充" : "その他");
                     } else {
                         if (cols.length < 6) continue;
                         qText = cols[0].trim();
@@ -668,7 +671,6 @@
         document.getElementById('user-badge-4').innerText = badgeText;
         document.getElementById('user-badge-5').innerText = badgeText;
 
-        // 🔥【追加】アプリ再起動・リロード時に、今日の成果データをストレージから安全に復元する
         const savedSummary = localStorage.getItem(`quiz_daily_summary_${studentKey}`);
         if (savedSummary) {
             dailySummaryData = JSON.parse(savedSummary);
@@ -684,7 +686,7 @@
         localStorage.removeItem('quiz_saved_name'); 
         localStorage.removeItem('quiz_saved_grade');
         localStorage.removeItem('quiz_saved_campus'); 
-        localStorage.removeItem(`quiz_daily_summary_${studentKey}`); // ログアウト時も今日のデータをクリア
+        localStorage.removeItem(`quiz_daily_summary_${studentKey}`);
         currentCombo = 0; maxCombo = 0; dailySummaryData = {};
         dailyRateChangeScience = 0; dailyRateChangeSocial = 0; dailyRateChangeEnglish = 0;
         document.getElementById('student-id-input').value = "";
@@ -741,7 +743,8 @@
         hideAllScreens();
         quizData = [];
         
-        ["1", "2", "3"].forEach(grade => {
+        // 💡 修正箇所：統合スプシを考慮し、1〜5のすべてのSTAGEデータをループ処理できるように拡張
+        ["1", "2", "3", "4", "5"].forEach(grade => {
             const wordSource = allQuizData[`english_word_${grade}`] || [];
             const grammarSource = allQuizData[`english_grammar_${grade}`] || [];
             
@@ -803,10 +806,8 @@
 
     function backToSectionSelect() {
         if (selectedSectionName) {
-            // 直前に解いていた分野（または全範囲）のまま、即座にクイズを再開
             startQuizWithSection(selectedSectionName);
         } else {
-            // 万が一データが空の場合はメインメニューに戻す安全策
             backToMainMenu();
         }
     }
@@ -907,23 +908,19 @@
         
         filteredQuizData.forEach(quiz => {
             if (quiz.type === "en_to_ja" || quiz.type === "ja_to_en") { 
-                // 💡【難易度UP修正】正解または問題の「英単語の頭文字」を基準にする
                 const targetWord = (quiz.type === "ja_to_en") ? quiz.correctText : quiz.question;
                 const targetChar = targetWord.trim()[0].toLowerCase();
 
-                // 同じ頭文字を持つ単語のデータだけをフィルターしてダミー候補にする
                 let sameInitialTexts = currentSectionAllQuestions
                     .filter(q => {
                         const word = (q.type === "ja_to_en") ? q.correctText : q.question;
                         return word.trim()[0].toLowerCase() === targetChar;
                     })
                     .map(q => q.correctText)
-                    .filter(txt => txt !== quiz.correctText); // 正解と同じテキストは除く
+                    .filter(txt => txt !== quiz.correctText);
                 
-                // 重複を排除したダミープールを作成
                 let dummyPool = Array.from(new Set(sameInitialTexts));
                 
-                // ダミープールをシャッフル
                 for (let i = dummyPool.length - 1; i > 0; i--) { 
                     const j = Math.floor(Math.random() * (i + 1)); 
                     [dummyPool[i], dummyPool[j]] = [dummyPool[j], dummyPool[i]]; 
@@ -931,7 +928,6 @@
                 
                 let dummies = dummyPool.slice(0, 3);
                 
-                // ⚠️【セーフティ】同じ頭文字の単語が少なくてダミーが3つ集まらない場合は、他の単語から補充する
                 if (dummies.length < 3) {
                     let allPool = currentSectionAllQuestions.map(q => q.correctText);
                     let backupPool = Array.from(new Set(allPool)).filter(txt => txt !== quiz.correctText && !dummies.includes(txt));
@@ -944,7 +940,6 @@
                     }
                 }
                 
-                // それでも万が一足りない場合のハイフン埋め
                 while(dummies.length < 3) { dummies.push("---"); }
                 
                 let choices = [quiz.correctText, ...dummies];
@@ -953,7 +948,6 @@
                 quiz.choices = choices;
                 quiz.correct = choices.indexOf(quiz.correctText);
             } else {
-                // 理科・社会（通常ルール）の選択肢シャッフル処理
                 const correctText = quiz.choices[quiz.correct];
                 for (let i = quiz.choices.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [quiz.choices[i], quiz.choices[j]] = [quiz.choices[j], quiz.choices[i]]; }
                 quiz.correct = quiz.choices.indexOf(correctText);
@@ -1041,7 +1035,6 @@
             localStorage.setItem(`quiz_wrong_counts_${studentKey}`, JSON.stringify(wrongCounts));
         }
         
-        // 🔥1問回答するごとに、成果データをローカルストレージへリアルタイムで退避保存
         localStorage.setItem(`quiz_daily_summary_${studentKey}`, JSON.stringify(dailySummaryData));
         
         document.getElementById('next-btn').style.display = 'block';
@@ -1156,7 +1149,6 @@
         sendRateToSpreadsheet(selectedSubject, myRate); 
     }
 
-    // 以下の既存関数やイベントリスナー群はそのまま引き継ぎ
     function showDailySummary() {
         hideAllScreens();
         const sciSign = dailyRateChangeScience >= 0 ? `+${dailyRateChangeScience}` : `${dailyRateChangeScience}`;
@@ -1209,7 +1201,7 @@
         const mySec = document.getElementById('rate-my-section'); const rankSec = document.getElementById('rate-ranking-section');
         const myBtn = document.getElementById('cmd-show-my-rate'); const rankBtn = document.getElementById('cmd-show-ranking');
         if (subView === 'my') { mySec.style.display = 'block'; rankSec.style.display = 'none'; myBtn.style.backgroundColor = '#007bff'; rankBtn.style.backgroundColor = '#6c757d'; }
-        else { mySec.style.display = 'none'; rankSec.style.display = 'block'; myBtn.style.backgroundColor = '#6c757d'; myBtn.style.backgroundColor = '#6c757d'; rankBtn.style.backgroundColor = '#007bff'; }
+        else { mySec.style.display = 'none'; rankSec.style.display = 'block'; myBtn.style.backgroundColor = '#6c757d'; rankBtn.style.backgroundColor = '#007bff'; }
     }
     function tryFinishLearning() { hideAllScreens(); document.getElementById('confirm-screen').style.display = 'block'; }
     function cancelFinishLearning() { hideAllScreens(); if (selectedSubject === "english") { showEnglishSubScreen(); } else { renderSectionScreen(); document.getElementById('section-screen').style.display = 'block'; } }
@@ -1247,7 +1239,7 @@
         ];
         categories.forEach(cat => {
             let data = [];
-            if (cat.type === "english") { ["1", "2", "3"].forEach(g => { const wordData = allQuizData[`english_word_${g}`] || []; const grammarData = allQuizData[`english_grammar_${g}`] || []; data = [...data, ...wordData, ...grammarData]; }); }
+            if (cat.type === "english") { ["1", "2", "3", "4", "5"].forEach(g => { const wordData = allQuizData[`english_word_${g}`] || []; const grammarData = allQuizData[`english_grammar_${g}`] || []; data = [...data, ...wordData, ...grammarData]; }); }
             else { data = allQuizData[cat.key] || []; }
             if (data.length === 0) return;
             const header = document.createElement('div'); header.className = "report-cat-title"; header.innerText = cat.label; container.appendChild(header);
@@ -1272,7 +1264,7 @@
         const container = document.getElementById('wrong-details-list'); container.innerHTML = "";
         const wrongCounts = JSON.parse(localStorage.getItem(`quiz_wrong_counts_${studentKey}`) || '{}');
         let data = [];
-        if (isEnglish) { ["1", "2", "3"].forEach(g => { const wordData = allQuizData[`english_word_${g}`] || []; const grammarData = allQuizData[`english_grammar_${g}`] || []; data = [...data, ...wordData, ...grammarData]; }); }
+        if (isEnglish) { ["1", "2", "3", "4", "5"].forEach(g => { const wordData = allQuizData[`english_word_${g}`] || []; const grammarData = allQuizData[`english_grammar_${g}`] || []; data = [...data, ...wordData, ...grammarData]; }); }
         else { data = allQuizData[apiKey] || []; }
         const wrongQuestions = data.filter(q => q.section === sectionName && wrongCounts[q.question] > 0);
         if (wrongQuestions.length === 0) { container.innerHTML = "<div style='text-align:center; color:#28a745; font-weight:bold; padding:40px 0;'>✨ この分野で一度も間違えた問題はありません！</div>"; return; }
