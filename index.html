@@ -802,12 +802,12 @@
     function backToResult() { hideAllScreens(); document.getElementById('result-screen').style.display = 'block'; }
 
     function backToSectionSelect() {
-        hideAllScreens();
-        if (selectedSubject === "english") {
-            showEnglishSubScreen();
+        if (selectedSectionName) {
+            // 直前に解いていた分野（または全範囲）のまま、即座にクイズを再開
+            startQuizWithSection(selectedSectionName);
         } else {
-            renderSectionScreen(); 
-            document.getElementById('section-screen').style.display = 'block';
+            // 万が一データが空の場合はメインメニューに戻す安全策
+            backToMainMenu();
         }
     }
 
@@ -907,12 +907,44 @@
         
         filteredQuizData.forEach(quiz => {
             if (quiz.type === "en_to_ja" || quiz.type === "ja_to_en") { 
-                let allPool = currentSectionAllQuestions.map(q => q.correctText);
-                let dummyPool = Array.from(new Set(allPool)).filter(txt => txt !== quiz.correctText);
+                // 💡【難易度UP修正】正解または問題の「英単語の頭文字」を基準にする
+                const targetWord = (quiz.type === "ja_to_en") ? quiz.correctText : quiz.question;
+                const targetChar = targetWord.trim()[0].toLowerCase();
+
+                // 同じ頭文字を持つ単語のデータだけをフィルターしてダミー候補にする
+                let sameInitialTexts = currentSectionAllQuestions
+                    .filter(q => {
+                        const word = (q.type === "ja_to_en") ? q.correctText : q.question;
+                        return word.trim()[0].toLowerCase() === targetChar;
+                    })
+                    .map(q => q.correctText)
+                    .filter(txt => txt !== quiz.correctText); // 正解と同じテキストは除く
                 
-                for (let i = dummyPool.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [dummyPool[i], dummyPool[j]] = [dummyPool[j], dummyPool[i]]; }
+                // 重複を排除したダミープールを作成
+                let dummyPool = Array.from(new Set(sameInitialTexts));
+                
+                // ダミープールをシャッフル
+                for (let i = dummyPool.length - 1; i > 0; i--) { 
+                    const j = Math.floor(Math.random() * (i + 1)); 
+                    [dummyPool[i], dummyPool[j]] = [dummyPool[j], dummyPool[i]]; 
+                }
                 
                 let dummies = dummyPool.slice(0, 3);
+                
+                // ⚠️【セーフティ】同じ頭文字の単語が少なくてダミーが3つ集まらない場合は、他の単語から補充する
+                if (dummies.length < 3) {
+                    let allPool = currentSectionAllQuestions.map(q => q.correctText);
+                    let backupPool = Array.from(new Set(allPool)).filter(txt => txt !== quiz.correctText && !dummies.includes(txt));
+                    for (let i = backupPool.length - 1; i > 0; i--) { 
+                        const j = Math.floor(Math.random() * (i + 1)); 
+                        [backupPool[i], backupPool[j]] = [backupPool[j], backupPool[i]]; 
+                    }
+                    while (dummies.length < 3 && backupPool.length > 0) {
+                        dummies.push(backupPool.shift());
+                    }
+                }
+                
+                // それでも万が一足りない場合のハイフン埋め
                 while(dummies.length < 3) { dummies.push("---"); }
                 
                 let choices = [quiz.correctText, ...dummies];
@@ -921,6 +953,7 @@
                 quiz.choices = choices;
                 quiz.correct = choices.indexOf(quiz.correctText);
             } else {
+                // 理科・社会（通常ルール）の選択肢シャッフル処理
                 const correctText = quiz.choices[quiz.correct];
                 for (let i = quiz.choices.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [quiz.choices[i], quiz.choices[j]] = [quiz.choices[j], quiz.choices[i]]; }
                 quiz.correct = quiz.choices.indexOf(correctText);
@@ -1008,7 +1041,7 @@
             localStorage.setItem(`quiz_wrong_counts_${studentKey}`, JSON.stringify(wrongCounts));
         }
         
-        // 🔥【追加】1問回答するごとに、成果データをローカルストレージへリアルタイムで退避保存
+        // 🔥1問回答するごとに、成果データをローカルストレージへリアルタイムで退避保存
         localStorage.setItem(`quiz_daily_summary_${studentKey}`, JSON.stringify(dailySummaryData));
         
         document.getElementById('next-btn').style.display = 'block';
@@ -1123,59 +1156,43 @@
         sendRateToSpreadsheet(selectedSubject, myRate); 
     }
 
+    // 以下の既存関数やイベントリスナー群はそのまま引き継ぎ
     function showDailySummary() {
         hideAllScreens();
-        
         const sciSign = dailyRateChangeScience >= 0 ? `+${dailyRateChangeScience}` : `${dailyRateChangeScience}`;
         const socSign = dailyRateChangeSocial >= 0 ? `+${dailyRateChangeSocial}` : `${dailyRateChangeSocial}`;
         const engSign = dailyRateChangeEnglish >= 0 ? `+${dailyRateChangeEnglish}` : `${dailyRateChangeEnglish}`;
-        
         const sciEl = document.getElementById('daily-total-rate-sci');
         const socEl = document.getElementById('daily-total-rate-soc');
         const engEl = document.getElementById('daily-total-rate-eng');
-        
-        sciEl.innerText = sciSign;
-        socEl.innerText = socSign;
-        engEl.innerText = engSign;
-        
+        sciEl.innerText = sciSign; socEl.innerText = socSign; engEl.innerText = engSign;
         sciEl.style.color = dailyRateChangeScience > 0 ? '#28a745' : (dailyRateChangeScience < 0 ? '#dc3545' : '#4a5568');
         socEl.style.color = dailyRateChangeSocial > 0 ? '#28a745' : (dailyRateChangeSocial < 0 ? '#dc3545' : '#4a5568');
         engEl.style.color = dailyRateChangeEnglish > 0 ? '#28a745' : (dailyRateChangeEnglish < 0 ? '#dc3545' : '#4a5568');
-
         const listContainer = document.getElementById('summary-list');
         listContainer.innerHTML = "";
-
         const summaryKeys = Object.keys(dailySummaryData);
         if (summaryKeys.length === 0) {
             listContainer.innerHTML = "<div class='score-line' style='text-align:center; color:#666;'>まだ本日解答した問題はありません。</div>";
         } else {
             summaryKeys.forEach(key => {
                 const data = dailySummaryData[key];
-                
                 const totalInSection = quizData.filter(q => q.section === data.section).length;
                 const rate = totalInSection > 0 ? Math.round((data.correct / totalInSection) * 100) : 0;
                 const barColor = getGaugeColor(rate); 
-                
                 let statusText = "🚨 弱点 (要対策)";
                 if (rate > 90) statusText = "👑 完璧！";
                 else if (rate > 70) statusText = "🍏 克服！";
                 else if (rate > 30) statusText = "⚠️ あと少し";
-
                 const line = document.createElement('div');
-                line.className = "score-line";
-                line.style.borderBottom = "1px dashed #cbd5e0";
-                line.style.paddingBottom = "10px";
-                line.style.marginBottom = "10px";
-                
+                line.className = "score-line"; line.style.borderBottom = "1px dashed #cbd5e0"; line.style.paddingBottom = "10px"; line.style.marginBottom = "10px";
                 line.innerHTML = `
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
                         <span style="font-weight:bold; color:#2d3748;">📌 分野：${data.section} <span style="color:#718096; font-size:0.9rem;">(教科：${data.grade})</span></span>
                         <span class="section-status-badge" style="background-color: ${barColor}; font-size: 0.75rem; padding: 2px 8px;">${statusText}</span>
                     </div>
                     成果：<b>${totalInSection}</b> 問中 <span style="font-weight:bold; color:${barColor}; font-size:1.1rem;">${data.correct}</span> 問正解
-                    <div class="progress-bar-bg">
-                        <div class="progress-bar-fill" style="width: ${rate}%; background-color: ${barColor};"></div>
-                    </div>
+                    <div class="progress-bar-bg"><div class="progress-bar-fill" style="width: ${rate}%; background-color: ${barColor};"></div></div>
                     <div style="text-align: right; font-size: 0.8rem; color: #718096; margin-top: 2px;">正解率: ${rate}%</div>
                 `;
                 listContainer.appendChild(line);
@@ -1186,83 +1203,27 @@
 
     function backToSectionSelectFromSummary() {
         hideAllScreens();
-        if (selectedSubject === "english") {
-            showEnglishSubScreen();
-        } else {
-            renderSectionScreen(); 
-            document.getElementById('section-screen').style.display = 'block';
-        }
+        if (selectedSubject === "english") { showEnglishSubScreen(); } else { renderSectionScreen(); document.getElementById('section-screen').style.display = 'block'; }
     }
-
     function toggleRateView(subView) {
-        const mySec = document.getElementById('rate-my-section');
-        const rankSec = document.getElementById('rate-ranking-section');
-        const myBtn = document.getElementById('cmd-show-my-rate');
-        const rankBtn = document.getElementById('cmd-show-ranking');
-
-        if (subView === 'my') {
-            mySec.style.display = 'block';
-            rankSec.style.display = 'none';
-            myBtn.style.backgroundColor = '#007bff'; 
-            rankBtn.style.backgroundColor = '#6c757d'; 
-        } else {
-            mySec.style.display = 'none';
-            rankSec.style.display = 'block';
-            myBtn.style.backgroundColor = '#6c757d';
-            rankBtn.style.backgroundColor = '#007bff';
-        }
+        const mySec = document.getElementById('rate-my-section'); const rankSec = document.getElementById('rate-ranking-section');
+        const myBtn = document.getElementById('cmd-show-my-rate'); const rankBtn = document.getElementById('cmd-show-ranking');
+        if (subView === 'my') { mySec.style.display = 'block'; rankSec.style.display = 'none'; myBtn.style.backgroundColor = '#007bff'; rankBtn.style.backgroundColor = '#6c757d'; }
+        else { mySec.style.display = 'none'; rankSec.style.display = 'block'; myBtn.style.backgroundColor = '#6c757d'; myBtn.style.backgroundColor = '#6c757d'; rankBtn.style.backgroundColor = '#007bff'; }
     }
-
-    function tryFinishLearning() {
-        hideAllScreens();
-        document.getElementById('confirm-screen').style.display = 'block';
-    }
-
-    function cancelFinishLearning() {
-        hideAllScreens();
-        if (selectedSubject === "english") {
-            showEnglishSubScreen();
-        } else {
-            renderSectionScreen(); 
-            document.getElementById('section-screen').style.display = 'block';
-        }
-    }
-
-    function confirmFinishLearning() {
-        // 🔥【追加】「学習を終了する」を能動的に選択したときのみ、成果データをクリアして初期状態に戻す
-        localStorage.removeItem(`quiz_daily_summary_${studentKey}`);
-        location.reload(); 
-    }
+    function tryFinishLearning() { hideAllScreens(); document.getElementById('confirm-screen').style.display = 'block'; }
+    function cancelFinishLearning() { hideAllScreens(); if (selectedSubject === "english") { showEnglishSubScreen(); } else { renderSectionScreen(); document.getElementById('section-screen').style.display = 'block'; } }
+    function confirmFinishLearning() { localStorage.removeItem(`quiz_daily_summary_${studentKey}`); location.reload(); }
 
     function sendDataToTeacher(clearedCount, totalCount) {
         if (!GOOGLE_FORM_ACTION_URL || GOOGLE_FORM_ACTION_URL.includes("ここに")) return;
-        
         let quizSubjectText = "";
-        if (selectedSubject === "science") {
-            quizSubjectText = `理科_中${selectedGrade}`;
-        } else if (selectedSubject === "english") {
-            quizSubjectText = `英語_共通`; 
-        } else {
-            let subName = "その他";
-            if (selectedGrade === "geography") subName = "地理";
-            if (selectedGrade === "history") subName = "歴史";
-            if (selectedGrade === "civics") subName = "公民";
-            quizSubjectText = `社会_${subName}`;
-        }
-        
+        if (selectedSubject === "science") { quizSubjectText = `理科_中${selectedGrade}`; } else if (selectedSubject === "english") { quizSubjectText = `英語_共通`; }
+        else { let subName = "その他"; if (selectedGrade === "geography") subName = "地理"; if (selectedGrade === "history") subName = "歴史"; if (selectedGrade === "civics") subName = "公民"; quizSubjectText = `社会_${subName}`; }
         const params = new URLSearchParams();
-        
-        params.append(FORM_ENTRY_IDS.studentGrade, studentGrade);
-        params.append(FORM_ENTRY_IDS.studentName, studentName);
-        params.append(FORM_ENTRY_IDS.studentId, studentId);       
-        params.append(FORM_ENTRY_IDS.subject, quizSubjectText);
-        params.append(FORM_ENTRY_IDS.section, selectedSectionName);
-        params.append(FORM_ENTRY_IDS.score, clearedCount); 
-        params.append(FORM_ENTRY_IDS.total, totalCount);   
-
-        fetch(GOOGLE_FORM_ACTION_URL, { method: 'POST', body: params, mode: 'no-cors' })
-        .then(() => { console.log("先生のシートへ送信完了"); })
-        .catch((e) => { console.error("送信エラー:", e); });
+        params.append(FORM_ENTRY_IDS.studentGrade, studentGrade); params.append(FORM_ENTRY_IDS.studentName, studentName); params.append(FORM_ENTRY_IDS.studentId, studentId);       
+        params.append(FORM_ENTRY_IDS.subject, quizSubjectText); params.append(FORM_ENTRY_IDS.section, selectedSectionName); params.append(FORM_ENTRY_IDS.score, clearedCount); params.append(FORM_ENTRY_IDS.total, totalCount);   
+        fetch(GOOGLE_FORM_ACTION_URL, { method: 'POST', body: params, mode: 'no-cors' }).then(() => { console.log("先生のシートへ送信完了"); }).catch((e) => { console.error("送信エラー:", e); });
     }
 
     function showReviewScreen() {
@@ -1272,78 +1233,34 @@
             card.innerHTML = `<div class="review-q">問${index + 1}: ${item.question}</div><div class="review-ans review-wrong">❌ あなたの解答: ${item.yourAnswer}</div><div class="review-ans review-correct">⭕ 正しい正解: ${item.correctAnswer}</div>`;
             listContainer.appendChild(card);
         });
-        hideAllScreens();
-        document.getElementById('review-screen').style.display = 'block';
+        hideAllScreens(); document.getElementById('review-screen').style.display = 'block';
     }
 
     function showReportScreen() {
-        hideAllScreens();
-        document.getElementById('report-screen').style.display = 'block';
-        
-        const container = document.getElementById('report-sections-container');
-        container.innerHTML = "";
-        
+        hideAllScreens(); document.getElementById('report-screen').style.display = 'block';
+        const container = document.getElementById('report-sections-container'); container.innerHTML = "";
         const clearedList = JSON.parse(localStorage.getItem(`quiz_cleared_list_${studentKey}`) || '[]');
-        
         const categories = [
-            { type: "normal", key: "science_1", label: "🌿 理科 中学1年" },
-            { type: "normal", key: "science_2", label: "⚡ 理科 中学2年" },
-            { type: "normal", key: "science_3", label: "🌌 理科 中学3年" },
-            { type: "normal", key: "social_geography", label: "🗺️ 社会 地理" },
-            { type: "normal", key: "social_history", label: "⏳ 社会 歴史" },
-            { type: "normal", key: "social_civics", label: "⚖️ 社会 公民" },
+            { type: "normal", key: "science_1", label: "🌿 理科 中学1年" }, { type: "normal", key: "science_2", label: "⚡ 理科 中学2年" }, { type: "normal", key: "science_3", label: "🌌 理科 中学3年" },
+            { type: "normal", key: "social_geography", label: "🗺️ 社会 地理" }, { type: "normal", key: "social_history", label: "⏳ 社会 歴史" }, { type: "normal", key: "social_civics", label: "⚖️ 社会 公民" },
             { type: "english", grade: "1", label: "🔤 英語（全学年共通データ）" }
         ];
-        
         categories.forEach(cat => {
             let data = [];
-            if (cat.type === "english") {
-                ["1", "2", "3"].forEach(g => {
-                    const wordData = allQuizData[`english_word_${g}`] || [];
-                    const grammarData = allQuizData[`english_grammar_${g}`] || [];
-                    data = [...data, ...wordData, ...grammarData];
-                });
-            } else {
-                data = allQuizData[cat.key] || [];
-            }
+            if (cat.type === "english") { ["1", "2", "3"].forEach(g => { const wordData = allQuizData[`english_word_${g}`] || []; const grammarData = allQuizData[`english_grammar_${g}`] || []; data = [...data, ...wordData, ...grammarData]; }); }
+            else { data = allQuizData[cat.key] || []; }
             if (data.length === 0) return;
-            
-            const header = document.createElement('div');
-            header.className = "report-cat-title";
-            header.innerText = cat.label;
-            container.appendChild(header);
-            
-            const sectionsSet = new Set();
-            data.forEach(q => { if(q.section) sectionsSet.add(q.section) });
-            
+            const header = document.createElement('div'); header.className = "report-cat-title"; header.innerText = cat.label; container.appendChild(header);
+            const sectionsSet = new Set(); data.forEach(q => { if(q.section) sectionsSet.add(q.section) });
             sectionsSet.forEach(secName => {
-                const secQuestions = data.filter(q => q.section === secName);
-                const total = secQuestions.length;
-                const cleared = secQuestions.filter(q => clearedList.includes(q.question)).length;
+                const secQuestions = data.filter(q => q.section === secName); const total = secQuestions.length; const cleared = secQuestions.filter(q => clearedList.includes(q.question)).length;
                 const accuracy = total > 0 ? Math.round((cleared / total) * 100) : 0;
-                
-                const card = document.createElement('div');
-                card.className = "section-card";
-                card.onclick = () => showWrongQuestionsDetail(cat.key, secName, cat.type === "english", cat.grade);
-                
-                let badgeColor = getGaugeColor(accuracy);
-                let statusText = "🚨 弱点";
-                if (accuracy > 90) statusText = "👑 完璧！";
-                else if (accuracy > 70) statusText = "🍏 克服！";
-                else if (accuracy > 30) statusText = "⚠️ あと少し";
-                
+                const card = document.createElement('div'); card.className = "section-card"; card.onclick = () => showWrongQuestionsDetail(cat.key, secName, cat.type === "english", cat.grade);
+                let badgeColor = getGaugeColor(accuracy); let statusText = "🚨 弱点"; if (accuracy > 90) statusText = "👑 完璧！"; else if (accuracy > 70) statusText = "🍏 克服！"; else if (accuracy > 30) statusText = "⚠️ あと少し";
                 card.innerHTML = `
-                    <div class="section-card-title">
-                        <span>${secName}</span>
-                        <span class="section-status-badge" style="background-color: ${badgeColor};">${statusText}</span>
-                    </div>
-                    <div class="progress-bar-bg">
-                        <div class="progress-bar-fill" style="width: ${accuracy}%; background-color: ${badgeColor};"></div>
-                    </div>
-                    <div class="section-card-footer">
-                        <span>クリア: <b>${cleared}</b> / ${total} 問</span>
-                        <span>達成率: <b>${accuracy}%</b></span>
-                    </div>
+                    <div class="section-card-title"><span>${secName}</span><span class="section-status-badge" style="background-color: ${badgeColor};">${statusText}</span></div>
+                    <div class="progress-bar-bg"><div class="progress-bar-fill" style="width: ${accuracy}%; background-color: ${badgeColor};"></div></div>
+                    <div class="section-card-footer"><span>クリア: <b>${cleared}</b> / ${total} 問</span><span>達成率: <b>${accuracy}%</b></span></div>
                 `;
                 container.appendChild(card);
             });
@@ -1351,284 +1268,74 @@
     }
 
     function showWrongQuestionsDetail(apiKey, sectionName, isEnglish = false, grade = "") {
-        hideAllScreens();
-        document.getElementById('wrong-details-screen').style.display = 'block';
-        document.getElementById('wrong-details-title').innerText = `❌ 過去の間違い (${sectionName})`;
-        
-        const container = document.getElementById('wrong-details-list');
-        container.innerHTML = "";
-        
+        hideAllScreens(); document.getElementById('wrong-details-screen').style.display = 'block'; document.getElementById('wrong-details-title').innerText = `❌ 過去の間違い (${sectionName})`;
+        const container = document.getElementById('wrong-details-list'); container.innerHTML = "";
         const wrongCounts = JSON.parse(localStorage.getItem(`quiz_wrong_counts_${studentKey}`) || '{}');
-        
         let data = [];
-        if (isEnglish) {
-            ["1", "2", "3"].forEach(g => {
-                const wordData = allQuizData[`english_word_${g}`] || [];
-                const grammarData = allQuizData[`english_grammar_${g}`] || [];
-                data = [...data, ...wordData, ...grammarData];
-            });
-        } else {
-            data = allQuizData[apiKey] || [];
-        }
-        
+        if (isEnglish) { ["1", "2", "3"].forEach(g => { const wordData = allQuizData[`english_word_${g}`] || []; const grammarData = allQuizData[`english_grammar_${g}`] || []; data = [...data, ...wordData, ...grammarData]; }); }
+        else { data = allQuizData[apiKey] || []; }
         const wrongQuestions = data.filter(q => q.section === sectionName && wrongCounts[q.question] > 0);
-        
-        if (wrongQuestions.length === 0) {
-            container.innerHTML = "<div style='text-align:center; color:#28a745; font-weight:bold; padding:40px 0;'>✨ この分野で一度も間違えた問題はありません！</div>";
-            return;
-        }
-        
+        if (wrongQuestions.length === 0) { container.innerHTML = "<div style='text-align:center; color:#28a745; font-weight:bold; padding:40px 0;'>✨ この分野で一度も間違えた問題はありません！</div>"; return; }
         wrongQuestions.forEach((q, index) => {
-            const card = document.createElement('div');
-            card.className = "review-card";
-            const correctText = q.type === "en_to_ja" || q.type === "ja_to_en" ? q.correctText : q.choices[q.correct];
-            const count = wrongCounts[q.question];
-            
-            card.innerHTML = `
-                <div class="review-q">問${index + 1}: ${q.question}</div>
-                <div class="review-ans review-wrong" style="font-size:0.85rem; margin-bottom:5px;">⚠️ 過去のミス回数: ${count} 回</div>
-                <div class="review-ans review-correct">⭕ 正しい正解: ${correctText}</div>
-            `;
+            const card = document.createElement('div'); card.className = "review-card";
+            const correctText = q.type === "en_to_ja" || q.type === "ja_to_en" ? q.correctText : q.choices[q.correct]; const count = wrongCounts[q.question];
+            card.innerHTML = `<div class="review-q">問${index + 1}: ${q.question}</div><div class="review-ans review-wrong" style="font-size:0.85rem; margin-bottom:5px;">⚠️ 過去のミス回数: ${count} 回</div><div class="review-ans review-correct">⭕ 正しい正解: ${correctText}</div>`;
             container.appendChild(card);
         });
     }
 
-    function showRateScreen() {
-        hideAllScreens();
-        document.getElementById('rate-screen').style.display = 'block';
-        document.getElementById('rate-subject-selector-view').style.display = 'block'; 
-        document.getElementById('rate-detail-view').style.display = 'none';
-    }
-
-    function showRateHelp() {
-        hideAllScreens();
-        document.getElementById('rate-help-screen').style.display = 'block';
-    }
-
-    function backToRateScreenFromHelp() {
-        hideAllScreens();
-        document.getElementById('rate-screen').style.display = 'block';
-        document.getElementById('rate-subject-selector-view').style.display = 'block'; 
-        document.getElementById('rate-detail-view').style.display = 'none';
-    }
-
-    function selectRateSubject(subject) {
-        document.getElementById('rate-subject-selector-view').style.display = 'none';
-        document.getElementById('rate-detail-view').style.display = 'block';
-        switchRateTab(subject); 
-        toggleRateView('my'); 
-    }
-
-    function backToRateSubjectSelector() {
-        document.getElementById('rate-subject-selector-view').style.display = 'block';
-        document.getElementById('rate-detail-view').style.display = 'none';
-    }
+    function showRateScreen() { hideAllScreens(); document.getElementById('rate-screen').style.display = 'block'; document.getElementById('rate-subject-selector-view').style.display = 'block'; document.getElementById('rate-detail-view').style.display = 'none'; }
+    function showRateHelp() { hideAllScreens(); document.getElementById('rate-help-screen').style.display = 'block'; }
+    function backToRateScreenFromHelp() { hideAllScreens(); document.getElementById('rate-screen').style.display = 'block'; document.getElementById('rate-subject-selector-view').style.display = 'block'; document.getElementById('rate-detail-view').style.display = 'none'; }
+    function selectRateSubject(subject) { document.getElementById('rate-subject-selector-view').style.display = 'none'; document.getElementById('rate-detail-view').style.display = 'block'; switchRateTab(subject); toggleRateView('my'); }
+    function backToRateSubjectSelector() { document.getElementById('rate-subject-selector-view').style.display = 'block'; document.getElementById('rate-detail-view').style.display = 'none'; }
 
     function switchRateTab(subject) {
-        currentRateTab = subject;
-        
-        let subjectLabel = '理科';
-        if (subject === 'social') subjectLabel = '社会';
-        if (subject === 'english') subjectLabel = '英語';
-
-        document.getElementById('my-rate-subject-label').innerText = subjectLabel;
-        document.getElementById('ranking-subject-label').innerText = subjectLabel;
-
-        checkMonthlyReset();
-
-        const myRate = parseInt(localStorage.getItem(`quiz_rate_${subject}_${studentKey}`) || '1500');
-        document.getElementById('my-current-rate-val').innerText = myRate;
-
+        currentRateTab = subject; let subjectLabel = '理科'; if (subject === 'social') subjectLabel = '社会'; if (subject === 'english') subjectLabel = '英語';
+        document.getElementById('my-rate-subject-label').innerText = subjectLabel; document.getElementById('ranking-subject-label').innerText = subjectLabel;
+        checkMonthlyReset(); const myRate = parseInt(localStorage.getItem(`quiz_rate_${subject}_${studentKey}`) || '1500'); document.getElementById('my-current-rate-val').innerText = myRate;
         let rankingList = allStudentsList.map(s => {
-            let currentRateVal = 1500;
-            if (subject === 'science') currentRateVal = s.scienceRate;
-            else if (subject === 'social') currentRateVal = s.socialRate;
-            else if (subject === 'english') currentRateVal = s.englishRate; 
-
-            if (Number(s.id) === Number(studentId) && s.name === studentName) {
-                currentRateVal = myRate;
-            }
-            return { ...s, activeRate: currentRateVal };
+            let currentRateVal = 1500; if (subject === 'science') currentRateVal = s.scienceRate; else if (subject === 'social') currentRateVal = s.socialRate; else if (subject === 'english') currentRateVal = s.englishRate; 
+            if (Number(s.id) === Number(studentId) && s.name === studentName) { currentRateVal = myRate; } return { ...s, activeRate: currentRateVal };
         });
-
-        const hasMe = rankingList.some(s => Number(s.id) === Number(studentId) && s.name === studentName);
-        if (!hasMe && studentId) {
-            rankingList.push({ id: studentId, name: studentName, grade: studentGrade, campus: studentCampus, activeRate: myRate });
-        }
-
+        const hasMe = rankingList.some(s => Number(s.id) === Number(studentId) && s.name === studentName); if (!hasMe && studentId) { rankingList.push({ id: studentId, name: studentName, grade: studentGrade, campus: studentCampus, activeRate: myRate }); }
         rankingList.sort((a, b) => b.activeRate - a.activeRate);
-
-        let displayRank = 1;
-        let lastRate = -1;
-        let myRankNum = 1;
-
-        rankingList.forEach((s, idx) => {
-            if (s.activeRate !== lastRate) {
-                displayRank = idx + 1;
-                lastRate = s.activeRate;
-            }
-            s.computedRank = displayRank;
-            if (Number(s.id) === Number(studentId) && s.name === studentName) {
-                myRankNum = displayRank;
-            }
-        });
-
+        let displayRank = 1; let lastRate = -1; let myRankNum = 1;
+        rankingList.forEach((s, idx) => { if (s.activeRate !== lastRate) { displayRank = idx + 1; lastRate = s.activeRate; } s.computedRank = displayRank; if (Number(s.id) === Number(studentId) && s.name === studentName) { myRankNum = displayRank; } });
         document.getElementById('my-rate-rank-text').innerText = `全体順位: ${myRankNum} 位`;
-
-        const container = document.getElementById('ranking-list-container');
-        container.innerHTML = "";
-
+        const container = document.getElementById('ranking-list-container'); container.innerHTML = "";
         const showLimit = Math.min(10, rankingList.length);
         for (let i = 0; i < showLimit; i++) {
-            const s = rankingList[i];
-            const item = document.createElement('div');
-            item.className = "score-line";
-            item.style.padding = "6px 8px";
-            item.style.margin = "4px 0";
-            item.style.borderRadius = "4px";
-            
-            if (Number(s.id) === Number(studentId) && s.name === studentName) {
-                item.style.backgroundColor = "#feebc8"; 
-                item.style.fontWeight = "bold";
-                item.style.color = "#c05621";
-                item.innerHTML = `<div style="text-align:left;">👑 ${s.computedRank}位 : [${s.campus || '---'}] ${s.name} (${s.activeRate}) (あなた)</div>`;
-            } else {
-                item.style.borderBottom = "1px solid #edf2f7";
-                item.innerHTML = `<div style="text-align:left;">${s.computedRank}位 : [${s.campus || '---'}] ${s.name} (${s.activeRate})</div>`;
-            }
+            const s = rankingList[i]; const item = document.createElement('div'); item.className = "score-line"; item.style.padding = "6px 8px"; item.style.margin = "4px 0"; item.style.borderRadius = "4px";
+            if (Number(s.id) === Number(studentId) && s.name === studentName) { item.style.backgroundColor = "#feebc8"; item.style.fontWeight = "bold"; item.style.color = "#c05621"; item.innerHTML = `<div style="text-align:left;">👑 ${s.computedRank}位 : [${s.campus || '---'}] ${s.name} (${s.activeRate}) (あなた)</div>`; }
+            else { item.style.borderBottom = "1px solid #edf2f7"; item.innerHTML = `<div style="text-align:left;">${s.computedRank}位 : [${s.campus || '---'}] ${s.name} (${s.activeRate})</div>`; }
             container.appendChild(item);
         }
-
         if (myRankNum > 10) {
-            const divider = document.createElement('div');
-            divider.style.borderTop = "2px dashed #cbd5e0";
-            divider.style.margin = "10px 0";
-            container.appendChild(divider);
-
-            const myItem = document.createElement('div');
-            myItem.className = "score-line";
-            myItem.style.padding = "6px 8px";
-            myItem.style.borderRadius = "4px";
-            myItem.style.backgroundColor = "#feebc8";
-            myItem.style.fontWeight = "bold";
-            myItem.style.color = "#c05621";
-            myItem.innerHTML = `<div style="text-align:left;">🏅 ${myRankNum}位 : [${studentCampus}] ${studentName} (${myRate}) (あなた)</div>`;
-            container.appendChild(myItem);
+            const divider = document.createElement('div'); divider.style.borderTop = "2px dashed #cbd5e0"; divider.style.margin = "10px 0"; container.appendChild(divider);
+            const myItem = document.createElement('div'); myItem.className = "score-line"; myItem.style.padding = "6px 8px"; myItem.style.borderRadius = "4px"; myItem.style.backgroundColor = "#feebc8"; myItem.style.fontWeight = "bold"; myItem.style.color = "#c05621";
+            myItem.innerHTML = `<div style="text-align:left;">🏅 ${myRankNum}位 : [${studentCampus}] ${studentName} (${myRate}) (あなた)</div>`; container.appendChild(myItem);
         }
     }
 
-    function toggleSectionMenu(event) {
-        if (event) event.stopPropagation(); 
-        const menu = document.getElementById('section-menu-dropdown');
-        if (menu.style.display === 'none' || menu.style.display === '') {
-            menu.style.display = 'block';
-        } else {
-            menu.style.display = 'none';
-        }
-    }
+    function toggleSectionMenu(event) { if (event) event.stopPropagation(); const menu = document.getElementById('section-menu-dropdown'); if (menu.style.display === 'none' || menu.style.display === '') { menu.style.display = 'block'; } else { menu.style.display = 'none'; } }
+    function handleMenuAction(action) { document.getElementById('section-menu-dropdown').style.display = 'none'; if (action === 'main') { backToMainMenu(); } else if (action === 'subject') { startLearningMode(); } else if (action === 'rate') { showRateScreen(); } else if (action === 'report') { showReportScreen(); } else if (action === 'summary') { showDailySummary(); } }
+    document.addEventListener('click', function(e) { const menu = document.getElementById('section-menu-dropdown'); const trigger = document.getElementById('menu-trigger'); if (menu && menu.style.display === 'block') { if (e.target !== menu && e.target !== trigger && !menu.contains(e.target)) { menu.style.display = 'none'; } } });
 
-    function handleMenuAction(action) {
-        document.getElementById('section-menu-dropdown').style.display = 'none'; 
-        
-        if (action === 'main') {
-            backToMainMenu();
-        } else if (action === 'subject') {
-            startLearningMode();
-        } else if (action === 'rate') {
-            showRateScreen();
-        } else if (action === 'report') {
-            showReportScreen();
-        } else if (action === 'summary') {
-            showDailySummary();
-        }
-    }
-
-    document.addEventListener('click', function(e) {
-        const menu = document.getElementById('section-menu-dropdown');
-        const trigger = document.getElementById('menu-trigger');
-        if (menu && menu.style.display === 'block') {
-            if (e.target !== menu && e.target !== trigger && !menu.contains(e.target)) {
-                menu.style.display = 'none';
-            }
-        }
-    });
-
-    function showReportIssueScreen() {
-        hideAllScreens();
-        document.getElementById('report-issue-screen').style.display = 'block';
-        document.getElementById('report-content').value = ""; 
-        document.getElementById('report-subject').value = "science"; 
-        updateReportSections(); 
-    }
-
+    function showReportIssueScreen() { hideAllScreens(); document.getElementById('report-issue-screen').style.display = 'block'; document.getElementById('report-content').value = ""; document.getElementById('report-subject').value = "science"; updateReportSections(); }
     function updateReportSections() {
-        const subject = document.getElementById('report-subject').value;
-        const sectionSelect = document.getElementById('report-section');
-        sectionSelect.innerHTML = "";
-        
-        const sectionsSet = new Set();
-        
-        for (const key in allQuizData) {
-            if (key.startsWith(subject)) {
-                allQuizData[key].forEach(q => {
-                    if (q.section) sectionsSet.add(q.section);
-                });
-            }
-        }
-        
-        if (sectionsSet.size === 0) {
-            const opt = document.createElement('option');
-            opt.value = "共通・その他";
-            opt.innerText = "共通・other";
-            sectionSelect.appendChild(opt);
-        } else {
-            sectionsSet.forEach(sec => {
-                const opt = document.createElement('option');
-                opt.value = sec;
-                opt.innerText = sec;
-                sectionSelect.appendChild(opt);
-            });
-        }
+        const subject = document.getElementById('report-subject').value; const sectionSelect = document.getElementById('report-section'); sectionSelect.innerHTML = ""; const sectionsSet = new Set();
+        for (const key in allQuizData) { if (key.startsWith(subject)) { allQuizData[key].forEach(q => { if (q.section) sectionsSet.add(q.section); }); } }
+        if (sectionsSet.size === 0) { const opt = document.createElement('option'); opt.value = "共通・その他"; opt.innerText = "共通・other"; sectionSelect.appendChild(opt); }
+        else { sectionsSet.forEach(sec => { const opt = document.createElement('option'); opt.value = sec; opt.innerText = sec; sectionSelect.appendChild(opt); }); }
     }
-
     function submitReport() {
-        const subject = document.getElementById('report-subject').value;
-        const section = document.getElementById('report-section').value;
-        const content = document.getElementById('report-content').value.trim();
-        
-        if (!content) {
-            alert("報告内容を入力してください。");
-            return;
-        }
-        
-        const params = new URLSearchParams();
-        
-        let subjectText = "理科";
-        if (subject === "social") subjectText = "社会";
-        if (subject === "english") subjectText = "英語";
-        
-        params.append(REPORT_FORM_ENTRY_IDS.studentInfo, `${studentId}_${studentName} (${studentGrade})`);
-        params.append(REPORT_FORM_ENTRY_IDS.subject, subjectText);
-        params.append(REPORT_FORM_ENTRY_IDS.section, section);
-        params.append(REPORT_FORM_ENTRY_IDS.content, content);
-        
-        const submitBtn = document.querySelector("#report-issue-screen .nav-btn");
-        submitBtn.disabled = true;
-        submitBtn.innerText = "送信中...";
-
-        fetch(REPORT_FORM_ACTION_URL, { method: 'POST', body: params, mode: 'no-cors' })
-        .then(() => {
-            alert("誤答・誤植の報告を送信しました。ご協力ありがとうございました！");
-            submitBtn.disabled = false;
-            submitBtn.innerText = "報告を送信する";
-            backToMainMenu();
-        })
-        .catch((e) => {
-            console.error("送信エラー:", e);
-            alert("送信に失敗しました。");
-            submitBtn.disabled = false;
-            submitBtn.innerText = "報告を送信する";
-        });
+        const subject = document.getElementById('report-subject').value; const section = document.getElementById('report-section').value; const content = document.getElementById('report-content').value.trim();
+        if (!content) { alert("報告内容を入力してください。"); return; }
+        const params = new URLSearchParams(); let subjectText = "理科"; if (subject === "social") subjectText = "社会"; if (subject === "english") subjectText = "英語";
+        params.append(REPORT_FORM_ENTRY_IDS.studentInfo, `${studentId}_${studentName} (${studentGrade})`); params.append(REPORT_FORM_ENTRY_IDS.subject, subjectText); params.append(REPORT_FORM_ENTRY_IDS.section, section); params.append(REPORT_FORM_ENTRY_IDS.content, content);
+        const submitBtn = document.querySelector("#report-issue-screen .nav-btn"); submitBtn.disabled = true; submitBtn.innerText = "送信中...";
+        fetch(REPORT_FORM_ACTION_URL, { method: 'POST', body: params, mode: 'no-cors' }).then(() => { alert("誤答・誤植の報告を送信しました。ご協力ありがとうございました！"); submitBtn.disabled = false; submitBtn.innerText = "報告を送信する"; backToMainMenu(); }).catch((e) => { console.error("送信エラー:", e); alert("送信に失敗しました。"); submitBtn.disabled = false; submitBtn.innerText = "報告を送信する"; });
     }
 
     checkAutoLogin();
