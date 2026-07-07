@@ -133,8 +133,8 @@
         <div class="flex-center">
             <div>
                 <h2>メニューを選んでね</h2>
-                <button class="btn nav-btn" style="background-color: #007bff; margin-top: 15px; font-size: 1.15rem; font-weight: bold; padding: 14px;" onclick="startLearningMode()">📝 テストをする</button>
-                <button class="btn nav-btn" style="background-color: #ed8936; margin-top: 12px; font-size: 1.15rem; font-weight: bold; padding: 14px;" onclick="showReportScreen()">📊 成績をみる</button>
+                <button class="btn nav-btn" style="background-color: #007bff; margin-top: 15px; font-size: 1.15rem; font-weight: bold; padding: 14px;" onclick="setMode('test')">📝 テストをする</button>
+                <button class="btn nav-btn" style="background-color: #ed8936; margin-top: 12px; font-size: 1.15rem; font-weight: bold; padding: 14px;" onclick="setMode('report')">📊 成績をみる</button>
                 <button class="btn nav-btn" style="background-color: #eab308; margin-top: 12px; font-size: 1.15rem; font-weight: bold; padding: 14px; color: #212529;" onclick="showRateScreen()">🏆 レートをみる</button>
                 <button class="btn nav-btn" style="background-color: #dc3545; margin-top: 12px; font-size: 1.15rem; font-weight: bold; padding: 14px;" onclick="showReportIssueScreen()">⚠️ 誤答・誤植を報告する</button>
             </div>
@@ -300,7 +300,7 @@
     <div id="wrong-details-screen" class="screen" style="display: none;">
         <h2 id="wrong-details-title">間違えた問題一覧</h2>
         <div id="wrong-details-list" class="review-container" style="max-height: 360px;"></div>
-        <button class="btn back-btn" onclick="showReportScreen()">成績一覧に戻る</button>
+        <button class="btn back-btn" onclick="backFromWrongDetails()">戻る</button>
     </div>
 
     <div id="rate-screen" class="screen" style="display: none;">
@@ -409,7 +409,6 @@
 
     const STUDENT_LIST_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQ6RAVBjmqZyuxiuKluc_EJfUpWlAyIt213A_YnTUTo-YHG2skF0ZyvbO11Qc1JLVNjwzVgR9vCo7_e/pub?gid=690286817&single=true&output=tsv";
 
-    // 💡 修正箇所：一本化した統合スプシの2重読み込みを防ぐため「_1」のみに集約
     const SPREADSHEET_URLS = {
         "science_1": "https://docs.google.com/spreadsheets/d/e/2PACX-1vQ6RAVBjmqZyuxiuKluc_EJfUpWlAyIt213A_YnTUTo-YHG2skF0ZyvbO11Qc1JLVNjwzVgR9vCo7_e/pub?gid=874795216&single=true&output=tsv",
         "science_2": "https://docs.google.com/spreadsheets/d/e/2PACX-1vQ6RAVBjmqZyuxiuKluc_EJfUpWlAyIt213A_YnTUTo-YHG2skF0ZyvbO11Qc1JLVNjwzVgR9vCo7_e/pub?gid=1432685944&single=true&output=tsv",
@@ -421,10 +420,10 @@
         "english_word_1": "https://docs.google.com/spreadsheets/d/e/2PACX-1vQ6RAVBjmqZyuxiuKluc_EJfUpWlAyIt213A_YnTUTo-YHG2skF0ZyvbO11Qc1JLVNjwzVgR9vCo7_e/pub?gid=1929383758&single=true&output=tsv",
         "english_grammar_1": "https://docs.google.com/spreadsheets/d/e/2PACX-1vQ6RAVBjmqZyuxiuKluc_EJfUpWlAyIt213A_YnTUTo-YHG2skF0ZyvbO11Qc1JLVNjwzVgR9vCo7_e/pub?gid=228416641&single=true&output=tsv",
         
-        "english_word_2": "https://docs.google.com/spreadsheets/d/e/2PACX-1vQ6RAVBjmqZyuxiuKluc_EJfUpWlAyIt213A_YnTUTo-YHG2skF0ZyvbO11Qc1JLVNjwzVgR9vCo7_e/pub?gid=1929383758&single=true&output=tsv",
+        "english_word_2": "",
         "english_grammar_2": "",
         
-        "english_word_3": "https://docs.google.com/spreadsheets/d/e/2PACX-1vQ6RAVBjmqZyuxiuKluc_EJfUpWlAyIt213A_YnTUTo-YHG2skF0ZyvbO11Qc1JLVNjwzVgR9vCo7_e/pub?gid=1929383758&single=true&output=tsv",
+        "english_word_3": "",
         "english_grammar_3": ""
     };
 
@@ -476,6 +475,9 @@
     let dailyRateChangeSocial = 0;
     let dailyRateChangeEnglish = 0;
 
+    // 💡 モード管理フラグ ("test" = 通常クイズ, "report" = 過去の間違い確認)
+    let currentMode = "test"; 
+
     function getGaugeColor(rate) {
         if (rate <= 30) return "#dc3545"; 
         if (rate <= 70) return "#eab308"; 
@@ -504,6 +506,12 @@
             dailyRateChangeEnglish = 0;
             console.log("🌟 レーティングを1500にリセットしました。");
         }
+    }
+
+    // 💡 メインメニューからの遷移時にモードをセットする関数
+    function setMode(mode) {
+        currentMode = mode;
+        startLearningMode();
     }
 
     async function loginStudent() {
@@ -622,15 +630,22 @@
                     if (key.startsWith("english_word")) {
                         const en = cols[0].trim();
                         const ja = cols[1].trim();
-                        const stage = cols[2] ? cols[2].trim() : "Stage 1";
                         if (!en || !ja) continue;
                         
-                        allQuizData[key].push({ type: "en_to_ja", question: en, correctText: ja, section: `英単語⇒日本語 (${stage})` });
-                        allQuizData[key].push({ type: "ja_to_en", question: ja, correctText: en, section: `日本語⇒英単語 (${stage})` });
+                        // 💡 修正箇所：単語シートのSTAGE名をI列(9列目)またはC列(3列目)から安全に検出する
+                        let stage = "Stage 1";
+                        if (cols[8] && cols[8].trim()) {
+                            stage = cols[8].trim();
+                        } else if (cols[2] && cols[2].trim()) {
+                            stage = cols[2].trim();
+                        }
+                        
+                        allQuizData[key].push({ type: "en_to_ja", question: en, correctText: ja, section: `英単語⇒日本語 (${stage})`, explanation: "" });
+                        allQuizData[key].push({ type: "ja_to_en", question: ja, correctText: en, section: `日本語⇒英単語 (${stage})`, explanation: "" });
                         continue;
                     }
                     
-                    let qText, qChoices, qCorrect, qSection;
+                    let qText, qChoices, qCorrect, qSection, qExplanation;
                     const firstCol = cols[0].trim();
                     
                     if (firstCol === "science" || firstCol === "social" || firstCol === "english" || key.startsWith("english_grammar") || cols.length >= 8) {
@@ -638,17 +653,18 @@
                         qText = cols[2].trim();
                         qChoices = [cols[3].trim(), cols[4].trim(), cols[5].trim(), cols[6].trim()];
                         qCorrect = parseInt(cols[7].trim()) - 1;
-                        // 💡 修正箇所：英語空欄補充（統合スプシ）でもI列（cols[8]）にSTAGE名の記載があれば最優先で取得する
                         qSection = (cols[8] && cols[8].trim()) ? cols[8].trim() : (key.startsWith("english_grammar") ? "空欄補充" : "その他");
+                        qExplanation = cols[9] ? cols[9].trim() : "";
                     } else {
                         if (cols.length < 6) continue;
                         qText = cols[0].trim();
                         qChoices = [cols[1].trim(), cols[2].trim(), cols[3].trim(), cols[4].trim()];
                         qCorrect = parseInt(cols[5].trim()) - 1;
                         qSection = cols[6] ? cols[6].trim() : "共通";
+                        qExplanation = cols[7] ? cols[7].trim() : "";
                     }
                     if (isNaN(qCorrect)) continue;
-                    allQuizData[key].push({ question: qText, choices: qChoices, correct: qCorrect, section: qSection });
+                    allQuizData[key].push({ question: qText, choices: qChoices, correct: qCorrect, section: qSection, explanation: qExplanation });
                 }
             });
 
@@ -743,13 +759,12 @@
         hideAllScreens();
         quizData = [];
         
-        // 💡 修正箇所：統合スプシを考慮し、1〜5のすべてのSTAGEデータをループ処理できるように拡張
         ["1", "2", "3", "4", "5"].forEach(grade => {
             const wordSource = allQuizData[`english_word_${grade}`] || [];
             const grammarSource = allQuizData[`english_grammar_${grade}`] || [];
             
-            wordSource.forEach(q => quizData.push({ type: q.type, question: q.question, correctText: q.correctText, section: q.section }));
-            grammarSource.forEach(q => quizData.push({ question: q.question, choices: [...q.choices], correct: q.correct, section: q.section }));
+            wordSource.forEach(q => quizData.push({ type: q.type, question: q.question, correctText: q.correctText, section: q.section, explanation: "" }));
+            grammarSource.forEach(q => quizData.push({ question: q.question, choices: [...q.choices], correct: q.correct, section: q.section, explanation: q.explanation }));
         });
         
         document.getElementById('english-sub-screen').style.display = 'block';
@@ -806,7 +821,13 @@
 
     function backToSectionSelect() {
         if (selectedSectionName) {
-            startQuizWithSection(selectedSectionName);
+            // 💡 修正箇所：過去の間違い確認モード（report）中に結果画面から戻る場合は、再度テストを走らせずに分野選択画面に戻す
+            if (currentMode === "report") {
+                hideAllScreens();
+                document.getElementById('section-screen').style.display = 'block';
+            } else {
+                startQuizWithSection(selectedSectionName);
+            }
         } else {
             backToMainMenu();
         }
@@ -826,7 +847,7 @@
         quizData = [];
         
         sourceData.forEach(q => {
-            quizData.push({ question: q.question, choices: [...q.choices], correct: q.correct, section: q.section });
+            quizData.push({ question: q.question, choices: [...q.choices], correct: q.correct, section: q.section, explanation: q.explanation });
         });
 
         if (quizData.length === 0) {
@@ -843,13 +864,21 @@
         const container = document.getElementById('section-buttons'); 
         container.innerHTML = ""; 
         
-        const allBtn = document.createElement('button'); 
-        allBtn.className = "btn nav-btn"; 
-        allBtn.style.backgroundColor = "#007bff"; 
-        allBtn.style.marginBottom = "15px";
-        allBtn.innerText = "🌟 全範囲からランダム"; 
-        allBtn.onclick = () => startQuizWithSection("全範囲"); 
-        container.appendChild(allBtn);
+        // 💡 修正箇所：現在のモードに応じて、画面タイトルと「全範囲ランダムボタン」の表示有無を美しく切り替える
+        const titleEl = document.querySelector('#section-screen h2');
+        if (currentMode === "report") {
+            titleEl.innerText = "過去の間違いを確認 📊";
+        } else {
+            titleEl.innerText = "分野・弱点診断 📊";
+            
+            const allBtn = document.createElement('button'); 
+            allBtn.className = "btn nav-btn"; 
+            allBtn.style.backgroundColor = "#007bff"; 
+            allBtn.style.marginBottom = "15px";
+            allBtn.innerText = "🌟 全範囲からランダム"; 
+            allBtn.onclick = () => startQuizWithSection("全範囲"); 
+            container.appendChild(allBtn);
+        }
 
         const sectionsSet = new Set(); 
         quizData.forEach(q => { if(q.section) sectionsSet.add(q.section) }); 
@@ -867,7 +896,15 @@
         sectionStats.forEach(stat => {
             const card = document.createElement('div');
             card.className = "section-card";
-            card.onclick = () => startQuizWithSection(stat.name);
+            
+            // 💡 修正箇所：間違い確認モード（report）の時は、カードをタップするとクイズに進まず、その分野の間違い履歴に直接飛ぶ
+            if (currentMode === "report") {
+                const isEnglish = (selectedSubject === 'english');
+                const apiKey = `${selectedSubject}_${selectedGrade}`;
+                card.onclick = () => showWrongQuestionsDetail(apiKey, stat.name, isEnglish, selectedGrade);
+            } else {
+                card.onclick = () => startQuizWithSection(stat.name);
+            }
             
             let badgeColor = getGaugeColor(stat.accuracy);
             let statusText = "🚨 弱点 (要対策)";
@@ -1028,7 +1065,12 @@
             currentCombo = 0;
             comboDiv.innerText = "❌ コンボ終了！";
 
-            wrongQuestionsList.push({ question: currentQuiz.question, yourAnswer: currentQuiz.choices[selectedIndex], correctAnswer: currentQuiz.choices[currentQuiz.correct] });
+            wrongQuestionsList.push({ 
+                question: currentQuiz.question, 
+                yourAnswer: currentQuiz.choices[selectedIndex], 
+                correctAnswer: currentQuiz.choices[currentQuiz.correct],
+                explanation: currentQuiz.explanation 
+            });
             
             let wrongCounts = JSON.parse(localStorage.getItem(`quiz_wrong_counts_${studentKey}`) || '{}');
             wrongCounts[currentQuiz.question] = (wrongCounts[currentQuiz.question] || 0) + 1;
@@ -1222,10 +1264,17 @@
         const listContainer = document.getElementById('review-list'); listContainer.innerHTML = ""; 
         wrongQuestionsList.forEach((item, index) => {
             const card = document.createElement('div'); card.className = "review-card";
-            card.innerHTML = `<div class="review-q">問${index + 1}: ${item.question}</div><div class="review-ans review-wrong">❌ あなたの解答: ${item.yourAnswer}</div><div class="review-ans review-correct">⭕ 正しい正解: ${item.correctAnswer}</div>`;
+            let expHtml = item.explanation ? `<div class="review-ans" style="color: #65748b; margin-top: 6px; font-size: 0.9rem; border-top: 1px dashed #feb2b2; padding-top: 6px;">💡 解説: ${item.explanation}</div>` : '';
+            card.innerHTML = `<div class="review-q">問${index + 1}: ${item.question}</div><div class="review-ans review-wrong">❌ あなたの解答: ${item.yourAnswer}</div><div class="review-ans review-correct">⭕ 正しい正解: ${item.correctAnswer}</div>${expHtml}`;
             listContainer.appendChild(card);
         });
         hideAllScreens(); document.getElementById('review-screen').style.display = 'block';
+    }
+
+    // 💡 修正箇所：間違えた問題一覧（#wrong-details-screen）から分野選択画面（#section-screen）へ綺麗に戻るための関数
+    function backFromWrongDetails() {
+        hideAllScreens();
+        document.getElementById('section-screen').style.display = 'block';
     }
 
     function showReportScreen() {
@@ -1271,7 +1320,8 @@
         wrongQuestions.forEach((q, index) => {
             const card = document.createElement('div'); card.className = "review-card";
             const correctText = q.type === "en_to_ja" || q.type === "ja_to_en" ? q.correctText : q.choices[q.correct]; const count = wrongCounts[q.question];
-            card.innerHTML = `<div class="review-q">問${index + 1}: ${q.question}</div><div class="review-ans review-wrong" style="font-size:0.85rem; margin-bottom:5px;">⚠️ 過去のミス回数: ${count} 回</div><div class="review-ans review-correct">⭕ 正しい正解: ${correctText}</div>`;
+            let expHtml = q.explanation ? `<div class="review-ans" style="color: #65748b; margin-top: 6px; font-size: 0.9rem; border-top: 1px dashed #feb2b2; padding-top: 6px;">💡 解説: ${q.explanation}</div>` : '';
+            card.innerHTML = `<div class="review-q">問${index + 1}: ${q.question}</div><div class="review-ans review-wrong" style="font-size:0.85rem; margin-bottom:5px;">⚠️ 過去のミス回数: ${count} 回</div><div class="review-ans review-correct">⭕ 正しい正解: ${correctText}</div>${expHtml}`;
             container.appendChild(card);
         });
     }
@@ -1311,7 +1361,16 @@
     }
 
     function toggleSectionMenu(event) { if (event) event.stopPropagation(); const menu = document.getElementById('section-menu-dropdown'); if (menu.style.display === 'none' || menu.style.display === '') { menu.style.display = 'block'; } else { menu.style.display = 'none'; } }
-    function handleMenuAction(action) { document.getElementById('section-menu-dropdown').style.display = 'none'; if (action === 'main') { backToMainMenu(); } else if (action === 'subject') { startLearningMode(); } else if (action === 'rate') { showRateScreen(); } else if (action === 'report') { showReportScreen(); } else if (action === 'summary') { showDailySummary(); } }
+    
+    function handleMenuAction(action) { 
+        document.getElementById('section-menu-dropdown').style.display = 'none'; 
+        if (action === 'main') { backToMainMenu(); } 
+        // 💡 修正箇所：ハンバーガーメニューから飛ぶときも、現在の選択フローの状態にリダイレクト
+        else if (action === 'subject') { setMode('test'); } 
+        else if (action === 'rate') { showRateScreen(); } 
+        else if (action === 'report') { setMode('report'); } 
+        else if (action === 'summary') { showDailySummary(); } 
+    }
     document.addEventListener('click', function(e) { const menu = document.getElementById('section-menu-dropdown'); const trigger = document.getElementById('menu-trigger'); if (menu && menu.style.display === 'block') { if (e.target !== menu && e.target !== trigger && !menu.contains(e.target)) { menu.style.display = 'none'; } } });
 
     function showReportIssueScreen() { hideAllScreens(); document.getElementById('report-issue-screen').style.display = 'block'; document.getElementById('report-content').value = ""; document.getElementById('report-subject').value = "science"; updateReportSections(); }
