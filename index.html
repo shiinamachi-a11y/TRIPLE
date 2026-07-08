@@ -1,1210 +1,2679 @@
 <!DOCTYPE html>
+
 <html lang="ja">
+
 <head>
+
     <meta charset="UTF-8">
+
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title>TRIPLE</title>
+
     
+
     <link rel="manifest" href="manifest.json">
+
     <link rel="apple-touch-icon" href="https://i.ibb.co/RGx3mgyq/triple-png.png">
+
     <link rel="icon" type="image/png" href="https://i.ibb.co/RGx3mgyq/triple-png.png">
+
     <meta name="apple-mobile-web-app-capable" content="yes">
+
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
     <meta name="apple-mobile-web-app-title" content="TRIPLE">
+
     <meta name="theme-color" content="#f0f2f5">
+
     <style>
+
         body { font-family: sans-serif; background-color: #f0f2f5; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+
         .quiz-container { background: white; border-radius: 12px; box-shadow: 0 8px 24px rgba(0,0,0,0.15); width: 400px; height: 740px; text-align: center; box-sizing: border-box; position: relative; overflow: hidden; }
+
         .screen { width: 100%; height: 100%; padding: 30px; box-sizing: border-box; overflow-y: auto; position: relative; }
+
         .question { font-size: 1.2rem; font-weight: bold; margin-bottom: 20px; text-align: left; }
+
         .btn { display: block; width: 100%; padding: 12px; margin: 10px 0; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 1rem; box-sizing: border-box; transition: background-color 0.1s ease; }
+
         .nav-btn { background-color: #28a745; text-align: center; }
+
         .nav-btn:hover { background-color: #218838; }
+
         .ans-btn { background-color: #007bff; text-align: left; padding-left: 20px; }
+
         .ans-btn:hover { background-color: #0056b3; }
+
         .ans-btn.correct-choice { background-color: #28a745 !important; }
+
         .ans-btn.wrong-choice { background-color: #dc3545 !important; }
+
         .back-btn { background-color: #6c757d; text-align: center; margin-top: 20px; }
+
         .back-btn:hover { background-color: #5a6268; }
+
         .result { font-size: 1.4rem; font-weight: bold; margin-top: 20px; min-height: 30px; }
+
         .quiz-container h2 { margin-top: 0; color: #333; }
+
         .loading { font-size: 1.2rem; color: #666; }
+
         .progress-text { font-size: 0.9rem; color: #666; margin-bottom: 10px; text-align: right; font-weight: bold; }
+
         .score-box { background-color: #e9ecef; padding: 15px; border-radius: 8px; margin: 20px 0; text-align: left; }
+
         .score-line { font-size: 1.05rem; margin: 12px 0; color: #495057; }
+
         .score-highlight { font-weight: bold; font-size: 1.2rem; }
+
         .review-container { max-height: 280px; overflow-y: auto; text-align: left; margin: 15px 0; padding-right: 5px; margin-bottom: 10px; }
+
         .review-card { background: #fff5f5; border: 1px solid #feb2b2; padding: 12px; border-radius: 6px; margin-bottom: 12px; font-size: 0.95rem; }
+
         .review-q { font-weight: bold; color: #2d3748; margin-bottom: 6px; }
+
         .review-ans { margin: 3px 0; padding-left: 10px; }
+
         .review-wrong { color: #dc3545; font-weight: bold; }
+
         .review-correct { color: #28a745; font-weight: bold; }
+
         .wrong-alert { color: #dc3545; font-size: 0.9rem; text-align: left; font-weight: bold; margin-bottom: 8px; min-height: 18px; }
+
         .input-style { width: 100%; padding: 12px; font-size: 1.1rem; border: 2px solid #cbd5e0; border-radius: 6px; margin: 10px 0; box-sizing: border-box; text-align: center; }
+
         .student-badge { position: absolute; top: 20px; left: 30px; background-color: #4a5568; color: white; font-size: 0.85rem; padding: 6px 12px; border-radius: 20px; display: inline-block; font-weight: bold; z-index: 10; }
+
         .switch-student { font-size: 0.8rem; color: #63b3ed; text-decoration: underline; cursor: pointer; margin-left: 10px; font-weight: normal; }
+
         .combo-alert { color: #ed8936; font-size: 0.95rem; text-align: left; font-weight: bold; margin-bottom: 5px; min-height: 18px; }
+
         .section-screen-desc { font-size: 0.8rem; color: #4a5568; margin-bottom: 12px; background: #ebf8ff; padding: 10px; border-radius: 6px; border-left: 4px solid #3182ce; text-align: left; line-height: 1.4; }
+
         .section-card { background: #ffffff; border: 2px solid #e2e8f0; padding: 12px; border-radius: 8px; margin: 10px 0; text-align: left; cursor: pointer; transition: all 0.15s ease; box-shadow: 0 2px 4px rgba(0,0,0,0.02); box-sizing: border-box; }
+
         .section-card:hover { border-color: #4a5568; transform: translateY(-1px); box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+
         .section-card-title { font-weight: bold; font-size: 1rem; display: flex; justify-content: space-between; align-items: center; color: #2d3748; margin-bottom: 6px; }
+
         .section-status-badge { color: white; font-size: 0.7rem; padding: 2px 8px; border-radius: 12px; font-weight: bold; }
+
         .progress-bar-bg { background-color: #edf2f7; height: 10px; border-radius: 5px; margin: 6px 0 2px 0; overflow: hidden; border: 1px solid #e2e8f0; }
+
         .progress-bar-fill { height: 100%; width: 0%; transition: width 0.4s ease; }
+
         .section-card-footer { font-size: 0.8rem; color: #718096; display: flex; justify-content: space-between; align-items: center; }
+
         .menu-item { padding: 12px 16px; font-size: 0.9rem; color: #4a5568; cursor: pointer; transition: background-color 0.15s; border-bottom: 1px solid #edf2f7; text-align: left; }
+
         .menu-item:last-child { border-bottom: none; }
+
         .menu-item:hover { background-color: #f7fafc; color: #2d3748; }
+
         .correct-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background-color: rgba(255, 255, 255, 0.6); display: none; justify-content: center; align-items: center; font-size: 60vmin; color: #28a745; font-weight: bold; z-index: 9999; pointer-events: none; }
+
         .report-container { max-height: 360px; overflow-y: auto; padding-right: 5px; margin-bottom: 10px; }
+
         .report-cat-title { text-align: left; margin: 15px 0 5px 0; color: #4a5568; font-size: 1.05rem; border-bottom: 2px solid #cbd5e0; padding-bottom: 3px; }
+
         #login-screen { padding: 0; background-image: url('https://i.ibb.co/RGx3mgyq/triple-png.png'); background-size: cover; background-position: center; position: relative; overflow: hidden; }
+
         .login-box { position: absolute; bottom: 0; left: 0; width: 100%; background: rgba(15, 23, 42, 0.75); backdrop-filter: blur(8px); padding: 25px 30px 35px 30px; box-sizing: border-box; border-top: 1px solid rgba(255, 255, 255, 0.15); }
+
         .login-title { color: #ffffff; font-size: 1.25rem; font-weight: bold; margin: 0 0 4px 0; text-align: center; letter-spacing: 1px; }
+
         .login-desc { font-size: 0.85rem; color: #94a3b8; margin: 0 0 15px 0; text-align: center; }
+
         .input-dark { background-color: rgba(30, 41, 59, 0.8); border: 2px solid #475569; color: #f8fafc; transition: border-color 0.15s; }
+
         .input-dark:focus { border-color: #f59e0b; outline: none; }
+
         .input-dark::placeholder { color: #64748b; }
+
         .btn-gold { background-color: #d97706; color: #ffffff; font-weight: bold; border: 1px solid #b45309; box-shadow: 0 4px 6px rgba(0,0,0,0.2); }
+
         .btn-gold:hover { background-color: #b45309; }
+
         .bonus-tag { display: inline-block; font-size: 0.75rem; font-weight: bold; padding: 2px 6px; border-radius: 4px; margin-right: 5px; color: white; }
+
         .bg-combo { background-color: #ea580c; }
+
         .bg-field { background-color: #0284c7; }
+
         .flex-center { display: flex; flex-direction: column; justify-content: center; align-items: center; height: 100%; box-sizing: border-box; }
+
         .flex-center > div { width: 100%; }
+
         .vs-bar-container { background: #edf2f7; padding: 10px; border-radius: 8px; margin-bottom: 12px; text-align: left; border: 1px solid #e2e8f0; font-size: 0.85rem; }
+
+        .review-end-box { font-size: 1.15rem; font-weight: bold; color: #28a745; margin-top: 20px; background: #f0fff4; padding: 15px; border-radius: 8px; border: 1px solid #c6f6d5; text-align: center; box-shadow: 0 2px 8px rgba(40,167,69,0.1); }
+
     </style>
+
 </head>
+
 <body>
+
+
 
 <div id="correct-overlay" class="correct-overlay">⭕</div>
 
+
+
 <div class="quiz-container">
+
     
+
     <div id="login-screen" class="screen">
+
         <div class="login-box">
+
             <h3 class="login-title">LOGIN</h3>
+
             <p class="login-desc">生徒番号とカナ氏名を入力してね</p>
+
             <input type="text" id="student-id-input" class="input-style input-dark" placeholder="生徒番号（例：1001）">
+
             <input type="text" id="student-name-input" class="input-style input-dark" placeholder="氏名カナ（例：ヤマダタロウ）">
+
             <button id="login-submit-btn" class="btn btn-gold" style="margin-top: 15px;" onclick="loginStudent()">ログイン</button>
+
         </div>
+
     </div>
+
+
 
     <div id="main-menu-screen" class="screen" style="display: none;">
+
         <div class="student-badge">👤 <span id="user-badge-0"></span> <span class="switch-student" onclick="logoutStudent()">切り替え</span></div>
+
         <div class="flex-center">
+
             <div>
+
                 <h2>メニューを選んでね</h2>
+
                 <button class="btn nav-btn" style="background-color: #007bff; margin-top: 15px; font-size: 1.15rem; font-weight: bold; padding: 14px;" onclick="setMode('test')">📝 テストをする</button>
+
                 <button class="btn nav-btn" style="background-color: #6b46c1; margin-top: 12px; font-size: 1.15rem; font-weight: bold; padding: 14px;" onclick="setMode('battle')">⚔️ 対戦</button>
-                <button class="btn nav-btn" style="background-color: #ed8936; margin-top: 12px; font-size: 1.15rem; font-weight: bold; padding: 14px;" onclick="setMode('report')">📊 成績をみる</button>
+
+                <button class="btn nav-btn" style="background-color: #ed8936; margin-top: 12px; font-size: 1.15rem; font-weight: bold; padding: 14px;" onclick="showReportScreen()">📊 成績をみる</button>
+
                 <button class="btn nav-btn" style="background-color: #eab308; margin-top: 12px; font-size: 1.15rem; font-weight: bold; padding: 14px; color: #212529;" onclick="showRateScreen()">🏆 レートをみる</button>
+
                 <button class="btn nav-btn" style="background-color: #dc3545; margin-top: 12px; font-size: 1.15rem; font-weight: bold; padding: 14px;" onclick="showReportIssueScreen()">⚠️ 誤答・誤植を報告する</button>
+
             </div>
+
         </div>
+
     </div>
+
+
 
     <div id="subject-screen" class="screen" style="display: none;">
+
         <div class="student-badge">👤 <span id="user-badge-1"></span> <span class="switch-student" onclick="logoutStudent()">切り替え</span></div>
+
         <div class="flex-center">
+
             <div>
+
                 <div id="battle-rule-box" style="display: none;"></div>
 
+
+
                 <h2>教科を選んでね</h2>
+
                 <button class="btn nav-btn" style="background-color: #4a5568;" onclick="selectSubject('science')">理科</button>
+
                 <button class="btn nav-btn" style="background-color: #2b6cb0;" onclick="selectSubject('social')">社会</button>
+
                 <button class="btn nav-btn" style="background-color: #b45309;" onclick="selectSubject('english')">英語 🔤</button>
+
                 <button class="btn back-btn" onclick="backToMainMenu()">戻る</button>
+
             </div>
+
         </div>
+
     </div>
+
+
 
     <div id="english-sub-screen" class="screen" style="display: none;">
+
         <div class="student-badge">👤 <span id="user-badge-5"></span> <span class="switch-student" onclick="logoutStudent()">切り替え</span></div>
+
         <div class="flex-center">
+
             <div>
+
                 <h2>形式を選んでね 🔤</h2>
+
                 <button class="btn nav-btn" style="background-color: #d97706; font-weight: bold; padding: 14px;" onclick="selectEnglishMode('日本語⇒英単語')">日本語 ⇒ 英単語</button>
+
                 <button class="btn nav-btn" style="background-color: #b45309; font-weight: bold; padding: 14px;" onclick="selectEnglishMode('英単語⇒日本語')">英単語 ⇒ 日本語</button>
+
                 <button class="btn nav-btn" style="background-color: #2b6cb0; font-weight: bold; padding: 14px;" onclick="selectEnglishMode('空欄補充')">空欄補充</button>
+
                 <button class="btn back-btn" onclick="backToSubjectFromEnglish()">戻る</button>
+
             </div>
+
         </div>
+
     </div>
+
+
 
     <div id="grade-screen" class="screen" style="display: none;">
+
         <div class="student-badge">👤 <span id="user-badge-3"></span> <span class="switch-student" onclick="logoutStudent()">切り替え</span></div>
+
         <div class="flex-center">
+
             <div>
+
                 <h2>学年を選んでね</h2>
+
                 <button class="btn nav-btn" onclick="selectGrade('1')">中学1年</button>
+
                 <button class="btn nav-btn" onclick="selectGrade('2')">中学2年</button>
+
                 <button class="btn nav-btn" onclick="selectGrade('3')">中学3年</button>
+
                 <button class="btn back-btn" onclick="backToSubject()">戻る</button>
+
             </div>
+
         </div>
+
     </div>
+
+
 
     <div id="social-sub-screen" class="screen" style="display: none;">
+
         <div class="student-badge">👤 <span id="user-badge-4"></span> <span class="switch-student" onclick="logoutStudent()">切り替え</span></div>
+
         <div class="flex-center">
+
             <div>
+
                 <h2>分野を選んでね</h2>
+
                 <button class="btn nav-btn" onclick="selectSocialSub('geography')">地理</button>
+
                 <button class="btn nav-btn" onclick="selectSocialSub('history')">歴史</button>
+
                 <button class="btn nav-btn" onclick="selectSocialSub('civics')">公民</button>
+
                 <button class="btn back-btn" onclick="backToSubjectFromSocial()">戻る</button>
+
             </div>
+
         </div>
+
     </div>
+
+
 
     <div id="section-screen" class="screen" style="display: none; position: relative;">
+
         <div id="menu-trigger" style="position: absolute; top: -22px; left: -22px; width: 60px; height: 60px; display: flex; justify-content: center; align-items: center; cursor: pointer; user-select: none; z-index: 1001;" onclick="toggleSectionMenu(event)">
+
             <span style="position: absolute; font-size: 2.4rem; color: #a0aec0; opacity: 0.35; line-height: 1;">☰</span>
+
             <span style="position: absolute; font-size: 0.65rem; font-weight: bold; color: #4a5568; opacity: 0.55; margin-top: 2px;">メニュー</span>
+
         </div>
+
         
+
         <div id="section-menu-dropdown" style="display: none; position: absolute; top: 32px; left: -15px; background: white; border: 1px solid #cbd5e0; box-shadow: 0 4px 12px rgba(0,0,0,0.15); border-radius: 8px; width: 190px; z-index: 1000; overflow: hidden;">
+
             <div class="menu-item" onclick="handleMenuAction('main')">🏠 トップページに戻る</div>
+
             <div class="menu-item" onclick="handleMenuAction('subject')">📚 科目を選ぶ</div>
+
             <div class="menu-item" onclick="handleMenuAction('rate')">🏆 レートをみる</div>
+
             <div class="menu-item" onclick="handleMenuAction('report')">📊 成績を見る</div>
+
             <div class="menu-item" onclick="handleMenuAction('summary')">📝 本日の学習を振り返る</div>
+
         </div>
+
+
 
         <h2>分野・弱点診断 📊</h2>
+
         <div id="section-buttons" style="max-height: 340px; overflow-y: auto; padding-right: 5px; margin-bottom: 10px;"></div>
+
         <button class="btn back-btn" onclick="backToSubject()">戻る</button>
+
     </div>
+
+
 
     <div id="battle-match-screen" class="screen" style="display: none;">
+
         <h2 style="margin-top: 40px;">⚔️ 対戦確認</h2>
+
         <div class="score-box" style="background-color: #faf5ff; border: 1px solid #e9d8fd; text-align: center;">
+
             <div style="font-size: 0.9rem; color: #6b46c1; font-weight: bold;">選択中のバトルフィールド</div>
+
             <div id="battle-field-name" style="font-size: 1.3rem; font-weight: bold; color: #44337a; margin: 8px 0;">分野名</div>
+
             <div style="font-size: 0.85rem; color: #718096;">この分野で対戦を開始しますか？</div>
+
         </div>
+
+
 
         <button id="cmd-start-matching" class="btn nav-btn" style="background-color: #6b46c1; font-weight: bold; font-size: 1.1rem; padding: 14px;" onclick="triggerMatchingSequence()">マッチングを開始する</button>
+
         
+
         <div id="matching-status-area" style="display: none; margin-top: 25px;">
+
             <div class="loading" id="matching-status-text">対戦相手を探索中...</div>
+
             <div class="progress-bar-bg" style="margin-top: 10px;"><div id="matching-progress-fill" class="progress-bar-fill" style="background-color: #6b46c1; width: 0%;"></div></div>
+
         </div>
+
+
 
         <div id="matched-rival-card" class="score-box" style="display: none; background-color: #fffaf0; border: 1px solid #feebc8; text-align: center; margin-top: 20px;">
+
             <div style="font-size: 0.85rem; color: #dd6b20; font-weight: bold;">🎯 MATCHING COMPLETE!</div>
+
             <div style="font-size: 1.3rem; font-weight: bold; color: #2d3748; margin: 10px 0;">対戦相手が決定しました！</div>
+
             <div style="font-size: 1.1rem; color: #4a5568;">相手の現在のレート: <b id="rival-profile-rate" style="color:#6b46c1; font-size:1.4rem;">---</b></div>
+
             <button class="btn nav-btn" style="background-color: #dd6b20; font-weight: bold; margin-top: 15px;" onclick="startActualBattleQuiz()">対戦スタート！ ⚔️</button>
+
         </div>
+
+
 
         <button id="battle-match-back-btn" class="btn back-btn" onclick="backToSectionSelect()">戻る</button>
+
     </div>
+
+
 
     <div id="loading-screen" class="screen" style="display: none; padding-top: 300px;">
+
         <div class="loading" id="loading-text">指定のシートから問題を読み込んでいます...</div>
+
     </div>
+
+
+
+    <div id="review-start-screen" class="screen" style="display: none;">
+
+        <div class="flex-center">
+
+            <div>
+
+                <h2 style="color: #e53e3e; font-size: 1.6rem; letter-spacing: 1px;">🔥 復習タイムスタート！ 🔥</h2>
+
+                
+
+                <div style="margin: 20px 0;">
+
+                    <img src="復習タイム イラスト.png" alt="復習タイム イラスト.png" style="max-width: 85%; max-height: 280px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); object-fit: contain;">
+
+                </div>
+
+
+
+                <p style="font-size: 1.05rem; font-weight: bold; color: #4a5568; line-height: 1.5; padding: 0 10px;">
+
+                    間違えてしまった問題を<br>もう一度解き直して完璧にしよう！
+
+                </p>
+
+                <button class="btn nav-btn" style="background-color: #e53e3e; font-weight: bold; font-size: 1.1rem; padding: 14px; margin-top: 25px;" onclick="startReviewQuiz()">復習をはじめる ➡️</button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
 
     <div id="quiz-screen" class="screen" style="display: none;">
+
         <div id="vs-live-panel" style="display: none;">
+
             <div class="vs-bar-container">
+
                 <div>👤 キミの進捗: <span id="player-live-txt" style="font-weight:bold;">0 / 10問</span></div>
+
                 <div class="progress-bar-bg" style="height: 6px; margin-top:3px;"><div id="player-live-fill" class="progress-bar-fill" style="width:0%; background-color:#007bff;"></div></div>
+
             </div>
+
             <div class="vs-bar-container" style="background-color: #fff5f5; border-color: #fed7d7;">
+
                 <div>🤖 対戦相手: <span id="rival-live-txt" style="font-weight:bold;">0 / 10問</span> (正解: <span id="rival-live-score">0</span>)</div>
+
                 <div class="progress-bar-bg" style="height: 6px; margin-top:3px;"><div id="rival-live-fill" class="progress-bar-fill" style="width:0%; background-color:#e53e3e;"></div></div>
+
             </div>
+
         </div>
+
+
 
         <div id="progress" class="progress-text">0 / 0問目</div>
+
         <div id="combo-alert" class="combo-alert"></div>
+
         <div id="wrong-alert" class="wrong-alert"></div>
+
         <div id="question" class="question">問題がここに表示されます</div>
+
         <div id="answers">
+
             <button class="btn ans-btn" onclick="checkAnswer(0)">選択肢1</button>
+
             <button class="btn ans-btn" onclick="checkAnswer(1)">選択肢2</button>
+
             <button class="btn ans-btn" onclick="checkAnswer(2)">選択肢3</button>
+
             <button class="btn ans-btn" onclick="checkAnswer(3)">選択肢4</button>
+
         </div>
+
         <div id="result" class="result"></div>
+
+        
+
+        <div id="review-end-message" class="review-end-box" style="display: none;">
+
+            🎉 復習タイム終了！よく頑張ったね！
+
+        </div>
+
+
+
         <button id="next-btn" class="btn nav-btn" style="background-color: #ffc107; color: #212529; font-weight: bold; display: none; margin-top: 20px;" onclick="nextQuestion()">次へ ➡️</button>
+
+        
+
+        <button id="review-to-result-btn" class="btn nav-btn" style="background-color: #007bff; font-weight: bold; display: none; margin-top: 20px;" onclick="showFinalResult()">結果発表画面へ 📊</button>
+
     </div>
+
+
 
     <div id="result-screen" class="screen" style="display: none;">
+
         <div id="battle-result-banner" style="display: none; font-size: 1.8rem; font-weight: bold; margin-top: 30px; text-shadow: 0 2px 4px rgba(0,0,0,0.1); line-height: 1.3;">WIN 👑</div>
+
         
+
         <h2 id="result-screen-title" style="margin-top: 15px;">結果発表 🎉</h2>
+
         <div class="student-badge">👤 <span id="user-badge-2"></span></div>
+
         <div class="score-box">
+
             <div class="score-line">キミの正解数: <span id="current-score" class="score-highlight" style="color: #4a5568;">0</span> / <span id="total-questions">10</span> 問</div>
+
             <div id="battle-rival-score-line" class="score-line" style="display: none;">相手の正解数: <span id="battle-rival-score-val" class="score-highlight" style="color: #dc3545;">0</span> / 10 問</div>
+
             <div class="score-line">🔥 最高コンボ数: <span id="max-combo-score" class="score-highlight" style="color: #ed8936;">0</span> コンボ！</div>
+
             <div class="score-line">📈 レート変動: <span id="rate-change-display" class="score-highlight">理科レート: 1500 (±0)</span></div>
+
             
+
             <div id="bonus-breakdown-box" style="margin-top: 5px; font-size: 0.9rem; color: #4b5563; display: none; border-top: 1px dashed #cbd5e0; padding-top: 8px;">
+
                 <div id="combo-bonus-line" style="margin: 3px 0; text-align: left;"></div>
+
                 <div id="field-bonus-line" style="margin: 3px 0; text-align: left;"></div>
+
             </div>
+
+
 
             <div class="score-line" style="margin-top: 15px;">
+
                 今回の正解率: <span id="current-accuracy" class="score-highlight">0%</span>
+
                 <div class="progress-bar-bg"><div id="current-accuracy-bar" class="progress-bar-fill"></div></div>
+
             </div>
+
         </div>
+
         <button id="review-trigger-btn" class="btn" style="background-color: #ffc107; color: #212529; font-weight: bold; display: none;" onclick="showReviewScreen()">❌ 間違えた問題を見直す</button>
+
         <button class="btn nav-btn" onclick="backToSectionSelect()">続けて別の問題を解く</button>
+
         <button class="btn back-btn" style="margin-top: 10px;" onclick="backToSubjectFromResult()">教科を選び直す</button>
+
         
+
         <button class="btn" style="background-color: #ed8936; color: white; font-weight: bold; margin-top: 15px;" onclick="showDailySummary()">🔍 今日の学習を振り返る</button>
+
     </div>
+
+
 
     <div id="review-screen" class="screen" style="display: none;">
+
         <h2>間違えた問題の見直し</h2>
+
         <div id="review-list" class="review-container"></div>
+
         <button class="btn back-btn" onclick="backToResult()">結果画面に戻る</button>
+
     </div>
+
+
 
     <div id="summary-screen" class="screen" style="display: none;">
+
         <h2>今日の学習振り返り 📝</h2>
+
         <div class="score-box" style="background-color: #fffaf0; border: 1px solid #feebc8; text-align: center; margin-bottom: 15px; padding: 12px;">
+
             <div style="font-size: 0.95rem; color: #dd6b20; font-weight: bold; margin-bottom: 6px;">📈 本日の総レート増減</div>
+
             <div style="display: flex; justify-content: space-around; font-size: 1rem; font-weight: bold;">
+
                 <div>🌿 理科: <span id="daily-total-rate-sci">±0</span></div>
+
                 <div>🗺️ 社会: <span id="daily-total-rate-soc">±0</span></div>
+
                 <div>🔤 英語: <span id="daily-total-rate-eng">±0</span></div>
+
             </div>
+
         </div>
+
         <p style="font-size: 0.9rem; color: #555; margin-bottom: 15px;">今日正解した問題 of 分野総問題数に対する割合（ゲージ） Certified です。</p>
+
         <div class="score-box" id="summary-list" style="max-height: 240px; overflow-y: auto; padding-right: 5px;"></div>
+
         <button class="btn nav-btn" style="background-color: #28a745; margin-top: 15px;" onclick="backToSectionSelectFromSummary()">テストを続ける</button>
+
         <button class="btn" style="background-color: #dc3545; color: white; font-weight: bold;" onclick="tryFinishLearning()">学習を終了する</button>
+
     </div>
+
+
 
     <div id="confirm-screen" class="screen" style="display: none;">
+
         <h2>終了の確認 🛑</h2>
+
         <p style="font-size: 1.1rem; font-weight: bold; margin: 30px 0; color: #2d3748;">本当に終了しますか?</p>
+
         <p style="font-size: 0.85rem; color: #dc3545; margin-bottom: 30px; line-height: 1.4;">※終了すると、本日の連続正解数（コンボ）や振り返りデータはリセットされます。</p>
+
         <button class="btn nav-btn" style="background-color: #6c757d;" onclick="cancelFinishLearning()">いいえ（テストに戻る）</button>
+
         <button class="btn" style="background-color: #dc3545; color: white; font-weight: bold; margin-top: 10px;" onclick="confirmFinishLearning()">はい（終了する）</button>
+
     </div>
+
+
 
     <div id="report-screen" class="screen" style="display: none;">
+
         <h2>分野別達成率 📊</h2>
+
         <p style="font-size: 0.8rem; color: #555; text-align: left; margin-bottom: 10px; background: #ebf8ff; padding: 8px; border-radius: 5px; border-left: 4px solid #3182ce;">💡 分野カードを押すと「一度でも間違えた問題」を確認できます。</p>
+
         <div id="report-sections-container" class="report-container"></div>
+
         <button class="btn back-btn" onclick="backToMainMenu()">トップに戻る</button>
+
     </div>
+
+
 
     <div id="wrong-details-screen" class="screen" style="display: none;">
+
         <h2 id="wrong-details-title">間違えた問題一覧</h2> <div id="wrong-details-list" class="review-container" style="max-height: 360px;"></div>
+
         <button class="btn back-btn" onclick="backFromWrongDetails()">戻る</button>
+
     </div>
+
+
 
     <div id="rate-screen" class="screen" style="display: none;">
+
         <h2>レート・ランキング 🏆</h2>
+
         <div class="section-screen-desc" style="background: #fffaf0; border-left-color: #eab308; color: #744210; margin-bottom: 15px;">
+
             🏆 <b>目指せランキング１位！</b> キミの努力がリアルタイムで形になる！ライバルたちを全員ぶち抜いて、今月の絶対王者の座を掴み取れ！天下無双の学力を証明しよう！天辺で待ってるぞ！🔥
+
         </div>
+
         <div id="rate-subject-selector-view">
+
             <p style="font-size: 0.95rem; color: #555; margin-bottom: 15px; font-weight: bold;">見たい教科を選んでね</p>
+
             <button class="btn nav-btn" style="background-color: #007bff; font-weight: bold; margin-bottom: 12px; padding: 14px;" onclick="selectRateSubject('science')">🌿 理科のレートを見る</button>
+
             <button class="btn nav-btn" style="background-color: #28a745; font-weight: bold; margin-bottom: 12px; padding: 14px;" onclick="selectRateSubject('social')">🗺️ 社会のレートを見る</button>
+
             <button class="btn nav-btn" style="background-color: #b45309; font-weight: bold; margin-bottom: 12px; padding: 14px;" onclick="selectRateSubject('english')">🔤 英語のレートを見る</button>
+
             <button class="btn nav-btn" style="background-color: #4a5568; font-weight: bold; margin-bottom: 12px; padding: 14px;" onclick="showRateHelp()">❓ レーティングシステムとは？</button>
+
             <button class="btn back-btn" onclick="backToMainMenu()">トップに戻る</button>
+
         </div>
+
         <div id="rate-detail-view" style="display: none;">
+
             <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+
                 <button id="cmd-show-my-rate" class="btn nav-btn" style="margin: 0; flex: 1; font-weight: bold; font-size: 0.95rem; padding: 10px;" onclick="toggleRateView('my')">個人レートを確認</button>
+
                 <button id="cmd-show-ranking" class="btn nav-btn" style="margin: 0; flex: 1; font-weight: bold; font-size: 0.95rem; padding: 10px;" onclick="toggleRateView('ranking')">全体ランキングを見る</button>
+
             </div>
+
             <div id="rate-my-section" class="score-box" style="text-align: center; background-color: #ebf8ff; border: 1px solid #bee3f8; margin-bottom: 15px;">
+
                 <div style="font-size: 0.95rem; color: #2b6cb0; font-weight: bold;"><span id="my-rate-subject-label">理科</span>の現在レート</div>
+
                 <div id="my-current-rate-val" style="font-size: 2.5rem; font-weight: bold; color: #2b6cb0; margin: 4px 0;">1500</div>
+
                 <div id="my-rate-rank-text" style="font-size: 0.85rem; color: #4a5568; font-weight: bold;">全体順位: 計算中...</div>
+
             </div>
+
             <div id="rate-ranking-section" style="display: none;">
+
                 <h3 style="text-align: left; margin: 15px 0 8px 0; color: #2d3748; font-size: 1.05rem; border-bottom: 2px solid #cbd5e0; padding-bottom: 3px;">🏆 <span id="ranking-subject-label">理科</span>トップ10ランキング</h3>
+
                 <div id="ranking-list-container" class="report-container" style="max-height: 230px; background: #ffffff; padding: 5px; border-radius: 6px; border: 1px solid #e2e8f0;"></div>
+
             </div>
+
             <button class="btn back-btn" style="margin-top: 15px;" onclick="backToRateSubjectSelector()">🔙 教科を選び直す</button>
+
         </div>
+
     </div>
+
+
 
     <div id="rate-help-screen" class="screen" style="display: none;">
+
         <h2>レーティングシステム 💡</h2>
+
         <div class="report-container" style="max-height: 480px;">
+
             <div class="score-box" style="background-color: #ebf8ff; border: 1px solid #bee3f8; margin-bottom: 15px;">
+
                 <div style="font-weight: bold; color: #2b6cb0; margin-bottom: 5px;">🪙 1. 初期レートとリセット</div>
+
                 <div style="font-size: 0.9rem; color: #4a5568; line-height: 1.5; text-align: left;">
+
                     全プレイヤーは初期状態のレート **1500** からスタートします。なお、公平な勝負を維持するため、月が変わると全プレイヤーのレーティングが一律で1500にリセットされます。
+
                 </div>
+
             </div>
+
             <div class="score-box" style="background-color: #fffaf0; border: 1px solid #feebc8; margin-bottom: 15px;">
+
                 <div style="font-weight: bold; color: #dd6b20; margin-bottom: 5px;">📈 2. 基本的な増減ルール</div>
+
                 <div style="font-size: 0.9rem; color: #4a5568; line-height: 1.5; text-align: left;">
+
                     テストは1回あたり**10問構成**です。ちょうど半分である**5問正解**がキープの基準（増減±0）となります。
+
                     <br>・6問以上正解 ➡️ レートが**加算**されます（正解が多いほど大UP）
+
                     <br>・4問以下正解 ➡️ レートが**減算**されてしまいます
+
                 </div>
+
             </div>
+
             <div class="score-box" style="background-color: #f0fff4; border: 1px solid #c6f6d5; margin-bottom: 15px;">
+
                 <div style="font-weight: bold; color: #22543d; margin-bottom: 5px; font-size: 1rem;">🔥 3. コンボ（連続正解）ボーナス</div>
+
                 <div style="font-size: 0.9rem; color: #4a5568; line-height: 1.5; text-align: left;">
-                    ミスせずに連続で正解（コンボ）を繋げるると、テスト終了時にボーナス加算！
+
+                    ミスせずに連続で正解（コンボ）を繋げると、テスト終了時にボーナス加算！
+
                     <br>・5コンボ以上 ➡️ **コンボ数に応じたボーナス加算！**
+
                     <br>・30コンボ以上 ➡️ **最大コンボボーナス（+6）が炸裂！**
+
                 </div>
+
             </div>
+
             <div class="score-box" style="background-color: #edf2f7; border: 1px solid #e2e8f0; margin-bottom: 15px;">
+
                 <div style="font-weight: bold; color: #4a5568; margin-bottom: 5px; font-size: 1rem;">✨ 4. 複数フィールド（分野）ボーナス</div>
+
                 <div style="font-size: 0.9rem; color: #4a5568; line-height: 1.5; text-align: left;">
+
                     同じ分野ばかりでなく、1日のうちに色々な分野のテストに挑戦すると、新しい分野を開くたびに**最大+5まで**の「複数分野ボーナス」がリザルトに毎回上乗せされます！
+
                 </div>
+
             </div>
+
         </div>
+
         <button class="btn back-btn" onclick="backToScreenFromHelp()">戻る</button>
+
     </div>
 
+
+
     <div id="report-issue-screen" class="screen" style="display: none;">
+
         <h2>誤答・誤植の報告 ⚠️</h2>
+
         <p style="font-size: 0.85rem; color: #666; text-align: left; margin-bottom: 15px;">問題の記述や解答の間違いを見つけたら教えてね。</p>
+
         <div style="text-align: left; box-sizing: border-box;">
+
             <label style="font-weight: bold; color: #4a5568; font-size: 0.95rem;">1. 教科を選択</label>
+
             <select id="report-subject" class="input-style" onchange="updateReportSections()">
+
                 <option value="science">理科</option>
+
                 <option value="social">社会</option>
+
                 <option value="english">英語</option>
+
             </select>
+
             <label style="font-weight: bold; color: #4a5568; font-size: 0.95rem; margin-top: 10px; display: block;">2. 分野を選択</label>
+
             <select id="report-section" class="input-style"></select>
+
             <label style="font-weight: bold; color: #4a5568; font-size: 0.95rem; margin-top: 10px; display: block;">3. 報告内容</label>
+
+            
+
             <textarea id="report-content" class="input-style" style="height: 120px; text-align: left; resize: none; font-size: 0.95rem; padding: 10px;" placeholder="間違っている問題の内容や、正しいと思われる解答を詳しく書いてください。"></textarea>
+
         </div>
+
         <button class="btn nav-btn" style="background-color: #dc3545; margin-top: 15px; font-weight: bold;" onclick="submitReport()">報告を送信する</button>
+
         <button class="btn back-btn" onclick="backToMainMenu()">キャンセル</button>
+
     </div>
+
+
 
 </div>
 
+
+
 <script>
-    // 🔗 最新のデプロイURLに固定
+
     const GAS_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbyCnbJcejfOojnn0Vd2SZTqbHO5pQixnTn2lZkvHQ73g5-MikuNuTUvcuMEjkMnTmFR4A/exec";
+
     const STUDENT_LIST_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQ6RAVBjmqZyuxiuKluc_EJfUpWlAyIt213A_YnTUTo-YHG2skF0ZyvbO11Qc1JLVNjwzVgR9vCo7_e/pub?gid=690286817&single=true&output=tsv";
 
+
+
     const SPREADSHEET_URLS = {
+
         "science_1": "https://docs.google.com/spreadsheets/d/e/2PACX-1vQ6RAVBjmqZyuxiuKluc_EJfUpWlAyIt213A_YnTUTo-YHG2skF0ZyvbO11Qc1JLVNjwzVgR9vCo7_e/pub?gid=874795216&single=true&output=tsv",
+
         "science_2": "https://docs.google.com/spreadsheets/d/e/2PACX-1vQ6RAVBjmqZyuxiuKluc_EJfUpWlAyIt213A_YnTUTo-YHG2skF0ZyvbO11Qc1JLVNjwzVgR9vCo7_e/pub?gid=1432685944&single=true&output=tsv",
+
         "science_3": "https://docs.google.com/spreadsheets/d/e/2PACX-1vQ6RAVBjmqZyuxiuKluc_EJfUpWlAyIt213A_YnTUTo-YHG2skF0ZyvbO11Qc1JLVNjwzVgR9vCo7_e/pub?gid=1224838077&single=true&output=tsv",
+
         "social_geography": "https://docs.google.com/spreadsheets/d/e/2PACX-1vQ6RAVBjmqZyuxiuKluc_EJfUpWlAyIt213A_YnTUTo-YHG2skF0ZyvbO11Qc1JLVNjwzVgR9vCo7_e/pub?gid=156445310&single=true&output=tsv",
+
         "social_history": "https://docs.google.com/spreadsheets/d/e/2PACX-1vQ6RAVBjmqZyuxiuKluc_EJfUpWlAyIt213A_YnTUTo-YHG2skF0ZyvbO11Qc1JLVNjwzVgR9vCo7_e/pub?gid=1811162203&single=true&output=tsv",
+
         "social_civics": "https://docs.google.com/spreadsheets/d/e/2PACX-1vQ6RAVBjmqZyuxiuKluc_EJfUpWlAyIt213A_YnTUTo-YHG2skF0ZyvbO11Qc1JLVNjwzVgR9vCo7_e/pub?gid=1036812823&single=true&output=tsv",
+
         "english_word_1": "https://docs.google.com/spreadsheets/d/e/2PACX-1vQ6RAVBjmqZyuxiuKluc_EJfUpWlAyIt213A_YnTUTo-YHG2skF0ZyvbO11Qc1JLVNjwzVgR9vCo7_e/pub?gid=1929383758&single=true&output=tsv",
+
         "english_grammar_1": "https://docs.google.com/spreadsheets/d/e/2PACX-1vQ6RAVBjmqZyuxiuKluc_EJfUpWlAyIt213A_YnTUTo-YHG2skF0ZyvbO11Qc1JLVNjwzVgR9vCo7_e/pub?gid=228416641&single=true&output=tsv",
+
         "english_word_2": "", "english_grammar_2": "", "english_word_3": "", "english_grammar_3": ""
+
     };
+
+
 
     const GOOGLE_FORM_ACTION_URL = "https://docs.google.com/forms/d/e/1FAIpQLSeUlfCjG2sm3AnzYUm2E4m5K-ppJQ1Af9yTULfWj0kz93WQYQ/formResponse"; 
+
     const FORM_ENTRY_IDS = {
+
         studentGrade: "entry.778118025", studentName: "entry.1910034637", studentId: "entry.1113201872",   
+
         subject: "entry.1144846119", section: "entry.765540622", score: "entry.503101077", total: "entry.203688342"          
+
     };
 
+
+
     const REPORT_FORM_ACTION_URL = "https://docs.google.com/forms/d/e/1FAIpQLScnEZk3HjZ9H3uVZw50UcNQgnBcW75QI1lZa0XkZ95cgiq_5A/formResponse";
+
     const REPORT_FORM_ENTRY_IDS = { studentInfo: "entry.853229938", subject: "entry.243005802", section: "entry.550040200", content: "entry.555032327" };
 
+
+
     let studentId = ""; let studentGrade = ""; let studentName = ""; let studentCampus = ""; let studentKey = "";   
+
     let allStudentsList = []; let allQuizData = {}; let quizData = [];         
+
     let selectedSubject = ""; let selectedGrade = ""; let selectedSectionName = ""; 
+
     let currentSectionAllQuestions = []; let filteredQuizData = []; 
+
     let currentQuestionIndex = 0; let score = 0; let wrongQuestionsList = []; 
+
     let currentCombo = 0; let maxCombo = 0;      
+
     let dailySummaryData = {}; let currentRateTab = "science"; 
+
     let dailyRateChangeScience = 0; let dailyRateChangeSocial = 0; let dailyRateChangeEnglish = 0;
+
     let currentMode = "test"; 
 
-    // 出現重み設定
+
+
+    let isReviewMode = false;
+
+    let reviewQuizData = [];
+
+    let reviewQuestionIndex = 0;
+
+    let isDataSubmitted = false; // 【新規追加】データ多重送信・重複更新防止フラグ
+
+
+
     const FAST_ANSWER_THRESHOLD = 3000;
+
     const PERFORMANCE_WEIGHTS = { 'unseen': 100, 'wrong': 60, 'slow_correct': 20, 'fast_correct': 1 };
+
     let questionStartTime = 0;
+
     let roundTotalTimeMs = 0;
 
-    // 対戦用管理変数
+
+
     let activeGhostData = null;  
+
     let ghostTimerInterval = null;
+
     let ghostCurrentQuestion = 0;
+
     let ghostCurrentScore = 0;
+
     
-    // キミの「解答データ」を保存するログ配列
+
     let currentPlayerRoundLogs = []; 
 
+
+
     function getGaugeColor(rate) {
+
         if (rate <= 30) return "#dc3545"; if (rate <= 70) return "#eab308"; if (rate <= 90) return "#28a745"; return "#007bff"; 
+
     }
+
     function hideAllScreens() { 
+
         const screens = document.querySelectorAll('.screen'); screens.forEach(s => s.style.display = 'none'); 
+
         if (ghostTimerInterval) { clearTimeout(ghostTimerInterval); ghostTimerInterval = null; }
+
     }
+
+
 
     function checkMonthlyReset() {
+
         if (!studentKey) return;
+
         const now = new Date(); const currentMonthString = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+
         const savedMonthString = localStorage.getItem(`quiz_rate_month_${studentKey}`);
+
         if (savedMonthString !== currentMonthString) {
+
             localStorage.setItem(`quiz_rate_science_${studentKey}`, '1500'); localStorage.setItem(`quiz_rate_social_${studentKey}`, '1500'); localStorage.setItem(`quiz_rate_english_${studentKey}`, '1500');
+
             localStorage.setItem(`quiz_rate_month_${studentKey}`, currentMonthString);
+
             dailyRateChangeScience = 0; dailyRateChangeSocial = 0; dailyRateChangeEnglish = 0;
+
         }
+
     }
+
+
 
     function checkBattleLimit() {
+
         if (!studentKey) return true;
+
         const savedDate = localStorage.getItem(`quiz_battle_date_${studentKey}`);
+
         const now = new Date(); const todayStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+
         if (savedDate !== todayStr) {
+
             localStorage.setItem(`quiz_battle_date_${studentKey}`, todayStr);
+
             localStorage.setItem(`quiz_battle_count_${studentKey}`, '3');
+
             return true;
+
         }
+
         return parseInt(localStorage.getItem(`quiz_battle_count_${studentKey}`) || '3') > 0;
+
     }
+
+
 
     function getBattleRemainingCount() {
+
         if (!studentKey) return 3;
+
         checkBattleLimit(); return parseInt(localStorage.getItem(`quiz_battle_count_${studentKey}`) || '3');
+
     }
+
+
 
     function setMode(mode) { 
+
         if (mode === 'battle' && getBattleRemainingCount() <= 0) { alert("本日の対戦上限（3回）に達しました。また明日挑戦してね！"); return; }
+
         currentMode = mode; startLearningMode(); 
+
     }
+
+
 
     async function loginStudent() {
+
         const idInput = document.getElementById('student-id-input').value.trim(); const nameInput = document.getElementById('student-name-input').value.trim(); const loginBtn = document.getElementById('login-submit-btn');
+
         if (!idInput || !nameInput) { alert("生徒番号と氏名を入力してください。"); return; }
+
         loginBtn.disabled = true; loginBtn.innerText = "認証中...";
+
         try {
+
             const response = await fetch(STUDENT_LIST_URL); const text = await response.text(); const lines = text.split("\n");
+
             let isUserFound = false; allStudentsList = []; 
+
             for (let i = 1; i < lines.length; i++) {
+
                 const line = lines[i].trim(); if (!line) continue; const currentCols = line.split("\t"); if (currentCols.length < 2) continue;
+
                 allStudentsList.push({ id: currentCols[0].trim(), name: currentCols[1].trim(), grade: "生徒", scienceRate: currentCols[3]?parseInt(currentCols[3].trim()):1500, socialRate: currentCols[4]?parseInt(currentCols[4].trim()):1500, englishRate: currentCols[5]?parseInt(currentCols[5].trim()):1500, campus: currentCols[2]?currentCols[2].trim():"---" });
+
                 if (Number(currentCols[0].trim()) === Number(idInput) && currentCols[1].trim() === nameInput) {
+
                     studentId = currentCols[0].trim(); studentName = currentCols[1].trim(); studentGrade = "生徒"; studentCampus = currentCols[2]?currentCols[2].trim():"---"; studentKey = `${studentId}_${studentName}`; isUserFound = true;
+
                 }
+
             }
+
             if (!isUserFound) { alert("生徒番号または氏名が登録されていません。"); loginBtn.disabled = false; loginBtn.innerText = "ログイン"; return; }
+
             currentCombo = 0; maxCombo = 0; dailySummaryData = {}; dailyRateChangeScience = 0; dailyRateChangeSocial = 0; dailyRateChangeEnglish = 0;
+
             localStorage.setItem('quiz_saved_id', studentId); localStorage.setItem('quiz_saved_name', studentName); localStorage.setItem('quiz_saved_grade', studentGrade); localStorage.setItem('quiz_saved_campus', studentCampus); 
+
             checkMonthlyReset(); hideAllScreens(); document.getElementById('loading-screen').style.display = 'block'; document.getElementById('loading-text').innerText = "ログイン成功！問題データを読み込んでいます...";
+
             showMainScreen();
+
         } catch (error) { alert("生徒一覧データの読み込みに失敗しました。"); console.error(error); } finally { loginBtn.disabled = false; loginBtn.innerText = "ログイン"; }
+
     }
+
+
 
     async function loadAllQuizData() {
+
         document.getElementById('loading-text').innerText = "サーバーから最新の問題データを同期しています...";
+
         try {
+
             const keys = Object.keys(SPREADSHEET_URLS); const quizPromises = keys.map(key => SPREADSHEET_URLS[key] ? fetch(SPREADSHEET_URLS[key]).then(res => res.text()) : Promise.resolve(""));
+
             const studentPromise = fetch(STUDENT_LIST_URL).then(res => res.text()); const [studentText, ...quizTexts] = await Promise.all([studentPromise, ...quizPromises]);
+
             const studentLines = studentText.split("\n"); allStudentsList = [];
+
             for (let i = 1; i < studentLines.length; i++) {
+
                 const line = studentLines[i].trim(); if (!line) continue; const cols = line.split("\t"); if (cols.length < 2) continue;
+
                 allStudentsList.push({ id: cols[0].trim(), name: cols[1].trim(), grade: "生徒", campus: cols[2]?cols[2].trim():"---", scienceRate: cols[3]?parseInt(cols[3].trim()):1500, socialRate: cols[4]?parseInt(cols[4].trim()):1500, englishRate: cols[5]?parseInt(cols[5].trim()):1500 });
+
             }
+
             keys.forEach((key, index) => {
+
                 const text = quizTexts[index]; if (!text) return; const lines = text.split("\n"); allQuizData[key] = [];
+
                 for (let i = 1; i < lines.length; i++) {
+
                     const line = lines[i].trim(); if (!line) continue; const cols = line.split("\t");
+
                     if (key.startsWith("english_word")) {
-                        // ★【修正箇所 3】列数が足りない行を安全にスキップ（クラッシュ防止ガード句）
+
                         if (cols.length < 2 || !cols[0] || !cols[1]) continue; 
+
                         
+
                         const en = cols[0].trim(); const ja = cols[1].trim(); if (!en || !ja) continue;
+
                         let stage = "Stage 1"; if (cols[8] && cols[8].trim()) stage = cols[8].trim(); else if (cols[2] && cols[2].trim()) stage = cols[2].trim();
+
                         allQuizData[key].push({ type: "en_to_ja", question: en, correctText: ja, section: `英単語⇒日本語 (${stage})`, explanation: "" });
+
                         allQuizData[key].push({ type: "ja_to_en", question: ja, correctText: en, section: `日本語⇒英単語 (${stage})`, explanation: "" });
+
                         continue;
+
                     }
+
                     let qText, qChoices, qCorrect, qSection, qExplanation; const firstCol = cols[0].trim();
+
                     if (firstCol === "science" || firstCol === "social" || firstCol === "english" || key.startsWith("english_grammar") || cols.length >= 8) {
+
                         if (cols.length < 8) continue; qText = cols[2].trim(); qChoices = [cols[3].trim(), cols[4].trim(), cols[5].trim(), cols[6].trim()]; qCorrect = parseInt(cols[7].trim()) - 1;
+
                         qSection = (cols[8] && cols[8].trim()) ? cols[8].trim() : (key.startsWith("english_grammar") ? "空欄補充" : "その他"); qExplanation = cols[9] ? cols[9].trim() : "";
+
                     } else {
+
                         if (cols.length < 6) continue; qText = cols[0].trim(); qChoices = [cols[1].trim(), cols[2].trim(), cols[3].trim(), cols[4].trim()]; qCorrect = parseInt(cols[5].trim()) - 1;
+
                         qSection = cols[6] ? cols[6].trim() : "共通"; qExplanation = cols[7] ? cols[7].trim() : "";
+
                     }
+
                     if (isNaN(qCorrect)) continue; allQuizData[key].push({ question: qText, choices: qChoices, correct: qCorrect, section: qSection, explanation: qExplanation });
+
                 }
+
             });
+
             hideAllScreens(); document.getElementById('main-menu-screen').style.display = 'block';
+
         } catch (error) { alert("問題データの同期に失敗しました。"); console.error(error); hideAllScreens(); document.getElementById('login-screen').style.display = 'block'; }
+
     }
+
+
 
     function showMainScreen() {
+
         const badgeText = `[${studentCampus}] ${studentName} さん`;
+
         for(let i=0; i<=5; i++) { const el = document.getElementById(`user-badge-${i}`); if(el) el.innerText = badgeText; }
+
         const savedSummary = localStorage.getItem(`quiz_daily_summary_${studentKey}`); dailySummaryData = savedSummary ? JSON.parse(savedSummary) : {};
+
         loadAllQuizData();
-    }
-    function logoutStudent() {
-        localStorage.removeItem('quiz_saved_id'); localStorage.removeItem('quiz_saved_name'); localStorage.removeItem('quiz_saved_grade'); localStorage.removeItem('quiz_saved_campus'); localStorage.removeItem(`quiz_daily_summary_${studentKey}`);
-        currentCombo = 0; maxCombo = 0; dailySummaryData = {}; dailyRateChangeScience = 0; dailyRateChangeSocial = 0; dailyRateChangeEnglish = 0;
-        document.getElementById('student-id-input').value = ""; document.getElementById('student-name-input').value = "";
-        hideAllScreens(); document.getElementById('login-screen').style.display = 'block';
-    }
-    function checkAutoLogin() {
-        const savedId = localStorage.getItem('quiz_saved_id'); const savedName = localStorage.getItem('quiz_saved_name');
-        if (savedId && savedName) { document.getElementById('student-id-input').value = savedId; document.getElementById('student-name-input').value = savedName; }
+
     }
 
-    function startLearningMode() { 
-        hideAllScreens(); 
-        const ruleBox = document.getElementById('battle-rule-box');
-        if (currentMode === 'battle') {
-            const remCount = getBattleRemainingCount();
-            ruleBox.innerHTML = `
-                <div class="section-screen-desc" style="background: #faf5ff; border-left-color: #6b46c1; color: #44337a; margin-bottom: 15px;">
-                    ⚔️ <b>対戦ルール（スピードボーナス制）</b><br>
-                    ・勝利: レート <b>+20</b> / 敗北: レート <b>-20</b><br>
-                    ・判定: 正解時の<b>スピードPt</b>が高い方の勝ち！<br>
-                    ・1問につきベース 1000点。5秒以内に答えれば早さに応じて<b>最大500点のボーナス！</b><br>
-                    ・1日3回限定（残り可能数: <b>${remCount}回</b>）
-                </div>
-            `;
-            ruleBox.style.display = 'block';
-        } else { ruleBox.style.display = 'none'; }
-        document.getElementById('subject-screen').style.display = 'block'; 
+    function logoutStudent() {
+
+        localStorage.removeItem('quiz_saved_id'); localStorage.removeItem('quiz_saved_name'); localStorage.removeItem('quiz_saved_grade'); localStorage.removeItem('quiz_saved_campus'); localStorage.removeItem(`quiz_daily_summary_${studentKey}`);
+
+        currentCombo = 0; maxCombo = 0; dailySummaryData = {}; dailyRateChangeScience = 0; dailyRateChangeSocial = 0; dailyRateChangeEnglish = 0;
+
+        document.getElementById('student-id-input').value = ""; document.getElementById('student-name-input').value = "";
+
+        hideAllScreens(); document.getElementById('login-screen').style.display = 'block';
+
     }
+
+    function checkAutoLogin() {
+
+        const savedId = localStorage.getItem('quiz_saved_id'); const savedName = localStorage.getItem('quiz_saved_name');
+
+        if (savedId && savedName) { document.getElementById('student-id-input').value = savedId; document.getElementById('student-name-input').value = savedName; }
+
+    }
+
+
+
+    function startLearningMode() { 
+
+        hideAllScreens(); 
+
+        const ruleBox = document.getElementById('battle-rule-box');
+
+        if (currentMode === 'battle') {
+
+            const remCount = getBattleRemainingCount();
+
+            ruleBox.innerHTML = `
+
+                <div class="section-screen-desc" style="background: #faf5ff; border-left-color: #6b46c1; color: #44337a; margin-bottom: 15px;">
+
+                    ⚔️ <b>対戦ルール（スピードボーナス＆誤答ペナルティ制）</b><br>
+
+                    ・勝利: レート <b>+20</b> / 敗北: レート <b>-20</b><br>
+
+                    ・判定: 正解時の<b>スピードPt</b>が高い方の勝ち！<br>
+
+                    ・1問につきベース 1000点。5秒以内なら<b>最大500点のボーナス！</b><br>
+
+                    ・<span style="color:#dc3545; font-weight:bold;">【重要】誤答すると1問につき大減点（-1200点）！正確さが命！</span><br>
+
+                    ・1日3回限定（残り可能数: <b>${remCount}回</b>）
+
+                </div>
+
+            `;
+
+            ruleBox.style.display = 'block';
+
+        } else { ruleBox.style.display = 'none'; }
+
+        document.getElementById('subject-screen').style.display = 'block'; 
+
+    }
+
+
 
     function backToMainMenu() { hideAllScreens(); document.getElementById('main-menu-screen').style.display = 'block'; }
 
+
+
     function sendRateToSpreadsheet(subject, newRate) {
+
         if (!GAS_WEB_APP_URL || GAS_WEB_APP_URL.includes("ここに")) return;
+
         
+
         const params = new URLSearchParams();
+
         params.append("action", "update_rate"); 
+
         params.append("studentId", studentId);
+
         params.append("subject", subject);
+
         params.append("rate", newRate);
+
         
+
         fetch(GAS_WEB_APP_URL, { 
+
             method: 'POST', 
+
             body: params, 
+
             mode: 'no-cors' 
+
         }).catch((e) => { console.error("レート同期エラー:", e); });
+
     }
+
+
 
     function sendFieldSummaryToSpreadsheet() {
+
         if (!GAS_WEB_APP_URL || GAS_WEB_APP_URL.includes("ここに")) return;
+
         const payload = { 
+
             studentId: studentId, 
+
             studentName: studentName, 
+
             campus: studentCampus, 
+
             subject: selectedSubject, 
+
             section: selectedSectionName, 
+
             totalTimeMs: roundTotalTimeMs, 
+
             correctCount: score, 
+
             maxCombo: maxCombo,
+
             ghostLog: currentPlayerRoundLogs     
+
         };
+
         
+
         const params = new URLSearchParams();
+
         params.append("action", "update_field_summary");
+
         params.append("data", JSON.stringify(payload));
+
         
+
         fetch(GAS_WEB_APP_URL, { 
+
             method: 'POST', 
+
             body: params, 
+
             mode: 'no-cors' 
+
         }).catch(e => console.error("統計データ送信失敗:", e));
+
     }
+
+
 
     function sendDataToGoogleForm() {
+
         if (!GOOGLE_FORM_ACTION_URL || GOOGLE_FORM_ACTION_URL.includes("ここに")) return;
+
         
+
         const params = new URLSearchParams();
+
         params.append(FORM_ENTRY_IDS.studentGrade, studentGrade);
+
         params.append(FORM_ENTRY_IDS.studentName, studentName);
+
         params.append(FORM_ENTRY_IDS.studentId, studentId);
+
         params.append(FORM_ENTRY_IDS.subject, selectedSubject);
+
         params.append(FORM_ENTRY_IDS.section, selectedSectionName);
+
         params.append(FORM_ENTRY_IDS.score, score);
+
         params.append(FORM_ENTRY_IDS.total, filteredQuizData.length);
+
         
+
         fetch(GOOGLE_FORM_ACTION_URL, { 
+
             method: 'POST', 
+
             body: params, 
+
             mode: 'no-cors' 
+
         }).catch((e) => { console.error("Googleフォーム送信エラー:", e); });
+
     }
+
+
 
     function selectSubject(subject) { 
+
         selectedSubject = subject; 
+
         if (subject === 'english') { showEnglishSubScreen(); } 
+
         else if (subject === 'science') { 
-            let gradeStr = studentGrade.replace(/[１-３]/g, function(s) { return String.fromCharCode(s.charCodeAt(0) - 0xFEE0); }).replace(/一/g, "1").replace(/二/g, "2").replace(/三/g, "3");
-            const gradeNumber = gradeStr.replace(/[^0-9]/g, ""); const apiKey = `${selectedSubject}_${gradeNumber}`;
-            if (SPREADSHEET_URLS[apiKey]) selectGrade(gradeNumber); else { hideAllScreens(); document.getElementById('grade-screen').style.display = 'block'; }
+
+            hideAllScreens(); document.getElementById('grade-screen').style.display = 'block';
+
         } else if (subject === 'social') { hideAllScreens(); document.getElementById('social-sub-screen').style.display = 'block'; }
+
     }
+
     function showEnglishSubScreen() {
+
         hideAllScreens(); quizData = [];
+
         ["1", "2", "3", "4", "5"].forEach(grade => {
+
             (allQuizData[`english_word_${grade}`] || []).forEach(q => quizData.push({ type: q.type, question: q.question, correctText: q.correctText, section: q.section, explanation: "" }));
+
             (allQuizData[`english_grammar_${grade}`] || []).forEach(q => quizData.push({ question: q.question, choices: [...q.choices], correct: q.correct, section: q.section, explanation: q.explanation }));
+
         });
+
         document.getElementById('english-sub-screen').style.display = 'block';
+
     }
+
+
+
     function selectEnglishMode(mode) {
+
+        selectedGrade = ""; 
+
         let masterPool = [...quizData]; quizData = [];
+
         masterPool.forEach(q => {
+
             if (mode === "日本語⇒英単語" && q.type === "ja_to_en") quizData.push(q);
+
             else if (mode === "英単語⇒日本語" && q.type === "en_to_ja") quizData.push(q);
+
             else if (mode === "空欄補充" && !q.type) quizData.push(q);
+
         });
+
         if (quizData.length === 0) { alert("有効な問題データがありませんでした。"); showEnglishSubScreen(); return; }
+
         hideAllScreens(); renderSectionScreen(); document.getElementById('section-screen').style.display = 'block';
+
     }
+
+
+
     function backToSubjectFromEnglish() { hideAllScreens(); document.getElementById('subject-screen').style.display = 'block'; }
+
     function selectSocialSub(subSubject) { selectGrade(subSubject); }
+
     function backToSubjectFromSocial() { hideAllScreens(); document.getElementById('subject-screen').style.display = 'block'; }
-    function backToSubject() { hideAllScreens(); if (selectedSubject === 'science') document.getElementById('subject-screen').style.display = 'block'; else if (selectedSubject === 'english') showEnglishSubScreen(); else document.getElementById('social-sub-screen').style.display = 'block'; }
+
+    
+
+    function backToSubject() { 
+
+        hideAllScreens(); 
+
+        if (selectedSubject === 'science') {
+
+            document.getElementById('grade-screen').style.display = 'block'; 
+
+        } else if (selectedSubject === 'english') {
+
+            showEnglishSubScreen(); 
+
+        } else {
+
+            document.getElementById('social-sub-screen').style.display = 'block'; 
+
+        }
+
+    }
+
+
+
     function backToGrade() { hideAllScreens(); document.getElementById('grade-screen').style.display = 'block'; }
+
     function backToResult() { hideAllScreens(); document.getElementById('result-screen').style.display = 'block'; }
+
     function backToSectionSelect() { if (selectedSectionName) { if (currentMode === "report") { hideAllScreens(); document.getElementById('section-screen').style.display = 'block'; } else { prepareModeFlow(selectedSectionName); } } else backToMainMenu(); }
+
     function backToSubjectFromResult() { hideAllScreens(); document.getElementById('subject-screen').style.display = 'block'; }
 
+
+
     function selectGrade(grade) {
+
         selectedGrade = grade; hideAllScreens(); const apiKey = `${selectedSubject}_${grade}`; const sourceData = allQuizData[apiKey] || []; quizData = [];
+
         sourceData.forEach(q => { quizData.push({ question: q.question, choices: [...q.choices], correct: q.correct, section: q.section, explanation: q.explanation }); });
+
         if (quizData.length === 0) { alert("有効な問題データがありませんでした。"); document.getElementById('main-menu-screen').style.display = 'block'; return; }
+
         renderSectionScreen(); document.getElementById('section-screen').style.display = 'block';
+
     }
+
+
 
     function renderSectionScreen() {
+
         const container = document.getElementById('section-buttons'); container.innerHTML = ""; const titleEl = document.querySelector('#section-screen h2');
+
         if (currentMode === "report") { titleEl.innerText = "過去の間違いを確認 📊"; } 
+
         else {
+
             titleEl.innerText = currentMode === "battle" ? "対戦分野を選択 ⚔️" : "分野・弱点診断 📊"; 
+
             if(currentMode !== "battle") {
+
                 const allBtn = document.createElement('button'); allBtn.className = "btn nav-btn"; allBtn.style.backgroundColor = "#007bff"; allBtn.style.marginBottom = "15px"; allBtn.innerText = "🌟 全範囲からランダム"; allBtn.onclick = () => prepareModeFlow("全範囲"); container.appendChild(allBtn);
+
             }
+
         }
+
         const sectionsSet = new Set(); quizData.forEach(q => { if(q.section) sectionsSet.add(q.section) });
+
         const sectionStats = Array.from(sectionsSet).map(sec => {
+
             const stats = JSON.parse(localStorage.getItem('quiz_perf_stats_' + studentKey) || '{}');
+
             const total = quizData.filter(q => q.section === sec).length;
+
             const cleared = quizData.filter(q => q.section === sec && stats[q.question] && stats[q.question].status.includes('correct')).length;
+
             const accuracy = total > 0 ? Math.round((cleared / total) * 100) : 0;
+
             return { name: sec, total, cleared, accuracy };
+
         });
+
         sectionStats.forEach(stat => {
+
             const card = document.createElement('div'); card.className = "section-card";
+
             if (currentMode === "report") { const isEnglish = (selectedSubject === 'english'); card.onclick = () => showWrongQuestionsDetail(`${selectedSubject}_${selectedGrade}`, stat.name, isEnglish, selectedGrade); } else { card.onclick = () => prepareModeFlow(stat.name); }
+
             let badgeColor = getGaugeColor(stat.accuracy); let statusText = "🚨 弱点 (要対策)"; if (stat.accuracy > 90) statusText = "👑 完璧！"; else if (stat.accuracy > 70) statusText = "🍏 克服！"; else if (stat.accuracy > 30) statusText = "⚠️ あと少し";
+
             card.innerHTML = `<div class="section-card-title"><span>${stat.name}</span><span class="section-status-badge" style="background-color: ${badgeColor};">${statusText}</span></div><div class="progress-bar-bg"><div class="progress-bar-fill" style="width: ${stat.accuracy}%; background-color: ${badgeColor};"></div></div><div class="section-card-footer"><span>クリア問数: <b>${stat.cleared}</b> / ${stat.total} 問</span><span>クリア率: <b>${stat.accuracy}%</b></span></div>`;
+
             container.appendChild(card);
+
         });
+
     }
+
+
 
     function prepareModeFlow(section) {
+
         selectedSectionName = section;
+
         if (currentMode === "battle") {
+
             if (getBattleRemainingCount() <= 0) { alert("本日の対戦上限（3回）に達しました。"); backToMainMenu(); return; }
+
             hideAllScreens();
+
             document.getElementById('battle-field-name').innerText = section;
+
             document.getElementById('cmd-start-matching').style.display = 'block';
+
             document.getElementById('matching-status-area').style.display = 'none';
+
             document.getElementById('matched-rival-card').style.display = 'none';
+
             document.getElementById('battle-match-back-btn').style.display = 'block';
+
             document.getElementById('battle-match-screen').style.display = 'block';
+
         } else { startQuizWithSection(section); }
+
     }
 
+
+
     function triggerMatchingSequence() {
+
         document.getElementById('cmd-start-matching').style.display = 'none';
+
         document.getElementById('battle-match-back-btn').style.display = 'none';
+
         const statusArea = document.getElementById('matching-status-area');
+
         const statusTxt = document.getElementById('matching-status-text');
+
         const progressFill = document.getElementById('matching-progress-fill');
+
         
+
         statusArea.style.display = 'block';
+
         statusTxt.innerText = "対戦データベースをサンプリング中...";
+
         progressFill.style.width = "0%";
+
+
 
         const myRate = parseInt(localStorage.getItem(`quiz_rate_${selectedSubject}_${studentKey}`) || '1500');
 
+
+
         let progressVal = 0;
+
         let animationInterval = setInterval(() => {
+
             progressVal += 10; progressFill.style.width = progressVal + "%";
+
             if (progressVal === 40) statusTxt.innerText = `同レート帯（${myRate}±30）を探索中...`;
+
             if (progressVal === 80) statusTxt.innerText = "10問の詳細ラップタイムを取得中...";
 
+
+
             if (progressVal >= 100) {
+
                 clearInterval(animationInterval);
+
                 fetchGhostAndReveal(myRate);
+
             }
+
         }, 150);
+
     }
 
+
+
     function fetchGhostAndReveal(myRate) {
+
         document.getElementById('matching-status-area').style.display = 'none';
+
         const url = `${GAS_WEB_APP_URL}?action=get_battle_ghost&studentId=${studentId}&myRate=${myRate}&subject=${selectedSubject}&section=${encodeURIComponent(selectedSectionName)}`;
+
         
+
         fetch(url)
+
         .then(res => res.json())
+
         .then(data => {
+
             if (data && data.ghostLog && data.ghostLog.length > 0) {
+
                 activeGhostData = data; 
+
             } else {
+
                 activeGhostData = {
+
                     id: "9999",
+
                     name: "対戦相手",
+
                     rate: myRate,
+
                     ghostLog: Array.from({length:10}, () => ({isCorrect: Math.random() > 0.4, timeMs: Math.round(3500 + (Math.random() * 2000 - 1000))}))
+
                 };
+
             }
+
             document.getElementById('rival-profile-rate').innerText = activeGhostData.rate;
+
             document.getElementById('matched-rival-card').style.display = 'block';
+
         })
+
         .catch(err => {
+
             console.error("ゴーストデータ取得に失敗:", err);
+
             alert("対戦相手のデータ取得に失敗しました。通常テストモードに戻ります。");
+
             setMode('test');
+
         });
+
     }
+
+
 
     function startActualBattleQuiz() { startQuizWithSection(selectedSectionName); }
 
+
+
     function startQuizWithSection(section) {
+
+        isDataSubmitted = false; // 【修正】クイズの新しいラウンドが始まるタイミングで送信フラグをリセット
+
         selectedSectionName = section; currentSectionAllQuestions = (section === "全範囲") ? [...quizData] : quizData.filter(q => q.section === section);
+
         const stats = JSON.parse(localStorage.getItem(`quiz_perf_stats_${studentKey}`) || '{}');
+
         
+
         let weightedPool = currentSectionAllQuestions.map(q => {
+
             const itemStat = stats[q.question] || { status: 'unseen' };
+
             const weight = PERFORMANCE_WEIGHTS[itemStat.status] || PERFORMANCE_WEIGHTS['unseen'];
+
             return { questionData: q, weight: weight };
+
         });
+
+
 
         filteredQuizData = []; const targetCount = Math.min(10, weightedPool.length);
+
         for (let i = 0; i < targetCount; i++) {
+
             let totalWeight = weightedPool.reduce((sum, item) => sum + item.weight, 0);
+
             if (totalWeight === 0) {
+
                 let randIdx = Math.floor(Math.random() * weightedPool.length);
+
                 filteredQuizData.push(weightedPool.splice(randIdx, 1)[0].questionData); continue;
+
             }
+
             let randomValue = Math.random() * totalWeight; let weightSum = 0;
+
             for (let j = 0; j < weightedPool.length; j++) {
+
                 weightSum += weightedPool[j].weight;
+
                 if (randomValue <= weightSum) { filteredQuizData.push(weightedPool.splice(j, 1)[0].questionData); break; }
+
             }
+
         }
 
-        // ★【修正箇所 1】英単語ダミー選択肢の言語混ざり防止ロジック
+
+
         filteredQuizData.forEach(quiz => {
+
             if (quiz.type === "en_to_ja" || quiz.type === "ja_to_en") { 
+
                 const targetWord = (quiz.type === "ja_to_en") ? quiz.correctText : quiz.question; 
+
                 const targetChar = targetWord.trim()[0].toLowerCase();
+
                 
+
                 let sameInitialTexts = currentSectionAllQuestions.filter(q => { 
-                    // 出題形式（英日 / 日英）が完全に一致するものだけに絞り込む条件を追加
+
                     if (q.type !== quiz.type) return false; 
+
                     
+
                     const word = (q.type === "ja_to_en") ? q.correctText : q.question; 
+
+                    if (!word || !word.trim()) return false;
+
+                    
+
                     return word.trim()[0].toLowerCase() === targetChar; 
+
                 }).map(q => q.correctText).filter(txt => txt !== quiz.correctText);
+
                 
+
                 let dummyPool = Array.from(new Set(sameInitialTexts));
+
                 for (let i = dummyPool.length - 1; i > 0; i--) { 
+
                     const j = Math.floor(Math.random() * (i + 1)); 
+
                     [dummyPool[i], dummyPool[j]] = [dummyPool[j], dummyPool[i]]; 
+
                 }
+
                 let dummies = dummyPool.slice(0, 3);
+
                 if (dummies.length < 3) {
+
                     let backupPool = Array.from(new Set(currentSectionAllQuestions.filter(q => q.type === quiz.type).map(q => q.correctText))).filter(txt => txt !== quiz.correctText && !dummies.includes(txt));
+
                     for (let i = backupPool.length - 1; i > 0; i--) { 
+
                         const j = Math.floor(Math.random() * (i + 1)); 
+
                         [backupPool[i], backupPool[j]] = [backupPool[j], backupPool[i]]; 
+
                     }
+
                     while (dummies.length < 3 && backupPool.length > 0) { dummies.push(backupPool.shift()); }
+
                 }
+
                 while(dummies.length < 3) { dummies.push("---"); }
+
                 let choices = [quiz.correctText, ...dummies];
+
                 for (let i = choices.length - 1; i > 0; i--) { 
+
                     const j = Math.floor(Math.random() * (i + 1)); 
+
                     [choices[i], choices[j]] = [choices[j], choices[i]]; 
+
                 }
+
                 quiz.choices = choices; 
+
                 quiz.correct = choices.indexOf(quiz.correctText);
+
             } else {
+
                 const correctText = quiz.choices[quiz.correct];
+
                 for (let i = quiz.choices.length - 1; i > 0; i--) { 
+
                     const j = Math.floor(Math.random() * (i + 1)); 
+
                     [quiz.choices[i], quiz.choices[j]] = [quiz.choices[j], quiz.choices[i]]; 
+
                 }
+
                 quiz.correct = quiz.choices.indexOf(correctText);
+
             }
+
         });
+
+
 
         hideAllScreens(); document.getElementById('quiz-screen').style.display = 'block';
+
         currentQuestionIndex = 0; score = 0; wrongQuestionsList = []; roundTotalTimeMs = 0; currentPlayerRoundLogs = [];
+
         
+
+        isReviewMode = false;
+
+        reviewQuizData = [];
+
+        reviewQuestionIndex = 0;
+
+        document.getElementById('review-end-message').style.display = 'none';
+
+        document.getElementById('review-to-result-btn').style.display = 'none';
+
+
+
         if (currentMode === "battle" && activeGhostData) {
+
             ghostCurrentQuestion = 0; ghostCurrentScore = 0;
+
             document.getElementById('vs-live-panel').style.display = 'block';
+
             updateLiveVSUI(); startGhostSimulationLoop(); 
+
         } else {
+
             document.getElementById('vs-live-panel').style.display = 'none';
+
         }
+
         showQuestion();
+
     }
+
+
 
     function startGhostSimulationLoop() {
+
         if (ghostTimerInterval) clearTimeout(ghostTimerInterval);
+
         
+
         function executeGhostLap() {
+
             if (ghostCurrentQuestion < 10) {
+
                 const currentLapData = activeGhostData.ghostLog[ghostCurrentQuestion];
+
                 
+
                 ghostTimerInterval = setTimeout(() => {
+
                     ghostCurrentQuestion++;
+
                     if (currentLapData.isCorrect) { ghostCurrentScore++; }
+
                     updateLiveVSUI();
+
                     executeGhostLap(); 
+
                 }, currentLapData.timeMs); 
+
             }
+
         }
+
         executeGhostLap();
+
     }
+
+
 
     function updateLiveVSUI() {
+
         document.getElementById('player-live-txt').innerText = `${currentQuestionIndex} / 10問 (正解: ${score})`;
+
         document.getElementById('player-live-fill').style.width = (currentQuestionIndex * 10) + "%";
+
         document.getElementById('rival-live-txt').innerText = `${ghostCurrentQuestion} / 10問`;
+
         document.getElementById('rival-live-score').innerText = ghostCurrentScore;
+
         document.getElementById('rival-live-fill').style.width = (ghostCurrentQuestion * 10) + "%";
+
     }
+
+
 
     function showQuestion() {
-        const currentQuiz = filteredQuizData[currentQuestionIndex];
-        document.getElementById('progress').innerText = `${currentQuestionIndex + 1} / ${filteredQuizData.length} 問目`; document.getElementById('question').innerText = currentQuiz.question;
-        const comboDiv = document.getElementById('combo-alert'); comboDiv.innerText = currentCombo > 0 ? `🔥 ${currentCombo}コンボ中！` : "";
-        const stats = JSON.parse(localStorage.getItem(`quiz_perf_stats_` + studentKey) || '{}');
-        const count = (stats[currentQuiz.question] && stats[currentQuiz.question].wrong_count) ? stats[currentQuiz.question].wrong_count : 0;
-        const alertDiv = document.getElementById('wrong-alert'); alertDiv.innerText = count > 0 ? `⚠️ 過去に ${count} 回間違えた問題です！` : "";
+
+        const currentQuiz = isReviewMode ? reviewQuizData[reviewQuestionIndex] : filteredQuizData[currentQuestionIndex];
+
+        
+
+        if (!isReviewMode) {
+
+            document.getElementById('progress').innerText = `${currentQuestionIndex + 1} / ${filteredQuizData.length} 問目`;
+
+            const comboDiv = document.getElementById('combo-alert'); comboDiv.innerText = currentCombo > 0 ? `🔥 ${currentCombo}コンボ中！` : "";
+
+            const stats = JSON.parse(localStorage.getItem(`quiz_perf_stats_` + studentKey) || '{}');
+
+            const count = (stats[currentQuiz.question] && stats[currentQuiz.question].wrong_count) ? stats[currentQuiz.question].wrong_count : 0;
+
+            const alertDiv = document.getElementById('wrong-alert'); alertDiv.innerText = count > 0 ? `⚠️ 過去に ${count} 回間違えた問題です！` : "";
+
+            if (currentMode === "battle") updateLiveVSUI();
+
+        } else {
+
+            document.getElementById('progress').innerText = `🔄 復習 ${reviewQuestionIndex + 1} / ${reviewQuizData.length} 問目`;
+
+            document.getElementById('combo-alert').innerText = "";
+
+            document.getElementById('wrong-alert').innerText = "";
+
+            document.getElementById('vs-live-panel').style.display = 'none'; 
+
+        }
+
+
+
+        document.getElementById('question').innerText = currentQuiz.question;
+
         const buttons = document.querySelectorAll('#answers .ans-btn');
+
         buttons.forEach((button, index) => { button.innerText = `${index + 1}. ${currentQuiz.choices[index]}`; button.disabled = false; button.classList.remove('correct-choice', 'wrong-choice'); });
+
         document.getElementById('result').innerText = ""; document.getElementById('next-btn').style.display = 'none';
-        if (currentMode === "battle") updateLiveVSUI();
+
+        
+
         questionStartTime = Date.now();
+
     }
+
+
 
     function checkAnswer(selectedIndex) {
-        const answerTimeMs = Date.now() - questionStartTime; roundTotalTimeMs += answerTimeMs;
-        const currentQuiz = filteredQuizData[currentQuestionIndex]; const resultDiv = document.getElementById('result'); const buttons = document.querySelectorAll('#answers .ans-btn');
-        buttons.forEach(button => button.disabled = true); buttons[currentQuiz.correct].classList.add('correct-choice');
-        const comboDiv = document.getElementById('combo-alert');
+
+        const answerTimeMs = Date.now() - questionStartTime; 
+
+        if(!isReviewMode) roundTotalTimeMs += answerTimeMs;
+
         
-        const qSection = currentQuiz.section || "その他";
-        let qGrade = ""; if (selectedSubject === "science" || selectedSubject === "english") { qGrade = `${selectedSubject === "science" ? "理" : "英"}${selectedGrade || "共通"}`; } else { qGrade = (selectedGrade === "geography") ? "地理" : (selectedGrade === "history" ? "歴史" : "公民"); }
-        const summaryKey = `${selectedSubject}_${selectedGrade || "common"}_${qSection}`; if (!dailySummaryData[summaryKey]) { dailySummaryData[summaryKey] = { grade: qGrade, section: qSection, correct: 0, total: 0 }; }
-        dailySummaryData[summaryKey].total++;
 
-        let stats = JSON.parse(localStorage.getItem(`quiz_perf_stats_` + studentKey) || '{}');
-        if (!stats[currentQuiz.question]) { stats[currentQuiz.question] = { status: 'unseen', best_time: 999999, wrong_count: 0 }; }
+        const currentQuiz = isReviewMode ? reviewQuizData[reviewQuestionIndex] : filteredQuizData[currentQuestionIndex]; 
 
-        let isCorrect = (selectedIndex === currentQuiz.correct); let currentStatus = 'unseen';
-        if (isCorrect) {
-            resultDiv.innerText = `⭕ 正解！ (${(answerTimeMs / 1000).toFixed(2)}秒)`; resultDiv.style.color = "green"; score++;
-            const overlay = document.getElementById('correct-overlay'); overlay.style.display = 'flex'; setTimeout(() => { overlay.style.display = 'none'; }, 500);
-            currentCombo++; if (currentCombo > maxCombo) { maxCombo = currentCombo; } comboDiv.innerText = `🔥 ${currentCombo}コンボ中！`;
-            dailySummaryData[summaryKey].correct++;
-            currentStatus = (answerTimeMs <= FAST_ANSWER_THRESHOLD) ? 'fast_correct' : 'slow_correct';
-            if (answerTimeMs < stats[currentQuiz.question].best_time) { stats[currentQuiz.question].best_time = answerTimeMs; }
-            stats[currentQuiz.question].status = currentStatus;
+        const resultDiv = document.getElementById('result'); const buttons = document.querySelectorAll('#answers .ans-btn');
+
+        
+
+        buttons.forEach(button => button.disabled = true); buttons[currentQuiz.correct].classList.add('correct-choice');
+
+        const comboDiv = document.getElementById('combo-alert');
+
+        
+
+        let isCorrect = (selectedIndex === currentQuiz.correct); 
+
+
+
+        if (!isReviewMode) {
+
+            currentPlayerRoundLogs.push({ isCorrect: isCorrect, timeMs: answerTimeMs });
+
+
+
+            const qSection = currentQuiz.section || "その他";
+
+            let qGrade = ""; if (selectedSubject === "science" || selectedSubject === "english") { qGrade = `${selectedSubject === "science" ? "理" : "英"}${selectedGrade || "共通"}`; } else { qGrade = (selectedGrade === "geography") ? "地理" : (selectedGrade === "history" ? "歴史" : "公民"); }
+
+            const summaryKey = `${selectedSubject}_${selectedGrade || "common"}_${qSection}`; if (!dailySummaryData[summaryKey]) { dailySummaryData[summaryKey] = { grade: qGrade, section: qSection, correct: 0, total: 0 }; }
+
+            dailySummaryData[summaryKey].total++;
+
+
+
+            let stats = JSON.parse(localStorage.getItem(`quiz_perf_stats_` + studentKey) || '{}');
+
+            if (!stats[currentQuiz.question]) { stats[currentQuiz.question] = { status: 'unseen', best_time: 999999, wrong_count: 0 }; }
+
+
+
+            let currentStatus = 'unseen';
+
+            if (isCorrect) {
+
+                resultDiv.innerText = `⭕ 正解！ (${(answerTimeMs / 1000).toFixed(2)}秒)`; resultDiv.style.color = "green"; score++;
+
+                const overlay = document.getElementById('correct-overlay'); overlay.style.display = 'flex'; setTimeout(() => { overlay.style.display = 'none'; }, 500);
+
+                currentCombo++; if (currentCombo > maxCombo) { maxCombo = currentCombo; } comboDiv.innerText = `🔥 ${currentCombo}コンボ中！`;
+
+                dailySummaryData[summaryKey].correct++;
+
+                currentStatus = (answerTimeMs <= FAST_ANSWER_THRESHOLD) ? 'fast_correct' : 'slow_correct';
+
+                if (answerTimeMs < stats[currentQuiz.question].best_time) { stats[currentQuiz.question].best_time = answerTimeMs; }
+
+                stats[currentQuiz.question].status = currentStatus;
+
+            } else {
+
+                resultDiv.innerText = "❌ 不正解..."; resultDiv.style.color = "red"; buttons[selectedIndex].classList.add('wrong-choice');
+
+                currentCombo = 0; comboDiv.innerText = "❌ コンボ終了！";
+
+                wrongQuestionsList.push({ question: currentQuiz.question, yourAnswer: currentQuiz.choices[selectedIndex], correctAnswer: currentQuiz.choices[currentQuiz.correct], explanation: currentQuiz.explanation });
+
+                stats[currentQuiz.question].wrong_count++; stats[currentQuiz.question].status = 'wrong';
+
+                
+
+                reviewQuizData.push(currentQuiz);
+
+            }
+
+
+
+            localStorage.setItem(`quiz_perf_stats_` + studentKey, JSON.stringify(stats));
+
+            localStorage.setItem(`quiz_daily_summary_` + studentKey, JSON.stringify(dailySummaryData));
+
+            if (currentMode === "battle") updateLiveVSUI();
+
+            document.getElementById('next-btn').style.display = 'block';
+
+
+
         } else {
-            resultDiv.innerText = "❌ 不正解..."; resultDiv.style.color = "red"; buttons[selectedIndex].classList.add('wrong-choice');
-            currentCombo = 0; comboDiv.innerText = "❌ コンボ終了！";
-            wrongQuestionsList.push({ question: currentQuiz.question, yourAnswer: currentQuiz.choices[selectedIndex], correctAnswer: currentQuiz.choices[currentQuiz.correct], explanation: currentQuiz.explanation });
-            stats[currentQuiz.question].wrong_count++; stats[currentQuiz.question].status = 'wrong';
+
+            if (isCorrect) {
+
+                resultDiv.innerText = `⭕ 正解！`; resultDiv.style.color = "green";
+
+                const overlay = document.getElementById('correct-overlay'); overlay.style.display = 'flex'; setTimeout(() => { overlay.style.display = 'none'; }, 500);
+
+            } else {
+
+                resultDiv.innerText = "❌ 不正解...（次こそ合わせよう！）"; resultDiv.style.color = "red"; buttons[selectedIndex].classList.add('wrong-choice');
+
+            }
+
+
+
+            if (reviewQuestionIndex === reviewQuizData.length - 1) {
+
+                document.getElementById('next-btn').style.display = 'none';
+
+                document.getElementById('review-end-message').style.display = 'block';
+
+                document.getElementById('review-to-result-btn').style.display = 'block';
+
+            } else {
+
+                document.getElementById('next-btn').style.display = 'block';
+
+            }
+
         }
 
-        currentPlayerRoundLogs.push({
-            isCorrect: isCorrect,
-            timeMs: answerTimeMs
-        });
-
-        localStorage.setItem(`quiz_perf_stats_` + studentKey, JSON.stringify(stats));
-        localStorage.setItem(`quiz_daily_summary_` + studentKey, JSON.stringify(dailySummaryData));
-        if (currentMode === "battle") updateLiveVSUI();
-        document.getElementById('next-btn').style.display = 'block';
     }
 
-    function nextQuestion() { currentQuestionIndex++; if (currentQuestionIndex < filteredQuizData.length) { showQuestion(); } else { if (ghostTimerInterval) { clearTimeout(ghostTimerInterval); ghostTimerInterval = null; } showFinalResult(); } }
 
-    function showFinalResult() {
-        hideAllScreens(); document.getElementById('result-screen').style.display = 'block';
-        const totalQ = filteredQuizData.length; const currentAccuracy = Math.round((score / totalQ) * 100);
-        document.getElementById('current-score').innerText = score; document.getElementById('total-questions').innerText = totalQ; 
-        document.getElementById('current-accuracy').innerText = `${currentAccuracy}%`;
-        const currentBar = document.getElementById('current-accuracy-bar'); currentBar.style.width = `${currentAccuracy}%`; currentBar.style.backgroundColor = getGaugeColor(currentAccuracy);
-        document.getElementById('max-combo-score').innerText = maxCombo;
-        checkMonthlyReset();
 
-        const banner = document.getElementById('battle-result-banner');
-        const rivalLine = document.getElementById('battle-rival-score-line');
-        const screenTitle = document.getElementById('result-screen-title');
-        
-        let totalRateChange = 0;
-        
-        let comboBonus = 0;
-        let fieldBonus = 0;
-        let uniqueSectionsCount = 0;
+    function nextQuestion() { 
 
-        if (currentMode === "battle" && activeGhostData) {
-            screenTitle.style.marginTop = "5px";
-            rivalLine.style.display = 'block';
-            document.getElementById('battle-rival-score-val').innerText = ghostCurrentScore;
-            banner.style.display = 'block';
-            
-            const calculateBattlePoints = (log) => {
-                return log.reduce((total, q) => {
-                    if (!q.isCorrect) return total;
-                    const speedBonus = Math.max(0, Math.floor((5000 - q.timeMs) / 10));
-                    return total + 1000 + speedBonus;
-                }, 0);
-            };
+        if (!isReviewMode) {
 
-            const playerPoints = calculateBattlePoints(currentPlayerRoundLogs);
-            const ghostPoints = calculateBattlePoints(activeGhostData.ghostLog);
+            currentQuestionIndex++; 
 
-            let isPlayerWin = playerPoints > ghostPoints;
-            if (playerPoints === ghostPoints) {
-                const ghostTotalTime = activeGhostData.ghostLog.reduce((sum, item) => sum + item.timeMs, 0);
-                isPlayerWin = roundTotalTimeMs < ghostTotalTime;
-            }
+            if (currentQuestionIndex < filteredQuizData.length) { 
 
-            if (isPlayerWin) {
-                banner.innerHTML = `👑 キミの勝ち！ 👑<br><span style="font-size:1.1rem; font-weight:normal; color:#4a5568;">キミ: ${playerPoints} Pt vs 相手: ${ghostPoints} Pt</span>`; 
-                banner.style.color = "#28a745";
-                totalRateChange = 20; 
-            } else {
-                banner.innerHTML = `☠️ キミの負け... ☠️<br><span style="font-size:1.1rem; font-weight:normal; color:#4a5568;">キミ: ${playerPoints} Pt vs 相手: ${ghostPoints} Pt</span>`; 
-                banner.style.color = "#dc3545";
-                totalRateChange = -20; 
-            }
+                showQuestion(); 
 
-            let count = parseInt(localStorage.getItem(`quiz_battle_count_` + studentKey) || '3');
-            localStorage.setItem(`quiz_battle_count_` + studentKey, String(Math.max(0, count - 1)));
+            } else { 
+
+                if (ghostTimerInterval) { clearTimeout(ghostTimerInterval); ghostTimerInterval = null; } 
+
+                
+
+                if (reviewQuizData.length > 0) {
+
+                    isReviewMode = true;
+
+                    reviewQuestionIndex = 0;
+
+                    hideAllScreens();
+
+                    document.getElementById('review-start-screen').style.display = 'block';
+
+                } else {
+
+                    showFinalResult(); 
+
+                }
+
+            } 
+
         } else {
-            screenTitle.style.marginTop = "45px"; rivalLine.style.display = 'none'; banner.style.display = 'none';
-            const baseRateChange = score - 5;
-            
-            comboBonus = maxCombo >= 30 ? 6 : (maxCombo >= 5 ? Math.floor(maxCombo / 5) : 0);
-            uniqueSectionsCount = Object.keys(dailySummaryData).length;
-            fieldBonus = uniqueSectionsCount > 1 ? Math.min(uniqueSectionsCount - 1, 5) : 0; 
-            totalRateChange = baseRateChange + comboBonus + fieldBonus;
+
+            reviewQuestionIndex++;
+
+            if (reviewQuestionIndex < reviewQuizData.length) {
+
+                showQuestion();
+
+            }
+
         }
 
+    }
+
+
+
+    function startReviewQuiz() {
+
+        hideAllScreens();
+
+        document.getElementById('quiz-screen').style.display = 'block';
+
+        showQuestion();
+
+    }
+
+
+
+    function showFinalResult() {
+
+        if (isDataSubmitted) return; // 【修正】既に送信・更新が行われている場合は以降の処理をブロック
+
+        isDataSubmitted = true; // 【修正】送信中フラグを立てる
+
+
+
+        hideAllScreens(); document.getElementById('result-screen').style.display = 'block';
+
+        const totalQ = filteredQuizData.length; const currentAccuracy = Math.round((score / totalQ) * 100);
+
+        document.getElementById('current-score').innerText = score; document.getElementById('total-questions').innerText = totalQ; 
+
+        document.getElementById('current-accuracy').innerText = `${currentAccuracy}%`;
+
+        const currentBar = document.getElementById('current-accuracy-bar'); currentBar.style.width = `${currentAccuracy}%`; currentBar.style.backgroundColor = getGaugeColor(currentAccuracy);
+
+        document.getElementById('max-combo-score').innerText = maxCombo;
+
+        checkMonthlyReset();
+
+
+
+        const banner = document.getElementById('battle-result-banner');
+
+        const rivalLine = document.getElementById('battle-rival-score-line');
+
+        const screenTitle = document.getElementById('result-screen-title');
+
+        
+
+        let totalRateChange = 0;
+
+        let comboBonus = 0;
+
+        let fieldBonus = 0;
+
+        let uniqueSectionsCount = 0;
+
+
+
+        if (currentMode === "battle" && activeGhostData) {
+
+            screenTitle.style.marginTop = "5px";
+
+            rivalLine.style.display = 'block';
+
+            document.getElementById('battle-rival-score-val').innerText = ghostCurrentScore;
+
+            banner.style.display = 'block';
+
+            
+
+            const calculateBattlePoints = (log) => {
+
+                return log.reduce((total, q) => {
+
+                    if (!q.isCorrect) return total - 1200; 
+
+                    const speedBonus = Math.max(0, Math.floor((5000 - q.timeMs) / 10));
+
+                    return total + 1000 + speedBonus;
+
+                }, 0);
+
+            };
+
+
+
+            const playerPoints = calculateBattlePoints(currentPlayerRoundLogs);
+
+            const ghostPoints = calculateBattlePoints(activeGhostData.ghostLog.slice(0, ghostCurrentQuestion));
+
+
+
+            let isPlayerWin = playerPoints > ghostPoints;
+
+            if (playerPoints === ghostPoints) {
+
+                const ghostTotalTime = activeGhostData.ghostLog.slice(0, ghostCurrentQuestion).reduce((sum, item) => sum + item.timeMs, 0);
+
+                isPlayerWin = roundTotalTimeMs < ghostTotalTime;
+
+            }
+
+
+
+            if (isPlayerWin) {
+
+                banner.innerHTML = `👑 キミの勝ち！ 👑<br><span style="font-size:1.1rem; font-weight:normal; color:#4a5568;">キミ: ${playerPoints} Pt vs 相手: ${ghostPoints} Pt</span>`; 
+
+                banner.style.color = "#28a745";
+
+                totalRateChange = 20; 
+
+            } else {
+
+                banner.innerHTML = `☠️ キミの負け... ☠️<br><span style="font-size:1.1rem; font-weight:normal; color:#4a5568;">キミ: ${playerPoints} Pt vs 相手: ${ghostPoints} Pt</span>`; 
+
+                banner.style.color = "#dc3545";
+
+                totalRateChange = -20; 
+
+            }
+
+
+
+            let count = parseInt(localStorage.getItem(`quiz_battle_count_` + studentKey) || '3');
+
+            localStorage.setItem(`quiz_battle_count_` + studentKey, String(Math.max(0, count - 1)));
+
+        } else {
+
+            screenTitle.style.marginTop = "45px"; rivalLine.style.display = 'none'; banner.style.display = 'none';
+
+            const baseRateChange = score - 5;
+
+            
+
+            comboBonus = maxCombo >= 30 ? 6 : (maxCombo >= 5 ? Math.floor(maxCombo / 5) : 0);
+
+            uniqueSectionsCount = Object.keys(dailySummaryData).length;
+
+            fieldBonus = uniqueSectionsCount > 1 ? Math.min(uniqueSectionsCount - 1, 5) : 0; 
+
+            totalRateChange = baseRateChange + comboBonus + fieldBonus;
+
+        }
+
+
+
         let myRate = parseInt(localStorage.getItem(`quiz_rate_${selectedSubject}_` + studentKey) || '1500');
+
         myRate += totalRateChange; localStorage.setItem(`quiz_rate_${selectedSubject}_` + studentKey, myRate);
+
+
 
         if (selectedSubject === "science") dailyRateChangeScience += totalRateChange; else if (selectedSubject === "social") dailyRateChangeSocial += totalRateChange; else dailyRateChangeEnglish += totalRateChange;
 
+
+
         const rateSign = totalRateChange >= 0 ? `+${totalRateChange}` : `${totalRateChange}`;
+
         const rateDisplayEl = document.getElementById('rate-change-display');
+
         let subjectLabel = selectedSubject === "social" ? "社会" : (selectedSubject === "english" ? "英語" : "理科");
+
         rateDisplayEl.innerText = `${subjectLabel}レート: ${myRate} (${rateSign})`; rateDisplayEl.style.color = totalRateChange > 0 ? '#28a745' : (totalRateChange < 0 ? '#dc3545' : '#4a5568');
 
+
+
         const breakdownBox = document.getElementById('bonus-breakdown-box');
+
         if (currentMode !== "battle" && (comboBonus > 0 || fieldBonus > 0)) {
+
             breakdownBox.style.display = 'block';
+
             document.getElementById('combo-bonus-line').innerHTML = comboBonus > 0 ? `<span class="bonus-tag bg-combo">🔥 COMBO</span> 最高コンボボーナス: <b>+${comboBonus}</b>` : '';
+
             document.getElementById('field-bonus-line').innerHTML = fieldBonus > 0 ? `<span class="bonus-tag bg-field">✨ FIELD</span> 複数分野ボーナス (${uniqueSectionsCount}分野目): <b>+${fieldBonus}</b>` : '';
+
         } else { breakdownBox.style.display = 'none'; }
 
+
+
         let totalAnswered = parseInt(localStorage.getItem(`quiz_total_answered_` + studentKey) || '0'); let totalCorrect = parseInt(localStorage.getItem(`quiz_total_correct_` + studentKey) || '0');
+
         totalAnswered += totalQ; totalCorrect += score;
+
         localStorage.setItem(`quiz_total_answered_` + studentKey, totalAnswered); localStorage.setItem(`quiz_total_correct_` + studentKey, totalCorrect);
+
         document.getElementById('review-trigger-btn').style.display = wrongQuestionsList.length > 0 ? 'block' : 'none';
 
+
+
         const perfStats = JSON.parse(localStorage.getItem(`quiz_perf_stats_` + studentKey) || '{}');
+
         let totalCount = currentSectionAllQuestions.length; let clearedCount = currentSectionAllQuestions.filter(q => perfStats[q.question] && perfStats[q.question].status.includes('correct')).length;
 
+
+
         if (typeof sendDataToTeacher === "function") { sendDataToTeacher(clearedCount, totalCount); }
+
         
+
         sendRateToSpreadsheet(selectedSubject, myRate); 
+
         sendFieldSummaryToSpreadsheet(); 
+
         sendDataToGoogleForm();
+
     }
+
+
 
     function showDailySummary() {
+
         hideAllScreens();
+
         const sciEl = document.getElementById('daily-total-rate-sci'); const socEl = document.getElementById('daily-total-rate-soc'); const engEl = document.getElementById('daily-total-rate-eng');
+
         sciEl.innerText = dailyRateChangeScience >= 0 ? `+${dailyRateChangeScience}` : dailyRateChangeScience; socEl.innerText = dailyRateChangeSocial >= 0 ? `+${dailyRateChangeSocial}` : dailyRateChangeSocial; engEl.innerText = dailyRateChangeEnglish >= 0 ? `+${dailyRateChangeEnglish}` : dailyRateChangeEnglish;
+
         sciEl.style.color = dailyRateChangeScience > 0 ? '#28a745' : (dailyRateChangeScience < 0 ? '#dc3545' : '#4a5568'); socEl.style.color = dailyRateChangeSocial > 0 ? '#28a745' : (dailyRateChangeSocial < 0 ? '#dc3545' : '#4a5568'); engEl.style.color = dailyRateChangeEnglish > 0 ? '#28a745' : (dailyRateChangeEnglish < 0 ? '#dc3545' : '#4a5568');
+
         const listContainer = document.getElementById('summary-list'); listContainer.innerHTML = ""; const summaryKeys = Object.keys(dailySummaryData);
+
         if (summaryKeys.length === 0) { listContainer.innerHTML = "<div class='score-line' style='text-align:center; color:#666;'>まだ本日解答した問題はありません。</div>"; } 
+
         else {
+
             summaryKeys.forEach(key => {
+
                 const data = dailySummaryData[key]; 
+
                 
+
+                const targetSubPrefix = key.split('_')[0];
+
+                
+
                 let totalInSection = 0;
+
                 for (const sKey in allQuizData) {
-                    if (allQuizData[sKey]) {
-                        totalInSection += allQuizData[sKey].filter(q => q.section === data.section).length;
+
+                    if (allQuizData[sKey] && sKey.startsWith(targetSubPrefix)) {
+
+                        // 【修正】英語の単語テストの場合は、セクションの出題方向（日本語⇒英単語 / 英単語⇒日本語）と問題のtypeを一致させて重複カウントを防ぐ
+
+                        totalInSection += allQuizData[sKey].filter(q => {
+
+                            if (q.section !== data.section) return false;
+
+                            if (targetSubPrefix === "english" && q.type) {
+
+                                if (data.section.includes("英単語⇒日本語") && q.type !== "en_to_ja") return false;
+
+                                if (data.section.includes("日本語⇒英単語") && q.type !== "ja_to_en") return false;
+
+                            }
+
+                            return true;
+
+                        }).length;
+
                     }
+
                 }
+
                 if (totalInSection === 0) totalInSection = data.total;
 
+
+
                 const rate = totalInSection > 0 ? Math.round((data.correct / totalInSection) * 100) : 0; const barColor = getGaugeColor(rate); 
+
                 let statusText = "🚨 弱点 (要対策)"; if (rate > 90) statusText = "👑 完璧！"; else if (rate > 70) statusText = "🍏 克服！"; else if (rate > 30) statusText = "⚠️ あと少し";
+
                 const line = document.createElement('div'); line.className = "score-line"; line.style.borderBottom = "1px dashed #cbd5e0"; line.style.paddingBottom = "10px"; line.style.marginBottom = "10px";
+
                 
+
                 line.innerHTML = `<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;"><span style="font-weight:bold; color:#2d3748;">📌 分野：${data.section} <span style="color:#718096; font-size:0.9rem;">(教科：${data.grade})</span></span><span class="section-status-badge" style="background-color: ${barColor}; font-size: 0.75rem; padding: 2px 8px;">${statusText}</span></div>本日正解：<b>${data.correct}</b> 問 / 分野総数：${totalInSection} 問<div class="progress-bar-bg"><div class="progress-bar-fill" style="width: ${rate}%; background-color: ${barColor};"></div></div><div style="text-align: right; font-size: 0.8rem; color: #718096; margin-top: 2px;">全体のクリア率: ${rate}%</div>`;
+
                 listContainer.appendChild(line);
+
             });
+
         }
+
         document.getElementById('summary-screen').style.display = 'block';
+
     }
+
+
 
     function backToSectionSelectFromSummary() { hideAllScreens(); if (selectedSubject === "english") { showEnglishSubScreen(); } else { renderSectionScreen(); document.getElementById('section-screen').style.display = 'block'; } }
+
     function toggleRateView(subView) {
+
         const mySec = document.getElementById('rate-my-section'); const rankSec = document.getElementById('rate-ranking-section'); const myBtn = document.getElementById('cmd-show-my-rate'); const rankBtn = document.getElementById('cmd-show-ranking');
+
         if (subView === 'my') { mySec.style.display = 'block'; rankSec.style.display = 'none'; myBtn.style.backgroundColor = '#007bff'; rankBtn.style.backgroundColor = '#6c757d'; } else { mySec.style.display = 'none'; rankSec.style.display = 'block'; myBtn.style.backgroundColor = '#6c757d'; rankBtn.style.backgroundColor = '#007bff'; }
+
     }
+
     function tryFinishLearning() { hideAllScreens(); document.getElementById('confirm-screen').style.display = 'block'; }
+
     function cancelFinishLearning() { hideAllScreens(); if (selectedSubject === "english") { showEnglishSubScreen(); } else { renderSectionScreen(); document.getElementById('section-screen').style.display = 'block'; } }
+
     function confirmFinishLearning() { localStorage.removeItem(`quiz_daily_summary_` + studentKey); location.reload(); }
 
+
+
     function showReviewScreen() {
+
         const listContainer = document.getElementById('review-list'); listContainer.innerHTML = ""; 
+
         wrongQuestionsList.forEach((item, index) => {
+
             const card = document.createElement('div'); card.className = "review-card";
+
             let expHtml = item.explanation ? `<div class="review-ans" style="color: #65748b; margin-top: 6px; font-size: 0.9rem; border-top: 1px dashed #feb2b2; padding-top: 6px;">💡 解説: ${item.explanation}</div>` : '';
+
             card.innerHTML = `<div class="review-q">問${index + 1}: ${item.question}</div><div class="review-ans review-wrong">❌ あなたの解答: ${item.yourAnswer}</div><div class="review-ans review-correct">⭕ 正しい正解: ${item.correctAnswer}</div>${expHtml}`;
+
             listContainer.appendChild(card);
+
         });
+
         hideAllScreens(); document.getElementById('review-screen').style.display = 'block';
+
     }
-    function backFromWrongDetails() { hideAllScreens(); document.getElementById('section-screen').style.display = 'block'; }
+
+
+
+    function backFromWrongDetails() { 
+
+        hideAllScreens(); 
+
+        if (currentMode === "report") {
+
+            document.getElementById('report-screen').style.display = 'block'; 
+
+        } else {
+
+            document.getElementById('section-screen').style.display = 'block'; 
+
+        }
+
+    }
+
+
 
     function showReportScreen() {
+
+        currentMode = "report";
+
         hideAllScreens(); document.getElementById('report-screen').style.display = 'block';
+
         const container = document.getElementById('report-sections-container'); container.innerHTML = "";
+
         const perfStats = JSON.parse(localStorage.getItem('quiz_perf_stats_' + studentKey) || '{}');
+
         const categories = [
+
             { type: "normal", key: "science_1", label: "🌿 理科 中学1年" }, { type: "normal", key: "science_2", label: "⚡ 理科 中学2年" }, { type: "normal", key: "science_3", label: "🌌 理科 中学3年" },
+
             { type: "normal", key: "social_geography", label: "🗺️ 社会 地理" }, { type: "normal", key: "social_history", label: "⏳ 社会 歴史" }, { type: "normal", key: "social_civics", label: "⚖️ 社会 公民" },
+
             { type: "english", grade: "1", label: "🔤 英語（全学年共通データ）" }
+
         ];
+
         categories.forEach(cat => {
+
             let data = []; if (cat.type === "english") { ["1", "2", "3", "4", "5"].forEach(g => { data = [...data, ...(allQuizData[`english_word_${g}`] || []), ...(allQuizData[`english_grammar_${g}`] || [])]; }); } else { data = allQuizData[cat.key] || []; }
+
             if (data.length === 0) return;
+
             const header = document.createElement('div'); header.className = "report-cat-title"; header.innerText = cat.label; container.appendChild(header);
+
             const sectionsSet = new Set(); data.forEach(q => { if(q.section) sectionsSet.add(q.section) });
+
             sectionsSet.forEach(secName => {
+
                 const secQuestions = data.filter(q => q.section === secName); const total = secQuestions.length; 
+
                 const cleared = secQuestions.filter(q => perfStats[q.question] && perfStats[q.question].status.includes('correct')).length;
+
                 const accuracy = total > 0 ? Math.round((cleared / total) * 100) : 0; const card = document.createElement('div'); card.className = "section-card"; card.onclick = () => showWrongQuestionsDetail(cat.key, secName, cat.type === "english", cat.grade);
+
                 let badgeColor = getGaugeColor(accuracy); let statusText = "🚨 弱点"; if (accuracy > 90) statusText = "👑 完璧！"; else if (accuracy > 70) statusText = "🍏 克服！"; else if (accuracy > 30) statusText = "⚠️ あと少し";
+
                 card.innerHTML = `<div class="section-card-title"><span>${secName}</span><span class="section-status-badge" style="background-color: ${badgeColor};">${statusText}</span></div><div class="progress-bar-bg"><div class="progress-bar-fill" style="width: ${accuracy}%; background-color: ${badgeColor};"></div></div><div class="section-card-footer"><span>クリア: <b>${cleared}</b> / ${total} 問</span><span>達成率: <b>${accuracy}%</b></span></div>`;
+
                 container.appendChild(card);
+
             });
+
         });
+
     }
+
+
 
     function showWrongQuestionsDetail(apiKey, sectionName, isEnglish = false, grade = "") {
+
         hideAllScreens(); document.getElementById('wrong-details-screen').style.display = 'block'; document.getElementById('wrong-details-title').innerText = `❌ 過去の間違い (${sectionName})`;
+
         const container = document.getElementById('wrong-details-list'); container.innerHTML = "";
+
         const stats = JSON.parse(localStorage.getItem('quiz_perf_stats_' + studentKey) || '{}');
+
         let data = [];
+
         if (isEnglish) { ["1", "2", "3", "4", "5"].forEach(g => { data = [...data, ...(allQuizData[`english_word_${g}`] || []), ...(allQuizData[`english_grammar_${g}`] || [])]; }); } else { data = allQuizData[apiKey] || []; }
+
         const wrongQuestions = data.filter(q => q.section === sectionName && stats[q.question] && stats[q.question].wrong_count > 0);
+
         if (wrongQuestions.length === 0) { container.innerHTML = "<div style='text-align:center; color:#28a745; font-weight:bold; padding:40px 0;'>✨ この分野で一度も間違えた問題はありません！</div>"; return; }
+
         wrongQuestions.forEach((q, index) => {
+
             const card = document.createElement('div'); card.className = "review-card";
+
             const correctText = q.type === "en_to_ja" || q.type === "ja_to_en" ? q.correctText : q.choices[q.correct]; const count = stats[q.question].wrong_count;
+
             let expHtml = q.explanation ? `<div class="review-ans" style="color: #65748b; margin-top: 6px; font-size: 0.9rem; border-top: 1px dashed #feb2b2; padding-top: 6px;">💡 解説: ${q.explanation}</div>` : '';
+
             card.innerHTML = `<div class="review-q">問${index + 1}: ${q.question}</div><div class="review-ans review-wrong" style="font-size:0.85rem; margin-bottom:5px;">⚠️ 過去のミス回数: ${count} 回</div><div class="review-ans review-correct">⭕ 正しい正解: ${correctText}</div>${expHtml}`;
+
             container.appendChild(card);
+
         });
+
     }
+
+
 
     function showRateScreen() { hideAllScreens(); document.getElementById('rate-screen').style.display = 'block'; document.getElementById('rate-subject-selector-view').style.display = 'block'; document.getElementById('rate-detail-view').style.display = 'none'; }
+
     function showRateHelp() { hideAllScreens(); document.getElementById('rate-help-screen').style.display = 'block'; }
+
     function backToScreenFromHelp() { hideAllScreens(); if(currentMode === "battle") { startLearningMode(); } else { document.getElementById('rate-screen').style.display = 'block'; document.getElementById('rate-subject-selector-view').style.display = 'block'; document.getElementById('rate-detail-view').style.display = 'none'; } }
+
     function selectRateSubject(subject) { document.getElementById('rate-subject-selector-view').style.display = 'none'; document.getElementById('rate-detail-view').style.display = 'block'; switchRateTab(subject); toggleRateView('my'); }
+
     function backToRateSubjectSelector() { document.getElementById('rate-subject-selector-view').style.display = 'block'; document.getElementById('rate-detail-view').style.display = 'none'; }
 
+
+
     function switchRateTab(subject) {
+
         currentRateTab = subject; let subjectLabel = subject === 'social' ? '社会' : (subject === 'english' ? '英語' : '理科');
+
         document.getElementById('my-rate-subject-label').innerText = subjectLabel; document.getElementById('ranking-subject-label').innerText = subjectLabel;
+
         checkMonthlyReset(); const myRate = parseInt(localStorage.getItem(`quiz_rate_${subject}_` + studentKey) || '1500'); document.getElementById('my-current-rate-val').innerText = myRate;
+
         let rankingList = allStudentsList.map(s => {
+
             let currentRateVal = 1500; if (subject === 'science') currentRateVal = s.scienceRate; else if (subject === 'social') currentRateVal = s.socialRate; else if (subject === 'english') currentRateVal = s.englishRate; 
+
             if (Number(s.id) === Number(studentId) && s.name === studentName) { currentRateVal = myRate; } return { ...s, activeRate: currentRateVal };
+
         });
+
         if (!rankingList.some(s => Number(s.id) === Number(studentId) && s.name === studentName) && studentId) { rankingList.push({ id: studentId, name: studentName, grade: studentGrade, campus: studentCampus, activeRate: myRate }); }
+
         rankingList.sort((a, b) => b.activeRate - a.activeRate);
+
         let displayRank = 1; let lastRate = -1; let myRankNum = 1;
+
         rankingList.forEach((s, idx) => { if (s.activeRate !== lastRate) { displayRank = idx + 1; lastRate = s.activeRate; } s.computedRank = displayRank; if (Number(s.id) === Number(studentId) && s.name === studentName) { myRankNum = displayRank; } });
+
         document.getElementById('my-rate-rank-text').innerText = `全体順位: ${myRankNum} 位`;
+
         const container = document.getElementById('ranking-list-container'); container.innerHTML = ""; const showLimit = Math.min(10, rankingList.length);
+
         for (let i = 0; i < showLimit; i++) {
+
             const s = rankingList[i]; const item = document.createElement('div'); item.className = "score-line"; item.style.padding = "6px 8px"; item.style.margin = "4px 0"; item.style.borderRadius = "4px";
+
             if (Number(s.id) === Number(studentId) && s.name === studentName) { item.style.backgroundColor = "#feebc8"; item.style.fontWeight = "bold"; item.style.color = "#c05621"; item.innerHTML = `<div style="text-align:left;">👑 ${s.computedRank}位 : [${s.campus || '---'}] ${s.name} (${s.activeRate}) (あなた)</div>`; }
+
             else { item.style.borderBottom = "1px solid #edf2f7"; item.innerHTML = `<div style="text-align:left;">${s.computedRank}位 : [${s.campus || '---'}] ${s.name} (${s.activeRate})</div>`; }
+
             container.appendChild(item);
+
         }
+
         if (myRankNum > 10) {
+
             const divider = document.createElement('div'); divider.style.borderTop = "2px dashed #cbd5e0"; divider.style.margin = "10px 0"; container.appendChild(divider);
+
             const myItem = document.createElement('div'); myItem.className = "score-line"; myItem.style.padding = "6px 8px"; myItem.style.borderRadius = "4px"; myItem.style.backgroundColor = "#feebc8"; myItem.style.fontWeight = "bold"; myItem.style.color = "#c05621";
+
             myItem.innerHTML = `<div style="text-align:left;">🏅 ${myRankNum}位 : [${studentCampus}] ${studentName} (${myRate}) (あなた)</div>`; container.appendChild(myItem);
+
         }
+
     }
+
+
 
     function toggleSectionMenu(event) { if (event) event.stopPropagation(); const menu = document.getElementById('section-menu-dropdown'); menu.style.display = (menu.style.display === 'none' || menu.style.display === '') ? 'block' : 'none'; }
-    function handleMenuAction(action) { document.getElementById('section-menu-dropdown').style.display = 'none'; if (action === 'main') backToMainMenu(); else if (action === 'subject') setMode('test'); else if (action === 'rate') showRateScreen(); else if (action === 'report') setMode('report'); else if (action === 'summary') showDailySummary(); }
+
+    function handleMenuAction(action) { document.getElementById('section-menu-dropdown').style.display = 'none'; if (action === 'main') backToMainMenu(); else if (action === 'subject') setMode('test'); else if (action === 'rate') showRateScreen(); else if (action === 'report') showReportScreen(); else if (action === 'summary') showDailySummary(); }
+
     document.addEventListener('click', function(e) { const menu = document.getElementById('section-menu-dropdown'); const trigger = document.getElementById('menu-trigger'); if (menu && menu.style.display === 'block') { if (e.target !== menu && e.target !== trigger && !menu.contains(e.target)) { menu.style.display = 'none'; } } });
 
+
+
     function showReportIssueScreen() { hideAllScreens(); document.getElementById('report-issue-screen').style.display = 'block'; document.getElementById('report-content').value = ""; document.getElementById('report-subject').value = "science"; updateReportSections(); }
+
     function updateReportSections() {
+
         const subject = document.getElementById('report-subject').value; const sectionSelect = document.getElementById('report-section'); sectionSelect.innerHTML = ""; const sectionsSet = new Set();
+
         for (const key in allQuizData) { if (key.startsWith(subject)) { allQuizData[key].forEach(q => { if (q.section) sectionsSet.add(q.section); }); } }
+
         if (sectionsSet.size === 0) { const opt = document.createElement('option'); opt.value = "共通・その他"; opt.innerText = "共通・other"; sectionSelect.appendChild(opt); }
+
         else { sectionsSet.forEach(sec => { const opt = document.createElement('option'); opt.value = sec; opt.innerText = sec; sectionSelect.appendChild(opt); }); }
-    }
-    function submitReport() {
-        const subject = document.getElementById('report-subject').value; const section = document.getElementById('report-section').value; const content = document.getElementById('report-content').value.trim(); if (!content) { alert("報告内容を入力してください。"); return; }
-        
-        const params = new URLSearchParams();
-        let subjectText = subject === "social" ? "社会" : (subject === "english" ? "英語" : "理科");
-        params.append(REPORT_FORM_ENTRY_IDS.studentInfo, `${studentId}_${studentName} (${studentGrade})`); 
-        params.append(REPORT_FORM_ENTRY_IDS.subject, subjectText); 
-        params.append(REPORT_FORM_ENTRY_IDS.section, section); 
-        params.append(REPORT_FORM_ENTRY_IDS.content, content);
-        
-        const submitBtn = document.querySelector("#report-issue-screen .nav-btn"); submitBtn.disabled = true; submitBtn.innerText = "送信中...";
-        fetch(REPORT_FORM_ACTION_URL, { 
-            method: 'POST', 
-            body: params, 
-            mode: 'no-cors' 
-        }).then(() => { 
-            alert("誤答・誤植の報告を送信しました。ご協力ありがとうございました！"); 
-            submitBtn.disabled = false; submitBtn.innerText = "報告を送信する"; 
-            backToMainMenu(); 
-        }).catch((e) => { 
-            console.error("送信エラー:", e); 
-            alert("送信に失敗しました。"); 
-            submitBtn.disabled = false; submitBtn.innerText = "報告を送信する"; 
-        });
+
     }
 
+    function submitReport() {
+
+        const subject = document.getElementById('report-subject').value; const section = document.getElementById('report-section').value; const content = document.getElementById('report-content').value.trim(); if (!content) { alert("報告内容を入力してください。"); return; }
+
+        
+
+        const params = new URLSearchParams();
+
+        let subjectText = subject === "social" ? "社会" : (subject === "english" ? "英語" : "理科");
+
+        params.append(REPORT_FORM_ENTRY_IDS.studentInfo, `${studentId}_${studentName} (${studentGrade})`); 
+
+        params.append(REPORT_FORM_ENTRY_IDS.subject, subjectText); 
+
+        params.append(REPORT_FORM_ENTRY_IDS.section, section); 
+
+        params.append(REPORT_FORM_ENTRY_IDS.content, content);
+
+        
+
+        const submitBtn = document.querySelector("#report-issue-screen .nav-btn"); submitBtn.disabled = true; submitBtn.innerText = "送信中...";
+
+        fetch(REPORT_FORM_ACTION_URL, { 
+
+            method: 'POST', 
+
+            body: params, 
+
+            mode: 'no-cors' 
+
+        }).then(() => { 
+
+            alert("誤答・誤植の報告を送信しました。ご協力ありがとうございました！"); 
+
+            submitBtn.disabled = false; submitBtn.innerText = "報告を送信する"; 
+
+            backToMainMenu(); 
+
+        }).catch((e) => { 
+
+            console.error("送信エラー:", e); 
+
+            alert("送信に失敗しました。"); 
+
+            submitBtn.disabled = false; submitBtn.innerText = "報告を送信する"; 
+
+        });
+
+    }
+
+
+
     checkAutoLogin();
+
 </script>
+
 </body>
+
 </html>
