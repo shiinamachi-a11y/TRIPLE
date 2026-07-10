@@ -6,7 +6,7 @@
     <title>TRIPLE</title>
     
     <link rel="manifest" href="manifest.json">
-    <link class="apple-touch-icon" href="https://i.ibb.co/RGx3mgyq/triple-png.png">
+    <link rel="apple-touch-icon" href="https://i.ibb.co/RGx3mgyq/triple-png.png">
     <link rel="icon" type="image/png" href="https://i.ibb.co/RGx3mgyq/triple-png.png">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -74,14 +74,6 @@
         .flex-center > div { width: 100%; }
         .vs-bar-container { background: #edf2f7; padding: 10px; border-radius: 8px; margin-bottom: 12px; text-align: left; border: 1px solid #e2e8f0; font-size: 0.85rem; }
         .review-end-box { font-size: 1.15rem; font-weight: bold; color: #28a745; margin-top: 20px; background: #f0fff4; padding: 15px; border-radius: 8px; border: 1px solid #c6f6d5; text-align: center; box-shadow: 0 2px 8px rgba(40,167,69,0.1); }
-
-        .screen-fade-in {
-            animation: screenFadeIn 0.8s ease-in-out forwards;
-        }
-        @keyframes screenFadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
     </style>
 </head>
 <body>
@@ -216,10 +208,20 @@
         <div class="loading" id="loading-text">指定のシートから問題を読み込んでいます...</div>
     </div>
 
-    <!-- 🛠️ 変更箇所：ボタンの色を上品な半透明の薄めゴールド(rgba)に変更 -->
-    <div id="review-start-screen" class="screen screen-fade-in" style="display: none; padding: 0; background-color: #000; background-image: url('https://i.ibb.co/Xr68F3sy/Chat-GPT-Image-2026-7-9-17-34-49.png'); background-size: cover; background-position: center; position: relative;">
-        <div style="position: absolute; bottom: 50px; left: 50%; transform: translateX(-50%); width: 85%; box-sizing: border-box;">
-            <button class="btn" style="background-color: rgba(212, 175, 55, 0.85); backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); font-weight: bold; font-size: 1.15rem; padding: 14px; border: 1px solid rgba(255, 255, 255, 0.3); box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3); margin: 0; text-align: center; color: #ffffff;" onclick="startReviewQuiz()">復習をはじめる ➡️</button>
+    <div id="review-start-screen" class="screen" style="display: none;">
+        <div class="flex-center">
+            <div>
+                <h2 style="color: #e53e3e; font-size: 1.6rem; letter-spacing: 1px;">🔥 復習タイムスタート！ 🔥</h2>
+                
+                <div style="margin: 20px 0;">
+                    <img src="復習タイム イラスト.png" alt="復習タイム イラスト.png" style="max-width: 85%; max-height: 280px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); object-fit: contain;">
+                </div>
+
+                <p style="font-size: 1.05rem; font-weight: bold; color: #4a5568; line-height: 1.5; padding: 0 10px;">
+                    間違えてしまった問題を<br>もう一度解き直して完璧にしよう！
+                </p>
+                <button class="btn nav-btn" style="background-color: #e53e3e; font-weight: bold; font-size: 1.1rem; padding: 14px; margin-top: 25px;" onclick="startReviewQuiz()">復習をはじめる ➡️</button>
+            </div>
         </div>
     </div>
 
@@ -300,7 +302,7 @@
                 <div>🔤 英語: <span id="daily-total-rate-eng">±0</span></div>
             </div>
         </div>
-        <p style="font-size: 0.9rem; color: #555; margin-bottom: 15px;">今日正解した問題 of 分野総問題数に対する割合（ゲージ） Certified です。</p>
+        <p style="font-size: 0.9rem; color: #555; margin-bottom: 15px;">今日正解した問題が、分野の総問題数に対してどれくらいあるかの割合（ゲージ）です。</p>
         <div class="score-box" id="summary-list" style="max-height: 240px; overflow-y: auto; padding-right: 5px;"></div>
         <button class="btn nav-btn" style="background-color: #28a745; margin-top: 15px;" onclick="backToSectionSelectFromSummary()">テストを続ける</button>
         <button class="btn" style="background-color: #dc3545; color: white; font-weight: bold;" onclick="tryFinishLearning()">学習を終了する</button>
@@ -452,7 +454,7 @@
     let isReviewMode = false;
     let reviewQuizData = [];
     let reviewQuestionIndex = 0;
-    let isDataSubmitted = false;
+    let isDataSubmitted = false; 
 
     const FAST_ANSWER_THRESHOLD = 3000;
     const PERFORMANCE_WEIGHTS = { 'unseen': 100, 'wrong': 60, 'slow_correct': 20, 'fast_correct': 1 };
@@ -514,11 +516,13 @@
         try {
             const response = await fetch(STUDENT_LIST_URL); const text = await response.text(); const lines = text.split("\n");
             let isUserFound = false; allStudentsList = []; 
+            const cleanNameInput = nameInput.replace(/\s+/g, '');
             for (let i = 1; i < lines.length; i++) {
                 const line = lines[i].trim(); if (!line) continue; const currentCols = line.split("\t"); if (currentCols.length < 2) continue;
-                allStudentsList.push({ id: currentCols[0].trim(), name: currentCols[1].trim(), grade: "生徒", scienceRate: currentCols[3]?parseInt(currentCols[3].trim()):1500, socialRate: currentCols[4]?parseInt(currentCols[4].trim()):1500, englishRate: currentCols[5]?parseInt(currentCols[5].trim()):1500, campus: currentCols[2]?currentCols[2].trim():"---" });
-                if (Number(currentCols[0].trim()) === Number(idInput) && currentCols[1].trim() === nameInput) {
-                    studentId = currentCols[0].trim(); studentName = currentCols[1].trim(); studentGrade = "生徒"; studentCampus = currentCols[2]?currentCols[2].trim():"---"; studentKey = `${studentId}_${studentName}`; isUserFound = true;
+                const sheetName = currentCols[1].trim(); const cleanSheetName = sheetName.replace(/\s+/g, '');
+                allStudentsList.push({ id: currentCols[0].trim(), name: sheetName, grade: "生徒", scienceRate: currentCols[3]?parseInt(currentCols[3].trim()):1500, socialRate: currentCols[4]?parseInt(currentCols[4].trim()):1500, englishRate: currentCols[5]?parseInt(currentCols[5].trim()):1500, campus: currentCols[2]?currentCols[2].trim():"---" });
+                if (Number(currentCols[0].trim()) === Number(idInput) && cleanSheetName === cleanNameInput) {
+                    studentId = currentCols[0].trim(); studentName = sheetName; studentGrade = "生徒"; studentCampus = currentCols[2]?currentCols[2].trim():"---"; studentKey = `${studentId}_${studentName}`; isUserFound = true;
                 }
             }
             if (!isUserFound) { alert("生徒番号または氏名が登録されていません。"); loginBtn.disabled = false; loginBtn.innerText = "ログイン"; return; }
@@ -817,7 +821,7 @@
     function startActualBattleQuiz() { startQuizWithSection(selectedSectionName); }
 
     function startQuizWithSection(section) {
-        isDataSubmitted = false;
+        isDataSubmitted = false; 
         selectedSectionName = section; currentSectionAllQuestions = (section === "全範囲") ? [...quizData] : quizData.filter(q => q.section === section);
         const stats = JSON.parse(localStorage.getItem(`quiz_perf_stats_${studentKey}`) || '{}');
         
@@ -1032,22 +1036,8 @@
                 if (reviewQuizData.length > 0) {
                     isReviewMode = true;
                     reviewQuestionIndex = 0;
-                    
-                    // 🛠️ 変更箇所：現在の画面をすべて隠し、ローディング状態にして画像の事前ロードを行う
                     hideAllScreens();
-                    document.getElementById('loading-screen').style.display = 'block';
-                    document.getElementById('loading-text').innerText = "復習タイムの準備中...";
-                    
-                    const reviewImg = new Image();
-                    reviewImg.src = "https://i.ibb.co/Xr68F3sy/Chat-GPT-Image-2026-7-9-17-34-49.png";
-                    reviewImg.onload = function() {
-                        hideAllScreens();
-                        document.getElementById('review-start-screen').style.display = 'block';
-                    };
-                    reviewImg.onerror = function() {
-                        hideAllScreens();
-                        document.getElementById('review-start-screen').style.display = 'block';
-                    };
+                    document.getElementById('review-start-screen').style.display = 'block';
                 } else {
                     showFinalResult(); 
                 }
@@ -1067,8 +1057,8 @@
     }
 
     function showFinalResult() {
-        if (isDataSubmitted) return;
-        isDataSubmitted = true;
+        if (isDataSubmitted) return; 
+        isDataSubmitted = true; 
 
         hideAllScreens(); document.getElementById('result-screen').style.display = 'block';
         const totalQ = filteredQuizData.length; const currentAccuracy = Math.round((score / totalQ) * 100);
@@ -1167,7 +1157,7 @@
     function showDailySummary() {
         hideAllScreens();
         const sciEl = document.getElementById('daily-total-rate-sci'); const socEl = document.getElementById('daily-total-rate-soc'); const engEl = document.getElementById('daily-total-rate-eng');
-        sciEl.innerText = dailyRateChangeScience >= 0 ? `+${dailyRateChangeScience}` : dailyRateChangeScience; socEl.innerText = dailyRateChangeSocial >= 0 ? `+${dailyRateChangeSocial}` : dailyRateChangeSocial; engEl.innerText = dailyRateChangeEnglish >= 0 ? `+${dailyRateChangeEnglish}` : dailyRateChangeEnglish;
+        sciEl.innerText = dailyRateChangeScience >= 0 ? `+${dailyRateChangeScience}` : dailyRateChangeScience; socEl.innerText = dailyRateChangeSocial >= 0 ? `+${dailyRateChangeSocial}/` : dailyRateChangeSocial; engEl.innerText = dailyRateChangeEnglish >= 0 ? `+${dailyRateChangeEnglish}` : dailyRateChangeEnglish;
         sciEl.style.color = dailyRateChangeScience > 0 ? '#28a745' : (dailyRateChangeScience < 0 ? '#dc3545' : '#4a5568'); socEl.style.color = dailyRateChangeSocial > 0 ? '#28a745' : (dailyRateChangeSocial < 0 ? '#dc3545' : '#4a5568'); engEl.style.color = dailyRateChangeEnglish > 0 ? '#28a745' : (dailyRateChangeEnglish < 0 ? '#dc3545' : '#4a5568');
         const listContainer = document.getElementById('summary-list'); listContainer.innerHTML = ""; const summaryKeys = Object.keys(dailySummaryData);
         if (summaryKeys.length === 0) { listContainer.innerHTML = "<div class='score-line' style='text-align:center; color:#666;'>まだ本日解答した問題はありません。</div>"; } 
@@ -1250,7 +1240,7 @@
             sectionsSet.forEach(secName => {
                 const secQuestions = data.filter(q => q.section === secName); const total = secQuestions.length; 
                 const cleared = secQuestions.filter(q => perfStats[q.question] && perfStats[q.question].status.includes('correct')).length;
-                const accuracy = total > 0 ? Math.round((cleared / total) * 100) : 0; const card = document.createElement('div'); card.className = "section-card"; card.onclick = () => showWrongQuestionsDetail(cat.key, secName, cat.type === "english", cat.grade);
+                const accuracy = total > 0 ? Math.round((cleared / total) * 100) : 0; const card = document.createElement('div'); card.className = "section-card"; card.onclick = () => showWrongQuestionsDetail(cat.key || "", secName, cat.type === "english", cat.grade);
                 let badgeColor = getGaugeColor(accuracy); let statusText = "🚨 弱点"; if (accuracy > 90) statusText = "👑 完璧！"; else if (accuracy > 70) statusText = "🍏 克服！"; else if (accuracy > 30) statusText = "⚠️ あと少し";
                 card.innerHTML = `<div class="section-card-title"><span>${secName}</span><span class="section-status-badge" style="background-color: ${badgeColor};">${statusText}</span></div><div class="progress-bar-bg"><div class="progress-bar-fill" style="width: ${accuracy}%; background-color: ${badgeColor};"></div></div><div class="section-card-footer"><span>クリア: <b>${cleared}</b> / ${total} 問</span><span>達成率: <b>${accuracy}%</b></span></div>`;
                 container.appendChild(card);
@@ -1316,7 +1306,7 @@
     function updateReportSections() {
         const subject = document.getElementById('report-subject').value; const sectionSelect = document.getElementById('report-section'); sectionSelect.innerHTML = ""; const sectionsSet = new Set();
         for (const key in allQuizData) { if (key.startsWith(subject)) { allQuizData[key].forEach(q => { if (q.section) sectionsSet.add(q.section); }); } }
-        if (sectionsSet.size === 0) { const opt = document.createElement('option'); opt.value = "共通・その他"; opt.innerText = "共通・other"; sectionSelect.appendChild(opt); }
+        if (sectionsSet.size === 0) { const opt = document.createElement('option'); opt.value = "共通・その他"; opt.innerText = "共通・その他"; sectionSelect.appendChild(opt); }
         else { sectionsSet.forEach(sec => { const opt = document.createElement('option'); opt.value = sec; opt.innerText = sec; sectionSelect.appendChild(opt); }); }
     }
     function submitReport() {
