@@ -12,6 +12,8 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="TRIPLE">
     <meta name="theme-color" content="#f0f2f5">
+    <!-- Chart.js (グラフ描画ライブラリ) の読み込みを追加 -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         body { font-family: sans-serif; background-color: #f0f2f5; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
         .quiz-container { background: white; border-radius: 12px; box-shadow: 0 8px 24px rgba(0,0,0,0.15); width: 400px; height: 740px; text-align: center; box-sizing: border-box; position: relative; overflow: hidden; }
@@ -350,9 +352,14 @@
                 <div style="font-size: 0.95rem; color: #2b6cb0; font-weight: bold;"><span id="my-rate-subject-label">理科</span>の現在レート</div>
                 <div id="my-current-rate-val" style="font-size: 2.5rem; font-weight: bold; color: #2b6cb0; margin: 4px 0;">1500</div>
                 <div id="my-rate-rank-text" style="font-size: 0.85rem; color: #4a5568; font-weight: bold;">全体順位: 計算中...</div>
+                
+                <!-- 【追加】折れ線グラフ用キャンバスコンテナ -->
+                <div style="margin-top: 12px; background: white; padding: 8px; border-radius: 6px; border: 1px solid #cbd5e0; height: 180px; position: relative;">
+                    <canvas id="rate-history-chart"></canvas>
+                </div>
             </div>
             <div id="rate-ranking-section" style="display: none;">
-                <h3 style="text-align: left; margin: 15px 0 8px 0; color: #2d3748; font-size: 1.05rem; border-bottom: 2px solid #cbd5e0; padding-bottom: 3px;">🏆 <span id="ranking-subject-label">理科</span>トップ10ランキング</h3>
+                <h3 style="text-align: left; margin: 15px 0 8px 0; color: #2d3748; font-size: 1.05rem; border-bottom: 2px solid #cbd5e0; padding-bottom: 3px;">🏆 <span id="ranking-subject-label">理科</span>ランキング</h3>
                 <div id="ranking-list-container" class="report-container" style="max-height: 230px; background: #ffffff; padding: 5px; border-radius: 6px; border: 1px solid #e2e8f0;"></div>
             </div>
             <button class="btn back-btn" style="margin-top: 15px;" onclick="backToRateSubjectSelector()">🔙 教科を選び直す</button>
@@ -467,6 +474,9 @@
     let ghostCurrentScore = 0;
     
     let currentPlayerRoundLogs = []; 
+    
+    // 【追加】グラフのインスタンス管理用
+    let rateChartInstance = null;
 
     function getGaugeColor(rate) {
         if (rate <= 30) return "#dc3545"; if (rate <= 70) return "#eab308"; if (rate <= 90) return "#28a745"; return "#007bff"; 
@@ -483,6 +493,12 @@
         if (savedMonthString !== currentMonthString) {
             localStorage.setItem(`quiz_rate_science_${studentKey}`, '1500'); localStorage.setItem(`quiz_rate_social_${studentKey}`, '1500'); localStorage.setItem(`quiz_rate_english_${studentKey}`, '1500');
             localStorage.setItem(`quiz_rate_month_${studentKey}`, currentMonthString);
+            
+            // 【追加】月間リセット時に履歴もリセット
+            localStorage.setItem(`quiz_rate_history_science_${studentKey}`, JSON.stringify([{ label: "初期", rate: 1500 }]));
+            localStorage.setItem(`quiz_rate_history_social_${studentKey}`, JSON.stringify([{ label: "初期", rate: 1500 }]));
+            localStorage.setItem(`quiz_rate_history_english_${studentKey}`, JSON.stringify([{ label: "初期", rate: 1500 }]));
+            
             dailyRateChangeScience = 0; dailyRateChangeSocial = 0; dailyRateChangeEnglish = 0;
         }
     }
@@ -528,6 +544,15 @@
             if (!isUserFound) { alert("生徒番号または氏名が登録されていません。"); loginBtn.disabled = false; loginBtn.innerText = "ログイン"; return; }
             currentCombo = 0; maxCombo = 0; dailySummaryData = {}; dailyRateChangeScience = 0; dailyRateChangeSocial = 0; dailyRateChangeEnglish = 0;
             localStorage.setItem('quiz_saved_id', studentId); localStorage.setItem('quiz_saved_name', studentName); localStorage.setItem('quiz_saved_grade', studentGrade); localStorage.setItem('quiz_saved_campus', studentCampus); 
+            
+            // 【追加】ログイン時に履歴データが空ならベースを作成する
+            ['science', 'social', 'english'].forEach(sub => {
+                let historyKey = `quiz_rate_history_${sub}_${studentKey}`;
+                if (!localStorage.getItem(historyKey)) {
+                    localStorage.setItem(historyKey, JSON.stringify([{ label: "初期", rate: 1500 }]));
+                }
+            });
+
             checkMonthlyReset(); hideAllScreens(); document.getElementById('loading-screen').style.display = 'block'; document.getElementById('loading-text').innerText = "ログイン成功！問題データを読み込んでいます...";
             showMainScreen();
         } catch (error) { alert("生徒一覧データの読み込みに失敗しました。"); console.error(error); } finally { loginBtn.disabled = false; loginBtn.innerText = "ログイン"; }
@@ -866,7 +891,7 @@
                 }
                 let dummies = dummyPool.slice(0, 3);
                 if (dummies.length < 3) {
-                    let backupPool = Array.from(new Set(currentSectionAllQuestions.filter(q => q.type === quiz.type).map(q => q.correctText))).filter(txt => txt !== quiz.correctText && !dummies.includes(txt));
+                    let backupPool = Array.from(new Set(quizData.filter(q => q.type === quiz.type).map(q => q.correctText))).filter(txt => txt !== quiz.correctText && !dummies.includes(txt));
                     for (let i = backupPool.length - 1; i > 0; i--) { 
                         const j = Math.floor(Math.random() * (i + 1)); 
                         [backupPool[i], backupPool[j]] = [backupPool[j], backupPool[i]]; 
@@ -899,7 +924,7 @@
         reviewQuestionIndex = 0;
         document.getElementById('review-end-message').style.display = 'none';
         document.getElementById('review-to-result-btn').style.display = 'none';
-
+        maxCombo = currentCombo;
         if (currentMode === "battle" && activeGhostData) {
             ghostCurrentQuestion = 0; ghostCurrentScore = 0;
             document.getElementById('vs-live-panel').style.display = 'block';
@@ -1056,6 +1081,19 @@
         showQuestion();
     }
 
+    // 【追加】レート変更時の履歴保存用関数
+    function saveRateHistory(subject, newRate) {
+        if (!studentKey) return;
+        let historyKey = `quiz_rate_history_${subject}_${studentKey}`;
+        let history = JSON.parse(localStorage.getItem(historyKey) || "[]");
+        if (history.length === 0) {
+            history.push({ label: "初期", rate: 1500 });
+        }
+        let count = history.length;
+        history.push({ label: `${count}回`, rate: newRate });
+        localStorage.setItem(historyKey, JSON.stringify(history));
+    }
+
     function showFinalResult() {
         if (isDataSubmitted) return; 
         isDataSubmitted = true; 
@@ -1125,6 +1163,9 @@
         let myRate = parseInt(localStorage.getItem(`quiz_rate_${selectedSubject}_` + studentKey) || '1500');
         myRate += totalRateChange; localStorage.setItem(`quiz_rate_${selectedSubject}_` + studentKey, myRate);
 
+        // 【追加】レート変動履歴を記録
+        saveRateHistory(selectedSubject, myRate);
+
         if (selectedSubject === "science") dailyRateChangeScience += totalRateChange; else if (selectedSubject === "social") dailyRateChangeSocial += totalRateChange; else dailyRateChangeEnglish += totalRateChange;
 
         const rateSign = totalRateChange >= 0 ? `+${totalRateChange}` : `${totalRateChange}`;
@@ -1157,7 +1198,7 @@
     function showDailySummary() {
         hideAllScreens();
         const sciEl = document.getElementById('daily-total-rate-sci'); const socEl = document.getElementById('daily-total-rate-soc'); const engEl = document.getElementById('daily-total-rate-eng');
-        sciEl.innerText = dailyRateChangeScience >= 0 ? `+${dailyRateChangeScience}` : dailyRateChangeScience; socEl.innerText = dailyRateChangeSocial >= 0 ? `+${dailyRateChangeSocial}/` : dailyRateChangeSocial; engEl.innerText = dailyRateChangeEnglish >= 0 ? `+${dailyRateChangeEnglish}` : dailyRateChangeEnglish;
+        sciEl.innerText = dailyRateChangeScience >= 0 ? `+${dailyRateChangeScience}` : dailyRateChangeScience; socEl.innerText = dailyRateChangeSocial >= 0 ? `+${dailyRateChangeSocial}` : dailyRateChangeSocial; engEl.innerText = dailyRateChangeEnglish >= 0 ? `+${dailyRateChangeEnglish}` : dailyRateChangeEnglish;
         sciEl.style.color = dailyRateChangeScience > 0 ? '#28a745' : (dailyRateChangeScience < 0 ? '#dc3545' : '#4a5568'); socEl.style.color = dailyRateChangeSocial > 0 ? '#28a745' : (dailyRateChangeSocial < 0 ? '#dc3545' : '#4a5568'); engEl.style.color = dailyRateChangeEnglish > 0 ? '#28a745' : (dailyRateChangeEnglish < 0 ? '#dc3545' : '#4a5568');
         const listContainer = document.getElementById('summary-list'); listContainer.innerHTML = ""; const summaryKeys = Object.keys(dailySummaryData);
         if (summaryKeys.length === 0) { listContainer.innerHTML = "<div class='score-line' style='text-align:center; color:#666;'>まだ本日解答した問題はありません。</div>"; } 
@@ -1271,31 +1312,133 @@
     function selectRateSubject(subject) { document.getElementById('rate-subject-selector-view').style.display = 'none'; document.getElementById('rate-detail-view').style.display = 'block'; switchRateTab(subject); toggleRateView('my'); }
     function backToRateSubjectSelector() { document.getElementById('rate-subject-selector-view').style.display = 'block'; document.getElementById('rate-detail-view').style.display = 'none'; }
 
+    // 【追加】折れ線グラフ描画処理
+    function renderRateChart(subject) {
+        const ctx = document.getElementById('rate-history-chart').getContext('2d');
+        if (rateChartInstance) {
+            rateChartInstance.destroy(); // 古いグラフの破棄
+        }
+        let historyKey = `quiz_rate_history_${subject}_${studentKey}`;
+        let history = JSON.parse(localStorage.getItem(historyKey) || "[]");
+        if (history.length === 0) {
+            history = [{ label: "初期", rate: 1500 }];
+        }
+        
+        // 直近20件に絞って見やすくする
+        let displayData = history.slice(-20);
+        const labels = displayData.map(d => d.label);
+        const data = displayData.map(d => d.rate);
+        
+        rateChartInstance = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [{
+                    data: data,
+                    borderColor: '#2b6cb0',
+                    backgroundColor: 'rgba(66, 153, 225, 0.1)',
+                    borderWidth: 2,
+                    pointRadius: 3,
+                    tension: 0.15,
+                    fill: true
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: {
+                    x: { grid: { display: false }, ticks: { font: { size: 9 } } },
+                    y: { ticks: { font: { size: 10 } } }
+                }
+            }
+        });
+    }
+
+    // 【修正】匿名化・グラフ描画・限定表示ロジックの組み込み
     function switchRateTab(subject) {
         currentRateTab = subject; let subjectLabel = subject === 'social' ? '社会' : (subject === 'english' ? '英語' : '理科');
         document.getElementById('my-rate-subject-label').innerText = subjectLabel; document.getElementById('ranking-subject-label').innerText = subjectLabel;
         checkMonthlyReset(); const myRate = parseInt(localStorage.getItem(`quiz_rate_${subject}_` + studentKey) || '1500'); document.getElementById('my-current-rate-val').innerText = myRate;
+        
         let rankingList = allStudentsList.map(s => {
             let currentRateVal = 1500; if (subject === 'science') currentRateVal = s.scienceRate; else if (subject === 'social') currentRateVal = s.socialRate; else if (subject === 'english') currentRateVal = s.englishRate; 
             if (Number(s.id) === Number(studentId) && s.name === studentName) { currentRateVal = myRate; } return { ...s, activeRate: currentRateVal };
         });
         if (!rankingList.some(s => Number(s.id) === Number(studentId) && s.name === studentName) && studentId) { rankingList.push({ id: studentId, name: studentName, grade: studentGrade, campus: studentCampus, activeRate: myRate }); }
         rankingList.sort((a, b) => b.activeRate - a.activeRate);
+        
         let displayRank = 1; let lastRate = -1; let myRankNum = 1;
         rankingList.forEach((s, idx) => { if (s.activeRate !== lastRate) { displayRank = idx + 1; lastRate = s.activeRate; } s.computedRank = displayRank; if (Number(s.id) === Number(studentId) && s.name === studentName) { myRankNum = displayRank; } });
         document.getElementById('my-rate-rank-text').innerText = `全体順位: ${myRankNum} 位`;
-        const container = document.getElementById('ranking-list-container'); container.innerHTML = ""; const showLimit = Math.min(10, rankingList.length);
-        for (let i = 0; i < showLimit; i++) {
-            const s = rankingList[i]; const item = document.createElement('div'); item.className = "score-line"; item.style.padding = "6px 8px"; item.style.margin = "4px 0"; item.style.borderRadius = "4px";
-            if (Number(s.id) === Number(studentId) && s.name === studentName) { item.style.backgroundColor = "#feebc8"; item.style.fontWeight = "bold"; item.style.color = "#c05621"; item.innerHTML = `<div style="text-align:left;">👑 ${s.computedRank}位 : [${s.campus || '---'}] ${s.name} (${s.activeRate}) (あなた)</div>`; }
-            else { item.style.borderBottom = "1px solid #edf2f7"; item.innerHTML = `<div style="text-align:left;">${s.computedRank}位 : [${s.campus || '---'}] ${s.name} (${s.activeRate})</div>`; }
+        
+        // 個人レート用のグラフを描画
+        renderRateChart(subject);
+        
+        const container = document.getElementById('ranking-list-container'); container.innerHTML = "";
+        
+        // 【修正】表示対象のインデックス集合を作成（上位3名 + 自分の前後3名）
+        let myIdx = rankingList.findIndex(s => Number(s.id) === Number(studentId) && s.name === studentName);
+        let targetIndices = new Set();
+        
+        // 1. 上位3名を固定登録
+        for (let i = 0; i < Math.min(3, rankingList.length); i++) {
+            targetIndices.add(i);
+        }
+        // 2. 自分の前後3名を登録
+        if (myIdx !== -1) {
+            for (let i = Math.max(0, myIdx - 3); i <= Math.min(rankingList.length - 1, myIdx + 3); i++) {
+                targetIndices.add(i);
+            }
+        }
+        
+        // インデックス順（順位の高い順）に並び替え
+        let sortedIndices = Array.from(targetIndices).sort((a, b) => a - b);
+        let lastIdx = -1;
+        
+        sortedIndices.forEach(idx => {
+            // インデックスが離れている場合は省略線「···」を入れる
+            if (lastIdx !== -1 && idx > lastIdx + 1) {
+                const divider = document.createElement('div');
+                divider.style.borderTop = "1px dashed #cbd5e0";
+                divider.style.margin = "6px 0";
+                divider.style.textAlign = "center";
+                divider.style.color = "#a0aec0";
+                divider.style.fontSize = "0.8rem";
+                divider.innerText = "···";
+                container.appendChild(divider);
+            }
+            
+            const s = rankingList[idx];
+            const item = document.createElement('div');
+            item.className = "score-line";
+            item.style.padding = "6px 8px";
+            item.style.margin = "4px 0";
+            item.style.borderRadius = "4px";
+            item.style.fontSize = "0.9rem";
+            
+            const isMe = (Number(s.id) === Number(studentId) && s.name === studentName);
+            
+            // 【修正】自分以外は名前を一律「プレイヤー」にして非表示化
+            const displayName = isMe ? `${s.name} (あなた)` : `プレイヤー`;
+            
+            let rankPrefix = `${s.computedRank}位`;
+            if (s.computedRank === 1) rankPrefix = `🥇 1位`;
+            else if (s.computedRank === 2) rankPrefix = `🥈 2位`;
+            else if (s.computedRank === 3) rankPrefix = `🥉 3位`;
+            
+            if (isMe) {
+                item.style.backgroundColor = "#feebc8";
+                item.style.fontWeight = "bold";
+                item.style.color = "#c05621";
+                item.innerHTML = `<div style="text-align:left;">👑 ${rankPrefix} : [${s.campus || '---'}] ${displayName} (${s.activeRate})</div>`;
+            } else {
+                item.style.borderBottom = "1px solid #edf2f7";
+                item.innerHTML = `<div style="text-align:left;">${rankPrefix} : [${s.campus || '---'}] ${displayName} (${s.activeRate})</div>`;
+            }
             container.appendChild(item);
-        }
-        if (myRankNum > 10) {
-            const divider = document.createElement('div'); divider.style.borderTop = "2px dashed #cbd5e0"; divider.style.margin = "10px 0"; container.appendChild(divider);
-            const myItem = document.createElement('div'); myItem.className = "score-line"; myItem.style.padding = "6px 8px"; myItem.style.borderRadius = "4px"; myItem.style.backgroundColor = "#feebc8"; myItem.style.fontWeight = "bold"; myItem.style.color = "#c05621";
-            myItem.innerHTML = `<div style="text-align:left;">🏅 ${myRankNum}位 : [${studentCampus}] ${studentName} (${myRate}) (あなた)</div>`; container.appendChild(myItem);
-        }
+            lastIdx = idx;
+        });
     }
 
     function toggleSectionMenu(event) { if (event) event.stopPropagation(); const menu = document.getElementById('section-menu-dropdown'); menu.style.display = (menu.style.display === 'none' || menu.style.display === '') ? 'block' : 'none'; }
