@@ -11,71 +11,366 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="TRIPLE">
-    <meta name="theme-color" content="#f0f2f5">
-    <!-- Chart.js (グラフ描画ライブラリ) の読み込みを追加 -->
+    <meta name="theme-color" content="#0b0f19">
+    <!-- Chart.js (グラフ描画ライブラリ) の読み込み -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        body { font-family: sans-serif; background-color: #f0f2f5; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
-        .quiz-container { background: white; border-radius: 12px; box-shadow: 0 8px 24px rgba(0,0,0,0.15); width: 400px; height: 740px; text-align: center; box-sizing: border-box; position: relative; overflow: hidden; }
-        .screen { width: 100%; height: 100%; padding: 30px; box-sizing: border-box; overflow-y: auto; position: relative; }
-        .question { font-size: 1.2rem; font-weight: bold; margin-bottom: 20px; text-align: left; }
-        .btn { display: block; width: 100%; padding: 12px; margin: 10px 0; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 1rem; box-sizing: border-box; transition: background-color 0.1s ease; }
-        .nav-btn { background-color: #28a745; text-align: center; }
-        .nav-btn:hover { background-color: #218838; }
-        .ans-btn { background-color: #007bff; text-align: left; padding-left: 20px; }
-        .ans-btn:hover { background-color: #0056b3; }
-        .ans-btn.correct-choice { background-color: #28a745 !important; }
-        .ans-btn.wrong-choice { background-color: #dc3545 !important; }
-        .back-btn { background-color: #6c757d; text-align: center; margin-top: 20px; }
-        .back-btn:hover { background-color: #5a6268; }
-        .result { font-size: 1.4rem; font-weight: bold; margin-top: 20px; min-height: 30px; }
-        .quiz-container h2 { margin-top: 0; color: #333; }
-        .loading { font-size: 1.2rem; color: #666; }
-        .progress-text { font-size: 0.9rem; color: #666; margin-bottom: 10px; text-align: right; font-weight: bold; }
-        .score-box { background-color: #e9ecef; padding: 15px; border-radius: 8px; margin: 20px 0; text-align: left; }
-        .score-line { font-size: 1.05rem; margin: 12px 0; color: #495057; }
-        .score-highlight { font-weight: bold; font-size: 1.2rem; }
-        .review-container { max-height: 280px; overflow-y: auto; text-align: left; margin: 15px 0; padding-right: 5px; margin-bottom: 10px; }
-        .review-card { background: #fff5f5; border: 1px solid #feb2b2; padding: 12px; border-radius: 6px; margin-bottom: 12px; font-size: 0.95rem; }
-        .review-q { font-weight: bold; color: #2d3748; margin-bottom: 6px; }
-        .review-ans { margin: 3px 0; padding-left: 10px; }
-        .review-wrong { color: #dc3545; font-weight: bold; }
-        .review-correct { color: #28a745; font-weight: bold; }
-        .wrong-alert { color: #dc3545; font-size: 0.9rem; text-align: left; font-weight: bold; margin-bottom: 8px; min-height: 18px; }
-        .input-style { width: 100%; padding: 12px; font-size: 1.1rem; border: 2px solid #cbd5e0; border-radius: 6px; margin: 10px 0; box-sizing: border-box; text-align: center; }
-        .student-badge { position: absolute; top: 20px; left: 30px; background-color: #4a5568; color: white; font-size: 0.85rem; padding: 6px 12px; border-radius: 20px; display: inline-block; font-weight: bold; z-index: 10; }
-        .switch-student { font-size: 0.8rem; color: #63b3ed; text-decoration: underline; cursor: pointer; margin-left: 10px; font-weight: normal; }
-        .combo-alert { color: #ed8936; font-size: 0.95rem; text-align: left; font-weight: bold; margin-bottom: 5px; min-height: 18px; }
-        .section-screen-desc { font-size: 0.8rem; color: #4a5568; margin-bottom: 12px; background: #ebf8ff; padding: 10px; border-radius: 6px; border-left: 4px solid #3182ce; text-align: left; line-height: 1.4; }
-        .section-card { background: #ffffff; border: 2px solid #e2e8f0; padding: 12px; border-radius: 8px; margin: 10px 0; text-align: left; cursor: pointer; transition: all 0.15s ease; box-shadow: 0 2px 4px rgba(0,0,0,0.02); box-sizing: border-box; }
-        .section-card:hover { border-color: #4a5568; transform: translateY(-1px); box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
-        .section-card-title { font-weight: bold; font-size: 1rem; display: flex; justify-content: space-between; align-items: center; color: #2d3748; margin-bottom: 6px; }
-        .section-status-badge { color: white; font-size: 0.7rem; padding: 2px 8px; border-radius: 12px; font-weight: bold; }
-        .progress-bar-bg { background-color: #edf2f7; height: 10px; border-radius: 5px; margin: 6px 0 2px 0; overflow: hidden; border: 1px solid #e2e8f0; }
-        .progress-bar-fill { height: 100%; width: 0%; transition: width 0.4s ease; }
-        .section-card-footer { font-size: 0.8rem; color: #718096; display: flex; justify-content: space-between; align-items: center; }
-        .menu-item { padding: 12px 16px; font-size: 0.9rem; color: #4a5568; cursor: pointer; transition: background-color 0.15s; border-bottom: 1px solid #edf2f7; text-align: left; }
+        /* 全体ベース（ダークメタリック） */
+        body { 
+            font-family: 'Helvetica Neue', Arial, 'Hiragino Kaku Gothic ProN', sans-serif; 
+            background-color: #0b0f19; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            height: 100vh; 
+            margin: 0; 
+            color: #f1f5f9;
+        }
+        
+        /* アプリ筐体（高級感のあるチタンフレーム×微発光エッジ） */
+        .quiz-container { 
+            background: linear-gradient(135deg, #090d16 0%, #111827 100%); 
+            border: 2px solid #1e293b;
+            border-radius: 16px; 
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6), 0 0 30px rgba(37, 99, 235, 0.1); 
+            width: 400px; 
+            height: 740px; 
+            text-align: center; 
+            box-sizing: border-box; 
+            position: relative; 
+            overflow: hidden; 
+        }
+        
+        .screen { 
+            width: 100%; 
+            height: 100%; 
+            padding: 30px; 
+            box-sizing: border-box; 
+            overflow-y: auto; 
+            position: relative; 
+        }
+        
+        /* スクロールバーのスタイリング */
+        .screen::-webkit-scrollbar { width: 5px; }
+        .screen::-webkit-scrollbar-track { background: transparent; }
+        .screen::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 10px; }
+        .screen::-webkit-scrollbar-thumb:hover { background: #3b82f6; }
+
+        /* タイトル・見出し */
+        .quiz-container h2 { margin-top: 0; margin-bottom: 15px; color: #ffffff; font-weight: 800; letter-spacing: 1px; text-shadow: 0 2px 4px rgba(0,0,0,0.5); }
+        .question { font-size: 1.15rem; font-weight: bold; margin-bottom: 25px; text-align: left; color: #f8fafc; line-height: 1.5; }
+        
+        /* 基本ボタン（共通） */
+        .btn { 
+            display: block; 
+            width: 100%; 
+            padding: 14px; 
+            margin: 12px 0; 
+            color: #ffffff; 
+            border: none; 
+            border-radius: 8px; 
+            cursor: pointer; 
+            font-size: 1rem; 
+            font-weight: bold;
+            box-sizing: border-box; 
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); 
+            text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+        }
+        
+        /* ナビゲーション・主導線（深みのあるサイバーグリーン） */
+        .nav-btn { 
+            background: linear-gradient(135deg, #059669 0%, #10b981 100%); 
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);
+        }
+        .nav-btn:hover { 
+            transform: translateY(-1px);
+            box-shadow: 0 6px 16px rgba(16, 185, 129, 0.4);
+        }
+        
+        /* 選択肢ボタン（ディープメタリックブルー） */
+        .ans-btn { 
+            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); 
+            border: 1px solid #334155;
+            text-align: left; 
+            padding-left: 20px; 
+            color: #cbd5e1;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+        }
+        .ans-btn:hover { 
+            background: linear-gradient(135deg, #1d4ed8 0%, #1e40af 100%); 
+            border-color: #3b82f6;
+            color: #ffffff;
+            transform: translateX(2px);
+            box-shadow: 0 0 15px rgba(59, 130, 246, 0.4);
+        }
+        .ans-btn.correct-choice { 
+            background: linear-gradient(135deg, #047857 0%, #065f46 100%) !important; 
+            border-color: #10b981 !important;
+            color: #ffffff !important;
+            box-shadow: 0 0 20px rgba(16, 185, 129, 0.5) !important;
+        }
+        .ans-btn.wrong-choice { 
+            background: linear-gradient(135deg, #b91c1c 0%, #991b1b 100%) !important; 
+            border-color: #ef4444 !important;
+            color: #ffffff !important;
+            box-shadow: 0 0 20px rgba(239, 68, 68, 0.5) !important;
+        }
+        
+        /* プレミアムゴールドボタン（金） */
+        .btn-gold { 
+            background: linear-gradient(135deg, #9a3412 0%, #d97706 50%, #f59e0b 100%); 
+            color: #0f172a; 
+            font-weight: 800; 
+            border: 1px solid #f59e0b; 
+            box-shadow: 0 4px 15px rgba(217, 119, 6, 0.3); 
+        }
+        .btn-gold:hover { 
+            background: linear-gradient(135deg, #d97706 0%, #f59e0b 50%, #facc15 100%); 
+            transform: translateY(-1px);
+            box-shadow: 0 6px 20px rgba(245, 158, 11, 0.5); 
+        }
+        
+        /* 戻るボタン（ダークカーボン） */
+        .back-btn { 
+            background: linear-gradient(135deg, #334155 0%, #1e293b 100%); 
+            border: 1px solid #475569;
+            text-align: center; 
+            margin-top: 20px; 
+            color: #94a3b8;
+        }
+        .back-btn:hover { 
+            background: #475569; 
+            color: #ffffff;
+        }
+
+        /* メインメニュー：4つの角丸正方形カード */
+        .menu-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+            margin-top: 25px;
+        }
+        .menu-card {
+            position: relative;
+            height: 135px;
+            background: linear-gradient(135deg, #131c2e 0%, #0b0f19 100%);
+            border: 1px solid #1e293b;
+            border-radius: 16px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            overflow: hidden;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.4);
+        }
+        /* テスト・成績（メタリックブルー） */
+        .menu-card.blue-card {
+            border-color: #2563eb;
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.15);
+        }
+        .menu-card.blue-card:hover {
+            background: linear-gradient(135deg, #1d4ed8 0%, #1e40af 100%);
+            border-color: #3b82f6;
+            box-shadow: 0 8px 25px rgba(59, 130, 246, 0.4);
+            transform: translateY(-2px);
+        }
+        /* 対戦（バトルパープル） */
+        .menu-card.battle-card {
+            border-color: #6d46c1;
+            box-shadow: 0 4px 12px rgba(109, 70, 193, 0.15);
+        }
+        .menu-card.battle-card:hover {
+            background: linear-gradient(135deg, #5b21b6 0%, #4c1d95 100%);
+            border-color: #a78bfa;
+            box-shadow: 0 8px 25px rgba(167, 139, 250, 0.4);
+            transform: translateY(-2px);
+        }
+        /* レート（ラグジュアリーゴールド） */
+        .menu-card.gold-card {
+            border-color: #d97706;
+            box-shadow: 0 4px 12px rgba(217, 119, 6, 0.15);
+        }
+        .menu-card.gold-card:hover {
+            background: linear-gradient(135deg, #b45309 0%, #78350f 100%);
+            border-color: #f59e0b;
+            box-shadow: 0 8px 25px rgba(245, 158, 11, 0.4);
+            transform: translateY(-2px);
+        }
+        .menu-card-title {
+            font-size: 1rem;
+            font-weight: 800;
+            color: #ffffff;
+            z-index: 2;
+            letter-spacing: 0.5px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.8);
+        }
+        /* カードの後ろに潜む巨大なイラスト背景 */
+        .menu-card-bg-icon {
+            position: absolute;
+            font-size: 5.5rem;
+            bottom: -15px;
+            right: -10px;
+            opacity: 0.12;
+            z-index: 1;
+            pointer-events: none;
+            transition: all 0.25s ease;
+            user-select: none;
+        }
+        .menu-card:hover .menu-card-bg-icon {
+            transform: scale(1.18) rotate(-8deg);
+            opacity: 0.25;
+        }
+
+        /* 右下の角の誤字報告コマンド */
+        .report-corner-btn {
+            position: absolute;
+            bottom: 20px;
+            right: 25px;
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid #334155;
+            color: #64748b;
+            font-size: 0.75rem;
+            padding: 6px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-weight: bold;
+            z-index: 10;
+        }
+        .report-corner-btn:hover {
+            background: rgba(153, 27, 27, 0.2);
+            border-color: #ef4444;
+            color: #f87171;
+            box-shadow: 0 0 10px rgba(239, 68, 68, 0.2);
+        }
+        
+        /* 【大改造】ログイン画面：背景を一切隠さず下部にフォームのみを浮かせる完全シースルールック */
+        #login-screen { 
+            padding: 0; 
+            background-image: url('https://i.ibb.co/RGx3mgyq/triple-png.png'); 
+            background-size: cover; 
+            background-position: center; 
+            position: relative; 
+            overflow: hidden; 
+            box-sizing: border-box;
+        }
+        .login-box { 
+            position: absolute; 
+            bottom: 35px; 
+            left: 0; 
+            width: 100%; 
+            background: transparent; 
+            backdrop-filter: none; 
+            -webkit-backdrop-filter: none;
+            padding: 0 30px; 
+            box-sizing: border-box; 
+            border: none;
+            box-shadow: none;
+        }
+        .input-dark { 
+            background-color: rgba(15, 23, 42, 0.75); 
+            border: 2px solid #2563eb; /* フォームの輪郭を青ベースに輝かせる */
+            color: #f8fafc; 
+            transition: all 0.2s; 
+            box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+        }
+        .input-dark:focus { 
+            border-color: #3b82f6; 
+            outline: none; 
+            box-shadow: 0 0 15px rgba(59, 130, 246, 0.6);
+        }
+        .input-dark::placeholder { color: #475569; }
+
+        /* ステータス・スコアボックス（ダークグラス） */
+        .score-box { 
+            background: rgba(30, 41, 59, 0.4); 
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            padding: 18px; 
+            border-radius: 12px; 
+            margin: 20px 0; 
+            text-align: left; 
+        }
+        .score-line { font-size: 1rem; margin: 12px 0; color: #cbd5e1; }
+        .score-highlight { font-weight: bold; font-size: 1.2rem; text-shadow: 0 0 10px rgba(255,255,255,0.2); }
+        .result { font-size: 1.3rem; font-weight: bold; margin-top: 20px; min-height: 30px; }
+        .loading { font-size: 1.1rem; color: #94a3b8; }
+        .progress-text { font-size: 0.85rem; color: #64748b; margin-bottom: 10px; text-align: right; font-weight: bold; }
+        
+        /* アラート・バッジ */
+        .wrong-alert { color: #f87171; font-size: 0.85rem; text-align: left; font-weight: bold; margin-bottom: 8px; min-height: 18px; }
+        .combo-alert { color: #fbbf24; font-size: 0.95rem; text-align: left; font-weight: bold; margin-bottom: 5px; min-height: 18px; }
+        .student-badge { position: absolute; top: 20px; left: 30px; background: rgba(30, 41, 59, 0.7); border: 1px solid rgba(255,255,255,0.1); backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); color: #e2e8f0; font-size: 0.8rem; padding: 6px 14px; border-radius: 20px; display: inline-block; font-weight: bold; z-index: 10; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
+        .switch-student { font-size: 0.75rem; color: #3b82f6; text-decoration: none; cursor: pointer; margin-left: 10px; font-weight: bold; }
+        .switch-student:hover { color: #60a5fa; }
+        
+        /* 分野選択カード（メタリック×ゴールド枠発光） */
+        .section-screen-desc { font-size: 0.8rem; color: #94a3b8; margin-bottom: 15px; background: rgba(30, 41, 59, 0.5); padding: 12px; border-radius: 8px; border-left: 4px solid #3b82f6; text-align: left; line-height: 1.5; }
+        .section-card { 
+            background: linear-gradient(135deg, #1e293b 0%, #111827 100%); 
+            border: 1px solid #334155; 
+            padding: 14px; 
+            border-radius: 10px; 
+            margin: 12px 0; 
+            text-align: left; 
+            cursor: pointer; 
+            transition: all 0.2s ease; 
+            box-shadow: 0 4px 6px rgba(0,0,0,0.2); 
+            box-sizing: border-box; 
+        }
+        .section-card:hover { 
+            border-color: #d97706; 
+            transform: translateY(-2px); 
+            box-shadow: 0 8px 20px rgba(217, 119, 6, 0.15); 
+        }
+        .section-card-title { font-weight: bold; font-size: 0.95rem; display: flex; justify-content: space-between; align-items: center; color: #ffffff; margin-bottom: 8px; }
+        .section-status-badge { color: #ffffff; font-size: 0.65rem; padding: 2px 8px; border-radius: 12px; font-weight: bold; letter-spacing: 0.5px; }
+        .section-card-footer { font-size: 0.75rem; color: #64748b; display: flex; justify-content: space-between; align-items: center; margin-top: 4px; }
+        
+        /* ゲージ・進行バー */
+        .progress-bar-bg { background-color: #0f172a; height: 8px; border-radius: 4px; margin: 6px 0 4px 0; overflow: hidden; border: 1px solid #1e293b; }
+        .progress-bar-fill { height: 100%; width: 0%; transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1); }
+        
+        /* メニュー・ドロップダウン */
+        .menu-item { padding: 14px 18px; font-size: 0.85rem; color: #94a3b8; cursor: pointer; transition: all 0.15s; border-bottom: 1px solid #1e293b; text-align: left; font-weight: bold; }
         .menu-item:last-child { border-bottom: none; }
-        .menu-item:hover { background-color: #f7fafc; color: #2d3748; }
-        .correct-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background-color: rgba(255, 255, 255, 0.6); display: none; justify-content: center; align-items: center; font-size: 60vmin; color: #28a745; font-weight: bold; z-index: 9999; pointer-events: none; }
+        .menu-item:hover { background-color: #1e293b; color: #ffffff; }
+        
+        /* 復習・間違いリスト */
+        .review-container { max-height: 280px; overflow-y: auto; text-align: left; margin: 15px 0; padding-right: 5px; }
+        .review-card { background: rgba(239, 68, 68, 0.05); border: 1px solid rgba(239, 68, 68, 0.2); padding: 14px; border-radius: 8px; margin-bottom: 12px; font-size: 0.9rem; }
+        .review-q { font-weight: bold; color: #f8fafc; margin-bottom: 8px; }
+        .review-ans { margin: 4px 0; padding-left: 10px; }
+        .review-wrong { color: #f87171; font-weight: bold; }
+        .review-correct { color: #34d399; font-weight: bold; }
+        
+        /* インプット要素 */
+        .input-style { width: 100%; padding: 14px; font-size: 1.05rem; border-radius: 8px; margin: 12px 0; box-sizing: border-box; text-align: center; font-weight: bold; }
+        
+        /* オーバーレイ・対戦演出 */
+        .correct-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background-color: rgba(9, 13, 22, 0.5); display: none; justify-content: center; align-items: center; font-size: 60vmin; color: #10b981; font-weight: bold; z-index: 9999; pointer-events: none; text-shadow: 0 0 40px rgba(16, 185, 129, 0.4); }
         .report-container { max-height: 360px; overflow-y: auto; padding-right: 5px; margin-bottom: 10px; }
-        .report-cat-title { text-align: left; margin: 15px 0 5px 0; color: #4a5568; font-size: 1.05rem; border-bottom: 2px solid #cbd5e0; padding-bottom: 3px; }
-        #login-screen { padding: 0; background-image: url('https://i.ibb.co/RGx3mgyq/triple-png.png'); background-size: cover; background-position: center; position: relative; overflow: hidden; }
-        .login-box { position: absolute; bottom: 0; left: 0; width: 100%; background: rgba(15, 23, 42, 0.75); backdrop-filter: blur(8px); padding: 25px 30px 35px 30px; box-sizing: border-box; border-top: 1px solid rgba(255, 255, 255, 0.15); }
-        .login-title { color: #ffffff; font-size: 1.25rem; font-weight: bold; margin: 0 0 4px 0; text-align: center; letter-spacing: 1px; }
-        .login-desc { font-size: 0.85rem; color: #94a3b8; margin: 0 0 15px 0; text-align: center; }
-        .input-dark { background-color: rgba(30, 41, 59, 0.8); border: 2px solid #475569; color: #f8fafc; transition: border-color 0.15s; }
-        .input-dark:focus { border-color: #f59e0b; outline: none; }
-        .input-dark::placeholder { color: #64748b; }
-        .btn-gold { background-color: #d97706; color: #ffffff; font-weight: bold; border: 1px solid #b45309; box-shadow: 0 4px 6px rgba(0,0,0,0.2); }
-        .btn-gold:hover { background-color: #b45309; }
-        .bonus-tag { display: inline-block; font-size: 0.75rem; font-weight: bold; padding: 2px 6px; border-radius: 4px; margin-right: 5px; color: white; }
-        .bg-combo { background-color: #ea580c; }
-        .bg-field { background-color: #0284c7; }
-        .flex-center { display: flex; flex-direction: column; justify-content: center; align-items: center; height: 100%; box-sizing: border-box; }
+        .report-cat-title { text-align: left; margin: 20px 0 8px 0; color: #94a3b8; font-size: 0.95rem; font-weight: bold; border-bottom: 1px solid #1e293b; padding-bottom: 5px; }
+        
+        #battle-result-banner { font-size: 1.6rem; font-weight: 900; margin-top: 5px; margin-bottom: 15px; text-shadow: 0 0 15px rgba(255,255,255,0.2); line-height: 1.4; letter-spacing: 1px; }
+        .bonus-tag { display: inline-block; font-size: 0.7rem; font-weight: 800; padding: 2px 6px; border-radius: 4px; margin-right: 5px; color: white; }
+        
+        /* 復習画面用のプレースホルダーカードスタイル */
+        .review-placeholder-card { width: 140px; height: 140px; background: linear-gradient(135deg, #713f12, #a16207); border-radius: 50%; display: flex; justify-content: center; align-items: center; box-shadow: 0 8px 24px rgba(234,179,8,0.15); border: 4px solid #eab308; margin: 20px auto; }
+
+        /* 縦・横完全中央配置を約束するクラス */
+        .flex-center { 
+            display: flex; 
+            flex-direction: column; 
+            justify-content: center; 
+            align-items: center; 
+            height: 100%; 
+            box-sizing: border-box; 
+        }
         .flex-center > div { width: 100%; }
-        .vs-bar-container { background: #edf2f7; padding: 10px; border-radius: 8px; margin-bottom: 12px; text-align: left; border: 1px solid #e2e8f0; font-size: 0.85rem; }
-        .review-end-box { font-size: 1.15rem; font-weight: bold; color: #28a745; margin-top: 20px; background: #f0fff4; padding: 15px; border-radius: 8px; border: 1px solid #c6f6d5; text-align: center; box-shadow: 0 2px 8px rgba(40,167,69,0.1); }
     </style>
 </head>
 <body>
@@ -84,28 +379,50 @@
 
 <div class="quiz-container">
     
+    <!-- ログイン画面（下部配置・完全シースルー化） -->
     <div id="login-screen" class="screen">
         <div class="login-box">
-            <h3 class="login-title">LOGIN</h3>
-            <p class="login-desc">生徒番号とカナ氏名を入力してね</p>
             <input type="text" id="student-id-input" class="input-style input-dark" placeholder="生徒番号（例：1001）">
             <input type="text" id="student-name-input" class="input-style input-dark" placeholder="氏名カナ（例：ヤマダタロウ）">
             <button id="login-submit-btn" class="btn btn-gold" style="margin-top: 15px;" onclick="loginStudent()">ログイン</button>
         </div>
     </div>
 
-    <div id="main-menu-screen" class="screen" style="display: none;">
+    <!-- メインメニュー画面 -->
+    <div id="main-menu-screen" class="screen" style="display: none; padding-bottom: 60px;">
         <div class="student-badge">👤 <span id="user-badge-0"></span> <span class="switch-student" onclick="logoutStudent()">切り替え</span></div>
         <div class="flex-center">
             <div>
-                <h2>メニューを選んでね</h2>
-                <button class="btn nav-btn" style="background-color: #007bff; margin-top: 15px; font-size: 1.15rem; font-weight: bold; padding: 14px;" onclick="setMode('test')">📝 テストをする</button>
-                <button class="btn nav-btn" style="background-color: #6b46c1; margin-top: 12px; font-size: 1.15rem; font-weight: bold; padding: 14px;" onclick="setMode('battle')">⚔️ 対戦</button>
-                <button class="btn nav-btn" style="background-color: #ed8936; margin-top: 12px; font-size: 1.15rem; font-weight: bold; padding: 14px;" onclick="showReportScreen()">📊 成績をみる</button>
-                <button class="btn nav-btn" style="background-color: #eab308; margin-top: 12px; font-size: 1.15rem; font-weight: bold; padding: 14px; color: #212529;" onclick="showRateScreen()">🏆 レートをみる</button>
-                <button class="btn nav-btn" style="background-color: #dc3545; margin-top: 12px; font-size: 1.15rem; font-weight: bold; padding: 14px;" onclick="showReportIssueScreen()">⚠️ 誤答・誤植を報告する</button>
+                <h2>SELECT MENU</h2>
+                <div class="menu-grid">
+                    <!-- ① テストをする (青ベース・教科書背景) -->
+                    <div class="menu-card blue-card" onclick="setMode('test')">
+                        <span class="menu-card-title">📝 テストをする</span>
+                        <span class="menu-card-bg-icon">📖</span>
+                    </div>
+                    
+                    <!-- ② 対戦 (紫ベース・剣背景) -->
+                    <div class="menu-card battle-card" onclick="setMode('battle')">
+                        <span class="menu-card-title">⚔️ 対戦バトル</span>
+                        <span class="menu-card-bg-icon">⚔️</span>
+                    </div>
+                    
+                    <!-- ③ 成績をみる (青ベース・グラフ背景) -->
+                    <div class="menu-card blue-card" onclick="showReportScreen()">
+                        <span class="menu-card-title">📊 成績をみる</span>
+                        <span class="menu-card-bg-icon">📊</span>
+                    </div>
+                    
+                    <!-- ④ レートをみる (金ベース・トロフィー背景) -->
+                    <div class="menu-card gold-card" onclick="showRateScreen()">
+                        <span class="menu-card-title" style="color: #fbbf24;">🏆 レートをみる</span>
+                        <span class="menu-card-bg-icon">🏆</span>
+                    </div>
+                </div>
             </div>
         </div>
+        <!-- 右下の角に絶対配置された誤字報告ボタン -->
+        <div class="report-corner-btn" onclick="showReportIssueScreen()">⚠️ 誤字・誤植報告</div>
     </div>
 
     <div id="subject-screen" class="screen" style="display: none;">
@@ -115,9 +432,9 @@
                 <div id="battle-rule-box" style="display: none;"></div>
 
                 <h2>教科を選んでね</h2>
-                <button class="btn nav-btn" style="background-color: #4a5568;" onclick="selectSubject('science')">理科</button>
-                <button class="btn nav-btn" style="background-color: #2b6cb0;" onclick="selectSubject('social')">社会</button>
-                <button class="btn nav-btn" style="background-color: #b45309;" onclick="selectSubject('english')">英語 🔤</button>
+                <button class="btn nav-btn" style="background: linear-gradient(135deg, #1e293b 0%, #475569 100%); border: 1px solid #64748b;" onclick="selectSubject('science')">理科</button>
+                <button class="btn nav-btn" style="background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 100%); border: 1px solid #3b82f6;" onclick="selectSubject('social')">社会</button>
+                <button class="btn nav-btn" style="background: linear-gradient(135deg, #78350f 0%, #b45309 100%); border: 1px solid #d97706;" onclick="selectSubject('english')">英語 🔤</button>
                 <button class="btn back-btn" onclick="backToMainMenu()">戻る</button>
             </div>
         </div>
@@ -128,9 +445,9 @@
         <div class="flex-center">
             <div>
                 <h2>形式を選んでね 🔤</h2>
-                <button class="btn nav-btn" style="background-color: #d97706; font-weight: bold; padding: 14px;" onclick="selectEnglishMode('日本語⇒英単語')">日本語 ⇒ 英単語</button>
-                <button class="btn nav-btn" style="background-color: #b45309; font-weight: bold; padding: 14px;" onclick="selectEnglishMode('英単語⇒日本語')">英単語 ⇒ 日本語</button>
-                <button class="btn nav-btn" style="background-color: #2b6cb0; font-weight: bold; padding: 14px;" onclick="selectEnglishMode('空欄補充')">空欄補充</button>
+                <button class="btn nav-btn" style="background: linear-gradient(135deg, #b45309 0%, #d97706 100%);" onclick="selectEnglishMode('日本語⇒英単語')">日本語 ⇒ 英単語</button>
+                <button class="btn nav-btn" style="background: linear-gradient(135deg, #78350f 0%, #b45309 100%);" onclick="selectEnglishMode('英単語⇒日本語')">英単語 ⇒ 日本語</button>
+                <button class="btn nav-btn" style="background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 100%);" onclick="selectEnglishMode('空欄補充')">空欄補充</button>
                 <button class="btn back-btn" onclick="backToSubjectFromEnglish()">戻る</button>
             </div>
         </div>
@@ -144,7 +461,7 @@
                 <button class="btn nav-btn" onclick="selectGrade('1')">中学1年</button>
                 <button class="btn nav-btn" onclick="selectGrade('2')">中学2年</button>
                 <button class="btn nav-btn" onclick="selectGrade('3')">中学3年</button>
-                <button class="btn back-btn" onclick="backToSubject()">戻る</button>
+                <button class="btn back-btn" onclick="backToSubjectFromGrade()">戻る</button>
             </div>
         </div>
     </div>
@@ -164,11 +481,11 @@
 
     <div id="section-screen" class="screen" style="display: none; position: relative;">
         <div id="menu-trigger" style="position: absolute; top: -22px; left: -22px; width: 60px; height: 60px; display: flex; justify-content: center; align-items: center; cursor: pointer; user-select: none; z-index: 1001;" onclick="toggleSectionMenu(event)">
-            <span style="position: absolute; font-size: 2.4rem; color: #a0aec0; opacity: 0.35; line-height: 1;">☰</span>
-            <span style="position: absolute; font-size: 0.65rem; font-weight: bold; color: #4a5568; opacity: 0.55; margin-top: 2px;">メニュー</span>
+            <span style="position: absolute; font-size: 2.4rem; color: #475569; opacity: 0.5; line-height: 1;">☰</span>
+            <span style="position: absolute; font-size: 0.65rem; font-weight: bold; color: #94a3b8; opacity: 0.7; margin-top: 2px;">メニュー</span>
         </div>
         
-        <div id="section-menu-dropdown" style="display: none; position: absolute; top: 32px; left: -15px; background: white; border: 1px solid #cbd5e0; box-shadow: 0 4px 12px rgba(0,0,0,0.15); border-radius: 8px; width: 190px; z-index: 1000; overflow: hidden;">
+        <div id="section-menu-dropdown" style="display: none; position: absolute; top: 32px; left: -15px; background: #0f172a; border: 1px solid #334155; box-shadow: 0 4px 12px rgba(0,0,0,0.5); border-radius: 8px; width: 190px; z-index: 1000; overflow: hidden;">
             <div class="menu-item" onclick="handleMenuAction('main')">🏠 トップページに戻る</div>
             <div class="menu-item" onclick="handleMenuAction('subject')">📚 科目を選ぶ</div>
             <div class="menu-item" onclick="handleMenuAction('rate')">🏆 レートをみる</div>
@@ -176,171 +493,190 @@
             <div class="menu-item" onclick="handleMenuAction('summary')">📝 本日の学習を振り返る</div>
         </div>
 
-        <h2>分野・弱点診断 📊</h2>
-        <div id="section-buttons" style="max-height: 340px; overflow-y: auto; padding-right: 5px; margin-bottom: 10px;"></div>
+        <h2 style="margin-top: 10px;">分野・弱点診断 📊</h2>
+        <div id="section-buttons" style="max-height: 460px; overflow-y: auto; padding-right: 5px; margin-bottom: 10px;"></div>
         <button class="btn back-btn" onclick="backToSubject()">戻る</button>
     </div>
 
     <div id="battle-match-screen" class="screen" style="display: none;">
-        <h2 style="margin-top: 40px;">⚔️ 対戦確認</h2>
-        <div class="score-box" style="background-color: #faf5ff; border: 1px solid #e9d8fd; text-align: center;">
-            <div style="font-size: 0.9rem; color: #6b46c1; font-weight: bold;">選択中のバトルフィールド</div>
-            <div id="battle-field-name" style="font-size: 1.3rem; font-weight: bold; color: #44337a; margin: 8px 0;">分野名</div>
-            <div style="font-size: 0.85rem; color: #718096;">この分野で対戦を開始しますか？</div>
-        </div>
+        <div class="flex-center">
+            <div>
+                <h2>⚔️ 対戦確認</h2>
+                <div class="score-box" style="background: rgba(107, 70, 193, 0.1); border: 1px solid rgba(107, 70, 193, 0.3); text-align: center;">
+                    <div style="font-size: 0.9rem; color: #a78bfa; font-weight: bold;">選択中のバトルフィールド</div>
+                    <div id="battle-field-name" style="font-size: 1.3rem; font-weight: bold; color: #ffffff; margin: 8px 0;">分野名</div>
+                    <div style="font-size: 0.85rem; color: #94a3b8;">この分野で対戦を開始しますか？</div>
+                </div>
 
-        <button id="cmd-start-matching" class="btn nav-btn" style="background-color: #6b46c1; font-weight: bold; font-size: 1.1rem; padding: 14px;" onclick="triggerMatchingSequence()">マッチングを開始する</button>
-        
-        <div id="matching-status-area" style="display: none; margin-top: 25px;">
-            <div class="loading" id="matching-status-text">対戦相手を探索中...</div>
-            <div class="progress-bar-bg" style="margin-top: 10px;"><div id="matching-progress-fill" class="progress-bar-fill" style="background-color: #6b46c1; width: 0%;"></div></div>
-        </div>
+                <button id="cmd-start-matching" class="btn nav-btn" style="background: linear-gradient(135deg, #5b21b6 0%, #4c1d95 100%); margin-top: 15px;" onclick="triggerMatchingSequence()">マッチングを開始する</button>
+                
+                <div id="matching-status-area" style="display: none; margin-top: 25px;">
+                    <div class="loading" id="matching-status-text">対戦相手を探索中...</div>
+                    <div class="progress-bar-bg" style="margin-top: 10px;"><div id="matching-progress-fill" class="progress-bar-fill" style="background-color: #a78bfa; width: 0%;"></div></div>
+                </div>
 
-        <div id="matched-rival-card" class="score-box" style="display: none; background-color: #fffaf0; border: 1px solid #feebc8; text-align: center; margin-top: 20px;">
-            <div style="font-size: 0.85rem; color: #dd6b20; font-weight: bold;">🎯 MATCHING COMPLETE!</div>
-            <div style="font-size: 1.3rem; font-weight: bold; color: #2d3748; margin: 10px 0;">対戦相手が決定しました！</div>
-            <div style="font-size: 1.1rem; color: #4a5568;">相手の現在のレート: <b id="rival-profile-rate" style="color:#6b46c1; font-size:1.4rem;">---</b></div>
-            <button class="btn nav-btn" style="background-color: #dd6b20; font-weight: bold; margin-top: 15px;" onclick="startActualBattleQuiz()">対戦スタート！ ⚔️</button>
-        </div>
+                <div id="matched-rival-card" class="score-box" style="display: none; background: rgba(217, 119, 6, 0.1); border: 1px solid rgba(217, 119, 6, 0.3); text-align: center; margin-top: 20px;">
+                    <div style="font-size: 0.85rem; color: #fbbf24; font-weight: bold;">🎯 MATCHING COMPLETE!</div>
+                    <div style="font-size: 1.3rem; font-weight: bold; color: #ffffff; margin: 10px 0;">対戦相手が決定しました！</div>
+                    <div style="font-size: 1.1rem; color: #cbd5e1;">相手の現在のレート: <b id="rival-profile-rate" style="color:#fbbf24; font-size:1.4rem;">---</b></div>
+                    <button class="btn nav-btn" style="background: linear-gradient(135deg, #c2410c 0%, #ed8936 100%);" onclick="startActualBattleQuiz()">対戦スタート！ ⚔️</button>
+                </div>
 
-        <button id="battle-match-back-btn" class="btn back-btn" onclick="backToSectionSelect()">戻る</button>
+                <button id="battle-match-back-btn" class="btn back-btn" onclick="backToSectionSelect()">戻る</button>
+            </div>
+        </div>
     </div>
 
     <div id="loading-screen" class="screen" style="display: none; padding-top: 300px;">
         <div class="loading" id="loading-text">指定のシートから問題を読み込んでいます...</div>
     </div>
 
+    <!-- 復習開始画面（パターンA：洗練されたダーク透過デザイン） -->
     <div id="review-start-screen" class="screen" style="display: none;">
         <div class="flex-center">
             <div>
-                <h2 style="color: #e53e3e; font-size: 1.6rem; letter-spacing: 1px;">🔥 復習タイムスタート！ 🔥</h2>
-                
-                <div style="margin: 20px 0;">
-                    <img src="復習タイム イラスト.png" alt="復習タイム イラスト.png" style="max-width: 85%; max-height: 280px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); object-fit: contain;">
+                <div style="margin: 0 auto; position: relative; width: 100%; max-width: 280px; border-radius: 12px; overflow: hidden; box-shadow: 0 8px 24px rgba(0,0,0,0.2);">
+                    <!-- イラスト画像 -->
+                    <img src="https://i.ibb.co/tMv6ftCq/Chat-GPT-Image-2026-7-9-17-34-49.png" alt="復習タイム イラスト" style="width: 100%; height: auto; display: block;" onerror="this.style.display='none'; document.getElementById('review-emoji-fallback').style.display='flex';">
+                    
+                    <!-- 予備のアイコンデザイン（画像にエラーが起きた時用） -->
+                    <div id="review-emoji-fallback" class="review-placeholder-card" style="display: none; margin: 40px auto;">
+                        <span style="font-size: 4.5rem;">✍️</span>
+                    </div>
+                    
+                    <!-- ログイン画面のトーンに合わせた、シネマティックなダークすりガラスボタン -->
+                    <button class="btn" style="position: absolute; bottom: 0; left: 0; width: 100%; margin: 0; border-radius: 0; background: rgba(15, 23, 42, 0.75); color: #fbbf24; font-weight: bold; font-size: 1.15rem; padding: 18px 10px; border: none; border-top: 1px solid rgba(255, 255, 255, 0.15); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); letter-spacing: 1px; text-shadow: 0 2px 4px rgba(0,0,0,0.4); cursor: pointer;" onclick="startReviewQuiz()">
+                        ⚡ 復習タイムスタート！
+                    </button>
                 </div>
-
-                <p style="font-size: 1.05rem; font-weight: bold; color: #4a5568; line-height: 1.5; padding: 0 10px;">
-                    間違えてしまった問題を<br>もう一度解き直して完璧にしよう！
-                </p>
-                <button class="btn nav-btn" style="background-color: #e53e3e; font-weight: bold; font-size: 1.1rem; padding: 14px; margin-top: 25px;" onclick="startReviewQuiz()">復習をはじめる ➡️</button>
             </div>
         </div>
     </div>
 
     <div id="quiz-screen" class="screen" style="display: none;">
-        <div id="vs-live-panel" style="display: none;">
-            <div class="vs-bar-container">
-                <div>👤 キミの進捗: <span id="player-live-txt" style="font-weight:bold;">0 / 10問</span></div>
-                <div class="progress-bar-bg" style="height: 6px; margin-top:3px;"><div id="player-live-fill" class="progress-bar-fill" style="width:0%; background-color:#007bff;"></div></div>
-            </div>
-            <div class="vs-bar-container" style="background-color: #fff5f5; border-color: #fed7d7;">
-                <div>🤖 対戦相手: <span id="rival-live-txt" style="font-weight:bold;">0 / 10問</span> (正解: <span id="rival-live-score">0</span>)</div>
-                <div class="progress-bar-bg" style="height: 6px; margin-top:3px;"><div id="rival-live-fill" class="progress-bar-fill" style="width:0%; background-color:#e53e3e;"></div></div>
-            </div>
-        </div>
+        <div class="flex-center">
+            <div>
+                <div id="vs-live-panel" style="display: none;">
+                    <div class="vs-bar-container" style="background: rgba(30, 41, 59, 0.4); border: 1px solid #1e293b;">
+                        <div>👤 キミの進捗: <span id="player-live-txt" style="font-weight:bold;">0 / 10問</span></div>
+                        <div class="progress-bar-bg" style="height: 6px; margin-top:3px;"><div id="player-live-fill" class="progress-bar-fill" style="width:0%; background-color:#3b82f6;"></div></div>
+                    </div>
+                    <div class="vs-bar-container" style="background-color: rgba(239, 68, 68, 0.05); border-color: rgba(239, 68, 68, 0.2); margin-top: 8px;">
+                        <div>🤖 対戦相手: <span id="rival-live-txt" style="font-weight:bold;">0 / 10問</span> (正解: <span id="rival-live-score">0</span>)</div>
+                        <div class="progress-bar-bg" style="height: 6px; margin-top:3px;"><div id="rival-live-fill" class="progress-bar-fill" style="width:0%; background-color:#ef4444;"></div></div>
+                    </div>
+                </div>
 
-        <div id="progress" class="progress-text">0 / 0問目</div>
-        <div id="combo-alert" class="combo-alert"></div>
-        <div id="wrong-alert" class="wrong-alert"></div>
-        <div id="question" class="question">問題がここに表示されます</div>
-        <div id="answers">
-            <button class="btn ans-btn" onclick="checkAnswer(0)">選択肢1</button>
-            <button class="btn ans-btn" onclick="checkAnswer(1)">選択肢2</button>
-            <button class="btn ans-btn" onclick="checkAnswer(2)">選択肢3</button>
-            <button class="btn ans-btn" onclick="checkAnswer(3)">選択肢4</button>
-        </div>
-        <div id="result" class="result"></div>
-        
-        <div id="review-end-message" class="review-end-box" style="display: none;">
-            🎉 復習タイム終了！よく頑張ったね！
-        </div>
+                <div id="progress" class="progress-text">0 / 0問目</div>
+                <div id="combo-alert" class="combo-alert"></div>
+                <div id="wrong-alert" class="wrong-alert"></div>
+                <div id="question" class="question">問題がここに表示されます</div>
+                <div id="answers">
+                    <button class="btn ans-btn" onclick="checkAnswer(0)">選択肢1</button>
+                    <button class="btn ans-btn" onclick="checkAnswer(1)">選択肢2</button>
+                    <button class="btn ans-btn" onclick="checkAnswer(2)">選択肢3</button>
+                    <button class="btn ans-btn" onclick="checkAnswer(3)">選択肢4</button>
+                </div>
+                <div id="result" class="result"></div>
+                
+                <div id="review-end-message" class="review-end-box" style="display: none;">
+                    🎉 復習タイム終了！よく頑張ったね！
+                </div>
 
-        <button id="next-btn" class="btn nav-btn" style="background-color: #ffc107; color: #212529; font-weight: bold; display: none; margin-top: 20px;" onclick="nextQuestion()">次へ ➡️</button>
-        
-        <button id="review-to-result-btn" class="btn nav-btn" style="background-color: #007bff; font-weight: bold; display: none; margin-top: 20px;" onclick="showFinalResult()">結果発表画面へ 📊</button>
+                <button id="next-btn" class="btn nav-btn" style="background-color: #ffc107; color: #212529; font-weight: bold; display: none; margin-top: 20px;" onclick="nextQuestion()">次へ ➡️</button>
+            </div>
+        </div>
     </div>
 
     <div id="result-screen" class="screen" style="display: none;">
-        <div id="battle-result-banner" style="display: none; font-size: 1.8rem; font-weight: bold; margin-top: 30px; text-shadow: 0 2px 4px rgba(0,0,0,0.1); line-height: 1.3;">WIN 👑</div>
-        
-        <h2 id="result-screen-title" style="margin-top: 15px;">結果発表 🎉</h2>
-        <div class="student-badge">👤 <span id="user-badge-2"></span></div>
-        <div class="score-box">
-            <div class="score-line">キミの正解数: <span id="current-score" class="score-highlight" style="color: #4a5568;">0</span> / <span id="total-questions">10</span> 問</div>
-            <div id="battle-rival-score-line" class="score-line" style="display: none;">相手の正解数: <span id="battle-rival-score-val" class="score-highlight" style="color: #dc3545;">0</span> / 10 問</div>
-            <div class="score-line">🔥 最高コンボ数: <span id="max-combo-score" class="score-highlight" style="color: #ed8936;">0</span> コンボ！</div>
-            <div class="score-line">📈 レート変動: <span id="rate-change-display" class="score-highlight">理科レート: 1500 (±0)</span></div>
-            
-            <div id="bonus-breakdown-box" style="margin-top: 5px; font-size: 0.9rem; color: #4b5563; display: none; border-top: 1px dashed #cbd5e0; padding-top: 8px;">
-                <div id="combo-bonus-line" style="margin: 3px 0; text-align: left;"></div>
-                <div id="field-bonus-line" style="margin: 3px 0; text-align: left;"></div>
-            </div>
+        <div class="flex-center">
+            <div>
+                <div id="battle-result-banner" style="display: none; font-size: 1.8rem; font-weight: bold; text-shadow: 0 2px 4px rgba(0,0,0,0.5); line-height: 1.3;">WIN 👑</div>
+                
+                <h2 id="result-screen-title">結果発表 🎉</h2>
+                <div class="student-badge" style="position: static; display: inline-block; margin-bottom: 15px;">👤 <span id="user-badge-2"></span></div>
+                <div class="score-box" style="margin-top: 5px;">
+                    <div class="score-line">キミの正解数: <span id="current-score" class="score-highlight" style="color: #ffffff;">0</span> / <span id="total-questions">10</span> 問</div>
+                    <div id="battle-rival-score-line" class="score-line" style="display: none;">相手の正解数: <span id="battle-rival-score-val" class="score-highlight" style="color: #f87171;">0</span> / 10 問</div>
+                    <div class="score-line">🔥 最高コンボ数: <span id="max-combo-score" class="score-highlight" style="color: #fbbf24;">0</span> コンボ！</div>
+                    <div class="score-line">📈 レート変動: <span id="rate-change-display" class="score-highlight">理科レート: 1500 (±0)</span></div>
+                    
+                    <div id="bonus-breakdown-box" style="margin-top: 5px; font-size: 0.9rem; color: #cbd5e1; display: none; border-top: 1px solid #334155; padding-top: 8px;">
+                        <div id="combo-bonus-line" style="margin: 3px 0; text-align: left;"></div>
+                        <div id="field-bonus-line" style="margin: 3px 0; text-align: left;"></div>
+                    </div>
 
-            <div class="score-line" style="margin-top: 15px;">
-                今回の正解率: <span id="current-accuracy" class="score-highlight">0%</span>
-                <div class="progress-bar-bg"><div id="current-accuracy-bar" class="progress-bar-fill"></div></div>
+                    <div class="score-line" style="margin-top: 15px;">
+                        今回の正解率: <span id="current-accuracy" class="score-highlight">0%</span>
+                        <div class="progress-bar-bg"><div id="current-accuracy-bar" class="progress-bar-fill"></div></div>
+                    </div>
+                </div>
+                <button id="review-trigger-btn" class="btn" style="background: linear-gradient(135deg, #b45309 0%, #eab308 100%); color: #0f172a; font-weight: bold; display: none;" onclick="showReviewScreen()">❌ 間間違えた問題を見直す</button>
+                <button class="btn nav-btn" onclick="backToSectionSelect()">続けて別の問題を解く</button>
+                <button class="btn back-btn" style="margin-top: 10px;" onclick="backToSubjectFromResult()">教科を選び直す</button>
+                
+                <button class="btn" style="background: linear-gradient(135deg, #c2410c 0%, #ed8936 100%); color: white; font-weight: bold; margin-top: 15px;" onclick="showDailySummary()">🔍 今日の学習を振り返る</button>
             </div>
         </div>
-        <button id="review-trigger-btn" class="btn" style="background-color: #ffc107; color: #212529; font-weight: bold; display: none;" onclick="showReviewScreen()">❌ 間違えた問題を見直す</button>
-        <button class="btn nav-btn" onclick="backToSectionSelect()">続けて別の問題を解く</button>
-        <button class="btn back-btn" style="margin-top: 10px;" onclick="backToSubjectFromResult()">教科を選び直す</button>
-        
-        <button class="btn" style="background-color: #ed8936; color: white; font-weight: bold; margin-top: 15px;" onclick="showDailySummary()">🔍 今日の学習を振り返る</button>
     </div>
 
     <div id="review-screen" class="screen" style="display: none;">
         <h2>間違えた問題の見直し</h2>
-        <div id="review-list" class="review-container"></div>
+        <div id="review-list" class="review-container" style="max-height: 480px;"></div>
         <button class="btn back-btn" onclick="backToResult()">結果画面に戻る</button>
     </div>
 
     <div id="summary-screen" class="screen" style="display: none;">
         <h2>今日の学習振り返り 📝</h2>
-        <div class="score-box" style="background-color: #fffaf0; border: 1px solid #feebc8; text-align: center; margin-bottom: 15px; padding: 12px;">
-            <div style="font-size: 0.95rem; color: #dd6b20; font-weight: bold; margin-bottom: 6px;">📈 本日の総レート増減</div>
+        <div class="score-box" style="background: rgba(217, 119, 6, 0.1); border: 1px solid rgba(217, 119, 6, 0.3); text-align: center; margin-bottom: 15px; padding: 12px;">
+            <div style="font-size: 0.95rem; color: #fbbf24; font-weight: bold; margin-bottom: 6px;">📈 本日の総レート増減</div>
             <div style="display: flex; justify-content: space-around; font-size: 1rem; font-weight: bold;">
                 <div>🌿 理科: <span id="daily-total-rate-sci">±0</span></div>
                 <div>🗺️ 社会: <span id="daily-total-rate-soc">±0</span></div>
                 <div>🔤 英語: <span id="daily-total-rate-eng">±0</span></div>
             </div>
         </div>
-        <p style="font-size: 0.9rem; color: #555; margin-bottom: 15px;">今日正解した問題が、分野の総問題数に対してどれくらいあるかの割合（ゲージ）です。</p>
-        <div class="score-box" id="summary-list" style="max-height: 240px; overflow-y: auto; padding-right: 5px;"></div>
-        <button class="btn nav-btn" style="background-color: #28a745; margin-top: 15px;" onclick="backToSectionSelectFromSummary()">テストを続ける</button>
-        <button class="btn" style="background-color: #dc3545; color: white; font-weight: bold;" onclick="tryFinishLearning()">学習を終了する</button>
+        <p style="font-size: 0.9rem; color: #94a3b8; margin-bottom: 15px;">今日正解した問題が、分野の総問題数に対してどれくらいあるかの割合（ゲージ）です。</p>
+        <div class="score-box" id="summary-list" style="max-height: 320px; overflow-y: auto; padding-right: 5px;"></div>
+        <button class="btn nav-btn" onclick="backToSectionSelectFromSummary()">テストを続ける</button>
+        <button class="btn" style="background: linear-gradient(135deg, #b91c1c 0%, #dc3545 100%); color: white; font-weight: bold;" onclick="tryFinishLearning()">学習を終了する</button>
     </div>
 
     <div id="confirm-screen" class="screen" style="display: none;">
-        <h2>終了の確認 🛑</h2>
-        <p style="font-size: 1.1rem; font-weight: bold; margin: 30px 0; color: #2d3748;">本当に終了しますか?</p>
-        <p style="font-size: 0.85rem; color: #dc3545; margin-bottom: 30px; line-height: 1.4;">※終了すると、本日の連続正解数（コンボ）や振り返りデータはリセットされます。</p>
-        <button class="btn nav-btn" style="background-color: #6c757d;" onclick="cancelFinishLearning()">いいえ（テストに戻る）</button>
-        <button class="btn" style="background-color: #dc3545; color: white; font-weight: bold; margin-top: 10px;" onclick="confirmFinishLearning()">はい（終了する）</button>
+        <div class="flex-center">
+            <div>
+                <h2>終了の確認 🛑</h2>
+                <p style="font-size: 1.1rem; font-weight: bold; margin: 30px 0; color: #ffffff;">本当に終了しますか?</p>
+                <p style="font-size: 0.85rem; color: #f87171; margin-bottom: 30px; line-height: 1.4;">※終了すると、本日の連続正解数（コンボ）や振り返りデータはリセットされます。</p>
+                <button class="btn nav-btn" style="background: linear-gradient(135deg, #334155 0%, #1e293b 100%); border: 1px solid #475569;" onclick="cancelFinishLearning()">いいえ（テストに戻る）</button>
+                <button class="btn" style="background: linear-gradient(135deg, #b91c1c 0%, #dc3545 100%); color: white; font-weight: bold; margin-top: 10px;" onclick="confirmFinishLearning()">はい（終了する）</button>
+            </div>
+        </div>
     </div>
 
     <div id="report-screen" class="screen" style="display: none;">
         <h2>分野別達成率 📊</h2>
-        <p style="font-size: 0.8rem; color: #555; text-align: left; margin-bottom: 10px; background: #ebf8ff; padding: 8px; border-radius: 5px; border-left: 4px solid #3182ce;">💡 分野カードを押すと「一度でも間違えた問題」を確認できます。</p>
-        <div id="report-sections-container" class="report-container"></div>
+        <p style="font-size: 0.8rem; color: #94a3b8; text-align: left; margin-bottom: 10px; background: rgba(30, 41, 59, 0.5); padding: 8px; border-radius: 5px; border-left: 4px solid #3b82f6;">💡 分野カードを押すと「一度でも間違えた問題」を確認できます。</p>
+        <div id="report-sections-container" class="report-container" style="max-height: 480px;"></div>
         <button class="btn back-btn" onclick="backToMainMenu()">トップに戻る</button>
     </div>
 
     <div id="wrong-details-screen" class="screen" style="display: none;">
-        <h2 id="wrong-details-title">間違えた問題一覧</h2> <div id="wrong-details-list" class="review-container" style="max-height: 360px;"></div>
+        <h2 id="wrong-details-title">間違えた問題一覧</h2> <div id="wrong-details-list" class="review-container" style="max-height: 460px;"></div>
         <button class="btn back-btn" onclick="backFromWrongDetails()">戻る</button>
     </div>
 
     <div id="rate-screen" class="screen" style="display: none;">
         <h2>レート・ランキング 🏆</h2>
-        <div class="section-screen-desc" style="background: #fffaf0; border-left-color: #eab308; color: #744210; margin-bottom: 15px;">
+        <div class="section-screen-desc" style="background: rgba(30, 41, 59, 0.4); border-left-color: #eab308; color: #cbd5e1; margin-bottom: 15px;">
             🏆 <b>目指せランキング１位！</b> キミの努力がリアルタイムで形になる！ライバルたちを全員ぶち抜いて、今月の絶対王者の座を掴み取れ！天下無双の学力を証明しよう！天辺で待ってるぞ！🔥
         </div>
         <div id="rate-subject-selector-view">
-            <p style="font-size: 0.95rem; color: #555; margin-bottom: 15px; font-weight: bold;">見たい教科を選んでね</p>
-            <button class="btn nav-btn" style="background-color: #007bff; font-weight: bold; margin-bottom: 12px; padding: 14px;" onclick="selectRateSubject('science')">🌿 理科のレートを見る</button>
-            <button class="btn nav-btn" style="background-color: #28a745; font-weight: bold; margin-bottom: 12px; padding: 14px;" onclick="selectRateSubject('social')">🗺️ 社会のレートを見る</button>
-            <button class="btn nav-btn" style="background-color: #b45309; font-weight: bold; margin-bottom: 12px; padding: 14px;" onclick="selectRateSubject('english')">🔤 英語のレートを見る</button>
-            <button class="btn nav-btn" style="background-color: #4a5568; font-weight: bold; margin-bottom: 12px; padding: 14px;" onclick="showRateHelp()">❓ レーティングシステムとは？</button>
+            <p style="font-size: 0.95rem; color: #94a3b8; margin-bottom: 15px; font-weight: bold;">見たい教科を選んでね</p>
+            <button class="btn nav-btn" style="background: linear-gradient(135deg, #1d4ed8 0%, #1e40af 100%); margin-bottom: 12px; padding: 14px;" onclick="selectRateSubject('science')">🌿 理科のレートを見る</button>
+            <button class="btn nav-btn" style="background: linear-gradient(135deg, #059669 0%, #10b981 100%); margin-bottom: 12px; padding: 14px;" onclick="selectRateSubject('social')">🗺️ 社会のレートを見る</button>
+            <button class="btn nav-btn" style="background: linear-gradient(135deg, #b45309 0%, #d97706 100%); margin-bottom: 12px; padding: 14px;" onclick="selectRateSubject('english')">🔤 英語のレートを見る</button>
+            <button class="btn nav-btn" style="background: linear-gradient(135deg, #334155 0%, #1e293b 100%); margin-bottom: 12px; padding: 14px;" onclick="showRateHelp()">❓ レーティングシステムとは？</button>
             <button class="btn back-btn" onclick="backToMainMenu()">トップに戻る</button>
         </div>
         <div id="rate-detail-view" style="display: none;">
@@ -348,19 +684,19 @@
                 <button id="cmd-show-my-rate" class="btn nav-btn" style="margin: 0; flex: 1; font-weight: bold; font-size: 0.95rem; padding: 10px;" onclick="toggleRateView('my')">個人レートを確認</button>
                 <button id="cmd-show-ranking" class="btn nav-btn" style="margin: 0; flex: 1; font-weight: bold; font-size: 0.95rem; padding: 10px;" onclick="toggleRateView('ranking')">全体ランキングを見る</button>
             </div>
-            <div id="rate-my-section" class="score-box" style="text-align: center; background-color: #ebf8ff; border: 1px solid #bee3f8; margin-bottom: 15px;">
-                <div style="font-size: 0.95rem; color: #2b6cb0; font-weight: bold;"><span id="my-rate-subject-label">理科</span>の現在レート</div>
-                <div id="my-current-rate-val" style="font-size: 2.5rem; font-weight: bold; color: #2b6cb0; margin: 4px 0;">1500</div>
-                <div id="my-rate-rank-text" style="font-size: 0.85rem; color: #4a5568; font-weight: bold;">全体順位: 計算中...</div>
+            <div id="rate-my-section" class="score-box" style="text-align: center; background-color: rgba(30, 41, 59, 0.4); border: 1px solid #1e3a8a; margin-bottom: 15px;">
+                <div style="font-size: 0.95rem; color: #3b82f6; font-weight: bold;"><span id="my-rate-subject-label">理科</span>の現在レート</div>
+                <div id="my-current-rate-val" style="font-size: 2.5rem; font-weight: bold; color: #ffffff; margin: 4px 0; text-shadow:0 0 10px rgba(59,130,246,0.3)">1500</div>
+                <div id="my-rate-rank-text" style="font-size: 0.85rem; color: #94a3b8; font-weight: bold;">全体順位: 計算中...</div>
                 
                 <!-- 【追加】折れ線グラフ用キャンバスコンテナ -->
-                <div style="margin-top: 12px; background: white; padding: 8px; border-radius: 6px; border: 1px solid #cbd5e0; height: 180px; position: relative;">
+                <div style="margin-top: 12px; background: #0f172a; padding: 8px; border-radius: 6px; border: 1px solid #1e293b; height: 180px; position: relative;">
                     <canvas id="rate-history-chart"></canvas>
                 </div>
             </div>
             <div id="rate-ranking-section" style="display: none;">
-                <h3 style="text-align: left; margin: 15px 0 8px 0; color: #2d3748; font-size: 1.05rem; border-bottom: 2px solid #cbd5e0; padding-bottom: 3px;">🏆 <span id="ranking-subject-label">理科</span>ランキング</h3>
-                <div id="ranking-list-container" class="report-container" style="max-height: 230px; background: #ffffff; padding: 5px; border-radius: 6px; border: 1px solid #e2e8f0;"></div>
+                <h3 style="text-align: left; margin: 15px 0 8px 0; color: #ffffff; font-size: 1.05rem; border-bottom: 2px solid #1e293b; padding-bottom: 3px;">🏆 <span id="ranking-subject-label">理科</span>ランキング</h3>
+                <div id="ranking-list-container" class="report-container" style="max-height: 230px; background: #0f172a; padding: 5px; border-radius: 6px; border: 1px solid #1e293b;"></div>
             </div>
             <button class="btn back-btn" style="margin-top: 15px;" onclick="backToRateSubjectSelector()">🔙 教科を選び直す</button>
         </div>
@@ -369,31 +705,31 @@
     <div id="rate-help-screen" class="screen" style="display: none;">
         <h2>レーティングシステム 💡</h2>
         <div class="report-container" style="max-height: 480px;">
-            <div class="score-box" style="background-color: #ebf8ff; border: 1px solid #bee3f8; margin-bottom: 15px;">
-                <div style="font-weight: bold; color: #2b6cb0; margin-bottom: 5px;">🪙 1. 初期レートとリセット</div>
-                <div style="font-size: 0.9rem; color: #4a5568; line-height: 1.5; text-align: left;">
+            <div class="score-box" style="background-color: rgba(30, 41, 59, 0.4); border: 1px solid rgba(59, 130, 246, 0.2); margin-bottom: 15px;">
+                <div style="font-weight: bold; color: #3b82f6; margin-bottom: 5px;">🪙 1. 初期レートとリセット</div>
+                <div style="font-size: 0.9rem; color: #cbd5e1; line-height: 1.5; text-align: left;">
                     全プレイヤーは初期状態のレート **1500** からスタートします。なお、公平な勝負を維持するため、月が変わると全プレイヤーのレーティングが一律で1500にリセットされます。
                 </div>
             </div>
-            <div class="score-box" style="background-color: #fffaf0; border: 1px solid #feebc8; margin-bottom: 15px;">
-                <div style="font-weight: bold; color: #dd6b20; margin-bottom: 5px;">📈 2. 基本的な増減ルール</div>
-                <div style="font-size: 0.9rem; color: #4a5568; line-height: 1.5; text-align: left;">
+            <div class="score-box" style="background-color: rgba(30, 41, 59, 0.4); border: 1px solid rgba(217, 119, 6, 0.2); margin-bottom: 15px;">
+                <div style="font-weight: bold; color: #ed8936; margin-bottom: 5px;">📈 2. 基本的な増減ルール</div>
+                <div style="font-size: 0.9rem; color: #cbd5e1; line-height: 1.5; text-align: left;">
                     テストは1回あたり**10問構成**です。ちょうど半分である**5問正解**がキープの基準（増減±0）となります。
                     <br>・6問以上正解 ➡️ レートが**加算**されます（正解が多いほど大UP）
                     <br>・4問以下正解 ➡️ レートが**減算**されてしまいます
                 </div>
             </div>
-            <div class="score-box" style="background-color: #f0fff4; border: 1px solid #c6f6d5; margin-bottom: 15px;">
-                <div style="font-weight: bold; color: #22543d; margin-bottom: 5px; font-size: 1rem;">🔥 3. コンボ（連続正解）ボーナス</div>
-                <div style="font-size: 0.9rem; color: #4a5568; line-height: 1.5; text-align: left;">
+            <div class="score-box" style="background-color: rgba(30, 41, 59, 0.4); border: 1px solid rgba(16, 185, 129, 0.2); margin-bottom: 15px;">
+                <div style="font-weight: bold; color: #10b981; margin-bottom: 5px; font-size: 1rem;">🔥 3. コンボ（連続正解）ボーナス</div>
+                <div style="font-size: 0.9rem; color: #cbd5e1; line-height: 1.5; text-align: left;">
                     ミスせずに連続で正解（コンボ）を繋げると、テスト終了時にボーナス加算！
                     <br>・5コンボ以上 ➡️ **コンボ数に応じたボーナス加算！**
                     <br>・30コンボ以上 ➡️ **最大コンボボーナス（+6）が炸裂！**
                 </div>
             </div>
-            <div class="score-box" style="background-color: #edf2f7; border: 1px solid #e2e8f0; margin-bottom: 15px;">
-                <div style="font-weight: bold; color: #4a5568; margin-bottom: 5px; font-size: 1rem;">✨ 4. 複数フィールド（分野）ボーナス</div>
-                <div style="font-size: 0.9rem; color: #4a5568; line-height: 1.5; text-align: left;">
+            <div class="score-box" style="background-color: rgba(30, 41, 59, 0.4); border: 1px solid #334155; margin-bottom: 15px;">
+                <div style="font-weight: bold; color: #94a3b8; margin-bottom: 5px; font-size: 1rem;">✨ 4. 複数フィールド（分野）ボーナス</div>
+                <div style="font-size: 0.9rem; color: #cbd5e1; line-height: 1.5; text-align: left;">
                     同じ分野ばかりでなく、1日のうちに色々な分野のテストに挑戦すると、新しい分野を開くたびに**最大+5まで**の「複数分野ボーナス」がリザルトに毎回上乗せされます！
                 </div>
             </div>
@@ -403,21 +739,21 @@
 
     <div id="report-issue-screen" class="screen" style="display: none;">
         <h2>誤答・誤植の報告 ⚠️</h2>
-        <p style="font-size: 0.85rem; color: #666; text-align: left; margin-bottom: 15px;">問題の記述や解答の間違いを見つけたら教えてね。</p>
+        <p style="font-size: 0.85rem; color: #94a3b8; text-align: left; margin-bottom: 15px;">問題の記述や解答の間違いを見つけたら教えてね。</p>
         <div style="text-align: left; box-sizing: border-box;">
-            <label style="font-weight: bold; color: #4a5568; font-size: 0.95rem;">1. 教科を選択</label>
-            <select id="report-subject" class="input-style" onchange="updateReportSections()">
+            <label style="font-weight: bold; color: #ffffff; font-size: 0.95rem;">1. 教科を選択</label>
+            <select id="report-subject" class="input-style input-dark" onchange="updateReportSections()">
                 <option value="science">理科</option>
                 <option value="social">社会</option>
                 <option value="english">英語</option>
             </select>
-            <label style="font-weight: bold; color: #4a5568; font-size: 0.95rem; margin-top: 10px; display: block;">2. 分野を選択</label>
-            <select id="report-section" class="input-style"></select>
-            <label style="font-weight: bold; color: #4a5568; font-size: 0.95rem; margin-top: 10px; display: block;">3. 報告内容</label>
+            <label style="font-weight: bold; color: #ffffff; font-size: 0.95rem; margin-top: 10px; display: block;">2. 分野を選択</label>
+            <select id="report-section" class="input-style input-dark"></select>
+            <label style="font-weight: bold; color: #ffffff; font-size: 0.95rem; margin-top: 10px; display: block;">3. 報告内容</label>
             
-            <textarea id="report-content" class="input-style" style="height: 120px; text-align: left; resize: none; font-size: 0.95rem; padding: 10px;" placeholder="間違っている問題の内容や、正しいと思われる解答を詳しく書いてください。"></textarea>
+            <textarea id="report-content" class="input-style input-dark" style="height: 120px; text-align: left; resize: none; font-size: 0.95rem; padding: 10px;" placeholder="間違っている問題の内容や、正しいと思われる解答を詳しく書いてください。"></textarea>
         </div>
-        <button class="btn nav-btn" style="background-color: #dc3545; margin-top: 15px; font-weight: bold;" onclick="submitReport()">報告を送信する</button>
+        <button class="btn nav-btn" style="background: linear-gradient(135deg, #991b1b 0%, #dc3545 100%); margin-top: 15px; font-weight: bold;" onclick="submitReport()">報告を送信する</button>
         <button class="btn back-btn" onclick="backToMainMenu()">キャンセル</button>
     </div>
 
@@ -475,11 +811,11 @@
     
     let currentPlayerRoundLogs = []; 
     
-    // 【追加】グラフのインスタンス管理用
+    // グラフのインスタンス管理用
     let rateChartInstance = null;
 
     function getGaugeColor(rate) {
-        if (rate <= 30) return "#dc3545"; if (rate <= 70) return "#eab308"; if (rate <= 90) return "#28a745"; return "#007bff"; 
+        if (rate <= 30) return "#dc3545"; if (rate <= 70) return "#eab308"; if (rate <= 90) return "#10b981"; return "#3b82f6"; 
     }
     function hideAllScreens() { 
         const screens = document.querySelectorAll('.screen'); screens.forEach(s => s.style.display = 'none'); 
@@ -494,7 +830,7 @@
             localStorage.setItem(`quiz_rate_science_${studentKey}`, '1500'); localStorage.setItem(`quiz_rate_social_${studentKey}`, '1500'); localStorage.setItem(`quiz_rate_english_${studentKey}`, '1500');
             localStorage.setItem(`quiz_rate_month_${studentKey}`, currentMonthString);
             
-            // 【追加】月間リセット時に履歴もリセット
+            // 月間リセット時に履歴もリセット
             localStorage.setItem(`quiz_rate_history_science_${studentKey}`, JSON.stringify([{ label: "初期", rate: 1500 }]));
             localStorage.setItem(`quiz_rate_history_social_${studentKey}`, JSON.stringify([{ label: "初期", rate: 1500 }]));
             localStorage.setItem(`quiz_rate_history_english_${studentKey}`, JSON.stringify([{ label: "初期", rate: 1500 }]));
@@ -545,7 +881,7 @@
             currentCombo = 0; maxCombo = 0; dailySummaryData = {}; dailyRateChangeScience = 0; dailyRateChangeSocial = 0; dailyRateChangeEnglish = 0;
             localStorage.setItem('quiz_saved_id', studentId); localStorage.setItem('quiz_saved_name', studentName); localStorage.setItem('quiz_saved_grade', studentGrade); localStorage.setItem('quiz_saved_campus', studentCampus); 
             
-            // 【追加】ログイン時に履歴データが空ならベースを作成する
+            // ログイン時に履歴データが空ならベースを作成する
             ['science', 'social', 'english'].forEach(sub => {
                 let historyKey = `quiz_rate_history_${sub}_${studentKey}`;
                 if (!localStorage.getItem(historyKey)) {
@@ -555,7 +891,7 @@
 
             checkMonthlyReset(); hideAllScreens(); document.getElementById('loading-screen').style.display = 'block'; document.getElementById('loading-text').innerText = "ログイン成功！問題データを読み込んでいます...";
             showMainScreen();
-        } catch (error) { alert("生徒一覧データの読み込みに失敗しました。"); console.error(error); } finally { loginBtn.disabled = false; loginBtn.innerText = "ログイン"; }
+        } catch (error) { alert("問題データまたは生徒一覧の同期に失敗しました。"); console.error(error); hideAllScreens(); document.getElementById('login-screen').style.display = 'block'; }
     }
 
     async function loadAllQuizData() {
@@ -619,12 +955,12 @@
         if (currentMode === 'battle') {
             const remCount = getBattleRemainingCount();
             ruleBox.innerHTML = `
-                <div class="section-screen-desc" style="background: #faf5ff; border-left-color: #6b46c1; color: #44337a; margin-bottom: 15px;">
+                <div class="section-screen-desc" style="background: rgba(30, 41, 59, 0.5); border-left-color: #6b46c1; color: #e2e8f0; margin-bottom: 15px;">
                     ⚔️ <b>対戦ルール（スピードボーナス＆誤答ペナルティ制）</b><br>
                     ・勝利: レート <b>+20</b> / 敗北: レート <b>-20</b><br>
                     ・判定: 正解時の<b>スピードPt</b>が高い方の勝ち！<br>
                     ・1問につきベース 1000点。5秒以内なら<b>最大500点のボーナス！</b><br>
-                    ・<span style="color:#dc3545; font-weight:bold;">【重要】誤答すると1問につき大減点（-1200点）！正確さが命！</span><br>
+                    ・<span style="color:#f87171; font-weight:bold;">【重要】誤答すると1問につき大減点（-1200点）！正確さが命！</span><br>
                     ・1日3回限定（残り可能数: <b>${remCount}回</b>）
                 </div>
             `;
@@ -727,6 +1063,9 @@
     function selectSocialSub(subSubject) { selectGrade(subSubject); }
     function backToSubjectFromSocial() { hideAllScreens(); document.getElementById('subject-screen').style.display = 'block'; }
     
+    // 理科の学年選択画面から教科選択に戻る専用の関数
+    function backToSubjectFromGrade() { hideAllScreens(); document.getElementById('subject-screen').style.display = 'block'; }
+
     function backToSubject() { 
         hideAllScreens(); 
         if (selectedSubject === 'science') {
@@ -756,7 +1095,7 @@
         else {
             titleEl.innerText = currentMode === "battle" ? "対戦分野を選択 ⚔️" : "分野・弱点診断 📊"; 
             if(currentMode !== "battle") {
-                const allBtn = document.createElement('button'); allBtn.className = "btn nav-btn"; allBtn.style.backgroundColor = "#007bff"; allBtn.style.marginBottom = "15px"; allBtn.innerText = "🌟 全範囲からランダム"; allBtn.onclick = () => prepareModeFlow("全範囲"); container.appendChild(allBtn);
+                const allBtn = document.createElement('button'); allBtn.className = "btn nav-btn"; allBtn.style.backgroundColor = "#2563eb"; allBtn.style.marginBottom = "15px"; allBtn.innerText = "🌟 全範囲からランダム"; allBtn.onclick = () => prepareModeFlow("全範囲"); container.appendChild(allBtn);
             }
         }
         const sectionsSet = new Set(); quizData.forEach(q => { if(q.section) sectionsSet.add(q.section) });
@@ -923,7 +1262,6 @@
         reviewQuizData = [];
         reviewQuestionIndex = 0;
         document.getElementById('review-end-message').style.display = 'none';
-        document.getElementById('review-to-result-btn').style.display = 'none';
         maxCombo = currentCombo;
         if (currentMode === "battle" && activeGhostData) {
             ghostCurrentQuestion = 0; ghostCurrentScore = 0;
@@ -983,7 +1321,7 @@
         buttons.forEach((button, index) => { button.innerText = `${index + 1}. ${currentQuiz.choices[index]}`; button.disabled = false; button.classList.remove('correct-choice', 'wrong-choice'); });
         document.getElementById('result').innerText = ""; document.getElementById('next-btn').style.display = 'none';
         
-        questionStartTime = Date.now();
+        width = 400; questionStartTime = Date.now();
     }
 
     function checkAnswer(selectedIndex) {
@@ -1011,7 +1349,7 @@
 
             let currentStatus = 'unseen';
             if (isCorrect) {
-                resultDiv.innerText = `⭕ 正解！ (${(answerTimeMs / 1000).toFixed(2)}秒)`; resultDiv.style.color = "green"; score++;
+                resultDiv.innerText = `⭕ 正解！ (${(answerTimeMs / 1000).toFixed(2)}秒)`; resultDiv.style.color = "#10b981"; score++;
                 const overlay = document.getElementById('correct-overlay'); overlay.style.display = 'flex'; setTimeout(() => { overlay.style.display = 'none'; }, 500);
                 currentCombo++; if (currentCombo > maxCombo) { maxCombo = currentCombo; } comboDiv.innerText = `🔥 ${currentCombo}コンボ中！`;
                 dailySummaryData[summaryKey].correct++;
@@ -1019,7 +1357,7 @@
                 if (answerTimeMs < stats[currentQuiz.question].best_time) { stats[currentQuiz.question].best_time = answerTimeMs; }
                 stats[currentQuiz.question].status = currentStatus;
             } else {
-                resultDiv.innerText = "❌ 不正解..."; resultDiv.style.color = "red"; buttons[selectedIndex].classList.add('wrong-choice');
+                resultDiv.innerText = "❌ 不正解..."; resultDiv.style.color = "#ef4444"; buttons[selectedIndex].classList.add('wrong-choice');
                 currentCombo = 0; comboDiv.innerText = "❌ コンボ終了！";
                 wrongQuestionsList.push({ question: currentQuiz.question, yourAnswer: currentQuiz.choices[selectedIndex], correctAnswer: currentQuiz.choices[currentQuiz.correct], explanation: currentQuiz.explanation });
                 stats[currentQuiz.question].wrong_count++; stats[currentQuiz.question].status = 'wrong';
@@ -1030,21 +1368,31 @@
             localStorage.setItem(`quiz_perf_stats_` + studentKey, JSON.stringify(stats));
             localStorage.setItem(`quiz_daily_summary_` + studentKey, JSON.stringify(dailySummaryData));
             if (currentMode === "battle") updateLiveVSUI();
+            
+            document.getElementById('next-btn').innerText = "次へ ➡️";
+            document.getElementById('next-btn').style.background = "";
+            document.getElementById('next-btn').style.color = "#ffffff";
             document.getElementById('next-btn').style.display = 'block';
 
         } else {
             if (isCorrect) {
-                resultDiv.innerText = `⭕ 正解！`; resultDiv.style.color = "green";
+                resultDiv.innerText = `⭕ 正解！`; resultDiv.style.color = "#10b981";
                 const overlay = document.getElementById('correct-overlay'); overlay.style.display = 'flex'; setTimeout(() => { overlay.style.display = 'none'; }, 500);
             } else {
-                resultDiv.innerText = "❌ 不正解...（次こそ合わせよう！）"; resultDiv.style.color = "red"; buttons[selectedIndex].classList.add('wrong-choice');
+                resultDiv.innerText = "❌ 不正解...（次こそ合わせよう！）"; resultDiv.style.color = "#ef4444"; buttons[selectedIndex].classList.add('wrong-choice');
             }
 
+            // 復習の最終問題の場合は「結果発表画面へ」ボタンにトランスフォーム
             if (reviewQuestionIndex === reviewQuizData.length - 1) {
-                document.getElementById('next-btn').style.display = 'none';
+                document.getElementById('next-btn').innerText = "結果発表画面へ 📊";
+                document.getElementById('next-btn').style.background = "linear-gradient(135deg, #9a3412 0%, #d97706 50%, #f59e0b 100%)";
+                document.getElementById('next-btn').style.color = "#0f172a";
+                document.getElementById('next-btn').style.display = 'block';
                 document.getElementById('review-end-message').style.display = 'block';
-                document.getElementById('review-to-result-btn').style.display = 'block';
             } else {
+                document.getElementById('next-btn').innerText = "次へ ➡️";
+                document.getElementById('next-btn').style.background = "";
+                document.getElementById('next-btn').style.color = "#ffffff";
                 document.getElementById('next-btn').style.display = 'block';
             }
         }
@@ -1071,6 +1419,10 @@
             reviewQuestionIndex++;
             if (reviewQuestionIndex < reviewQuizData.length) {
                 showQuestion();
+            } else {
+                document.getElementById('next-btn').style.background = "";
+                document.getElementById('next-btn').style.color = "#ffffff";
+                showFinalResult(); 
             }
         }
     }
@@ -1081,7 +1433,7 @@
         showQuestion();
     }
 
-    // 【追加】レート変更時の履歴保存用関数
+    // レート変更時の履歴保存用関数
     function saveRateHistory(subject, newRate) {
         if (!studentKey) return;
         let historyKey = `quiz_rate_history_${subject}_${studentKey}`;
@@ -1116,7 +1468,6 @@
         let uniqueSectionsCount = 0;
 
         if (currentMode === "battle" && activeGhostData) {
-            screenTitle.style.marginTop = "5px";
             rivalLine.style.display = 'block';
             document.getElementById('battle-rival-score-val').innerText = ghostCurrentScore;
             banner.style.display = 'block';
@@ -1139,19 +1490,19 @@
             }
 
             if (isPlayerWin) {
-                banner.innerHTML = `👑 キミの勝ち！ 👑<br><span style="font-size:1.1rem; font-weight:normal; color:#4a5568;">キミ: ${playerPoints} Pt vs 相手: ${ghostPoints} Pt</span>`; 
-                banner.style.color = "#28a745";
+                banner.innerHTML = `👑 キミの勝ち！ 👑<br><span style="font-size:1.1rem; font-weight:normal; color:#94a3b8;">キミ: ${playerPoints} Pt vs 相手: ${ghostPoints} Pt</span>`; 
+                banner.style.color = "#10b981";
                 totalRateChange = 20; 
             } else {
-                banner.innerHTML = `☠️ キミの負け... ☠️<br><span style="font-size:1.1rem; font-weight:normal; color:#4a5568;">キミ: ${playerPoints} Pt vs 相手: ${ghostPoints} Pt</span>`; 
-                banner.style.color = "#dc3545";
+                banner.innerHTML = `☠️ キミの負け... ☠️<br><span style="font-size:1.1rem; font-weight:normal; color:#94a3b8;">キミ: ${playerPoints} Pt vs 相手: ${ghostPoints} Pt</span>`; 
+                banner.style.color = "#ef4444";
                 totalRateChange = -20; 
             }
 
             let count = parseInt(localStorage.getItem(`quiz_battle_count_` + studentKey) || '3');
             localStorage.setItem(`quiz_battle_count_` + studentKey, String(Math.max(0, count - 1)));
         } else {
-            screenTitle.style.marginTop = "45px"; rivalLine.style.display = 'none'; banner.style.display = 'none';
+            rivalLine.style.display = 'none'; banner.style.display = 'none';
             const baseRateChange = score - 5;
             
             comboBonus = maxCombo >= 30 ? 6 : (maxCombo >= 5 ? Math.floor(maxCombo / 5) : 0);
@@ -1163,7 +1514,6 @@
         let myRate = parseInt(localStorage.getItem(`quiz_rate_${selectedSubject}_` + studentKey) || '1500');
         myRate += totalRateChange; localStorage.setItem(`quiz_rate_${selectedSubject}_` + studentKey, myRate);
 
-        // 【追加】レート変動履歴を記録
         saveRateHistory(selectedSubject, myRate);
 
         if (selectedSubject === "science") dailyRateChangeScience += totalRateChange; else if (selectedSubject === "social") dailyRateChangeSocial += totalRateChange; else dailyRateChangeEnglish += totalRateChange;
@@ -1171,7 +1521,7 @@
         const rateSign = totalRateChange >= 0 ? `+${totalRateChange}` : `${totalRateChange}`;
         const rateDisplayEl = document.getElementById('rate-change-display');
         let subjectLabel = selectedSubject === "social" ? "社会" : (selectedSubject === "english" ? "英語" : "理科");
-        rateDisplayEl.innerText = `${subjectLabel}レート: ${myRate} (${rateSign})`; rateDisplayEl.style.color = totalRateChange > 0 ? '#28a745' : (totalRateChange < 0 ? '#dc3545' : '#4a5568');
+        rateDisplayEl.innerText = `${subjectLabel}レート: ${myRate} (${rateSign})`; rateDisplayEl.style.color = totalRateChange > 0 ? '#10b981' : (totalRateChange < 0 ? '#ef4444' : '#cbd5e1');
 
         const breakdownBox = document.getElementById('bonus-breakdown-box');
         if (currentMode !== "battle" && (comboBonus > 0 || fieldBonus > 0)) {
@@ -1199,9 +1549,9 @@
         hideAllScreens();
         const sciEl = document.getElementById('daily-total-rate-sci'); const socEl = document.getElementById('daily-total-rate-soc'); const engEl = document.getElementById('daily-total-rate-eng');
         sciEl.innerText = dailyRateChangeScience >= 0 ? `+${dailyRateChangeScience}` : dailyRateChangeScience; socEl.innerText = dailyRateChangeSocial >= 0 ? `+${dailyRateChangeSocial}` : dailyRateChangeSocial; engEl.innerText = dailyRateChangeEnglish >= 0 ? `+${dailyRateChangeEnglish}` : dailyRateChangeEnglish;
-        sciEl.style.color = dailyRateChangeScience > 0 ? '#28a745' : (dailyRateChangeScience < 0 ? '#dc3545' : '#4a5568'); socEl.style.color = dailyRateChangeSocial > 0 ? '#28a745' : (dailyRateChangeSocial < 0 ? '#dc3545' : '#4a5568'); engEl.style.color = dailyRateChangeEnglish > 0 ? '#28a745' : (dailyRateChangeEnglish < 0 ? '#dc3545' : '#4a5568');
+        sciEl.style.color = dailyRateChangeScience > 0 ? '#10b981' : (dailyRateChangeScience < 0 ? '#ef4444' : '#cbd5e1'); socEl.style.color = dailyRateChangeSocial > 0 ? '#10b981' : (dailyRateChangeScience < 0 ? '#ef4444' : '#cbd5e1'); engEl.style.color = dailyRateChangeEnglish > 0 ? '#10b981' : (dailyRateChangeEnglish < 0 ? '#ef4444' : '#cbd5e1');
         const listContainer = document.getElementById('summary-list'); listContainer.innerHTML = ""; const summaryKeys = Object.keys(dailySummaryData);
-        if (summaryKeys.length === 0) { listContainer.innerHTML = "<div class='score-line' style='text-align:center; color:#666;'>まだ本日解答した問題はありません。</div>"; } 
+        if (summaryKeys.length === 0) { listContainer.innerHTML = "<div class='score-line' style='text-align:center; color:#64748b;'>まだ本日解答した問題はありません。</div>"; } 
         else {
             summaryKeys.forEach(key => {
                 const data = dailySummaryData[key]; 
@@ -1225,9 +1575,9 @@
 
                 const rate = totalInSection > 0 ? Math.round((data.correct / totalInSection) * 100) : 0; const barColor = getGaugeColor(rate); 
                 let statusText = "🚨 弱点 (要対策)"; if (rate > 90) statusText = "👑 完璧！"; else if (rate > 70) statusText = "🍏 克服！"; else if (rate > 30) statusText = "⚠️ あと少し";
-                const line = document.createElement('div'); line.className = "score-line"; line.style.borderBottom = "1px dashed #cbd5e0"; line.style.paddingBottom = "10px"; line.style.marginBottom = "10px";
+                const line = document.createElement('div'); line.className = "score-line"; line.style.borderBottom = "1px solid #1e293b"; line.style.paddingBottom = "10px"; line.style.marginBottom = "10px";
                 
-                line.innerHTML = `<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;"><span style="font-weight:bold; color:#2d3748;">📌 分野：${data.section} <span style="color:#718096; font-size:0.9rem;">(教科：${data.grade})</span></span><span class="section-status-badge" style="background-color: ${barColor}; font-size: 0.75rem; padding: 2px 8px;">${statusText}</span></div>本日正解：<b>${data.correct}</b> 問 / 分野総数：${totalInSection} 問<div class="progress-bar-bg"><div class="progress-bar-fill" style="width: ${rate}%; background-color: ${barColor};"></div></div><div style="text-align: right; font-size: 0.8rem; color: #718096; margin-top: 2px;">全体のクリア率: ${rate}%</div>`;
+                line.innerHTML = `<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;"><span style="font-weight:bold; color:#ffffff;">📌 分野：${data.section} <span style="color:#64748b; font-size:0.85rem;">(教科：${data.grade})</span></span><span class="section-status-badge" style="background-color: ${barColor}; font-size: 0.75rem; padding: 2px 8px;">${statusText}</span></div>本日正解：<b>${data.correct}</b> 問 / 分野総数：${totalInSection} 問<div class="progress-bar-bg"><div class="progress-bar-fill" style="width: ${rate}%; background-color: ${barColor};"></div></div><div style="text-align: right; font-size: 0.8rem; color: #64748b; margin-top: 2px;">全体のクリア率: ${rate}%</div>`;
                 listContainer.appendChild(line);
             });
         }
@@ -1237,7 +1587,7 @@
     function backToSectionSelectFromSummary() { hideAllScreens(); if (selectedSubject === "english") { showEnglishSubScreen(); } else { renderSectionScreen(); document.getElementById('section-screen').style.display = 'block'; } }
     function toggleRateView(subView) {
         const mySec = document.getElementById('rate-my-section'); const rankSec = document.getElementById('rate-ranking-section'); const myBtn = document.getElementById('cmd-show-my-rate'); const rankBtn = document.getElementById('cmd-show-ranking');
-        if (subView === 'my') { mySec.style.display = 'block'; rankSec.style.display = 'none'; myBtn.style.backgroundColor = '#007bff'; rankBtn.style.backgroundColor = '#6c757d'; } else { mySec.style.display = 'none'; rankSec.style.display = 'block'; myBtn.style.backgroundColor = '#6c757d'; rankBtn.style.backgroundColor = '#007bff'; }
+        if (subView === 'my') { mySec.style.display = 'block'; rankSec.style.display = 'none'; myBtn.style.backgroundColor = '#1d4ed8'; rankBtn.style.backgroundColor = '#334155'; } else { mySec.style.display = 'none'; rankSec.style.display = 'block'; myBtn.style.backgroundColor = '#334155'; rankBtn.style.backgroundColor = '#1d4ed8'; }
     }
     function tryFinishLearning() { hideAllScreens(); document.getElementById('confirm-screen').style.display = 'block'; }
     function cancelFinishLearning() { hideAllScreens(); if (selectedSubject === "english") { showEnglishSubScreen(); } else { renderSectionScreen(); document.getElementById('section-screen').style.display = 'block'; } }
@@ -1247,7 +1597,7 @@
         const listContainer = document.getElementById('review-list'); listContainer.innerHTML = ""; 
         wrongQuestionsList.forEach((item, index) => {
             const card = document.createElement('div'); card.className = "review-card";
-            let expHtml = item.explanation ? `<div class="review-ans" style="color: #65748b; margin-top: 6px; font-size: 0.9rem; border-top: 1px dashed #feb2b2; padding-top: 6px;">💡 解説: ${item.explanation}</div>` : '';
+            let expHtml = item.explanation ? `<div class="review-ans" style="color: #94a3b8; margin-top: 6px; font-size: 0.9rem; border-top: 1px dashed rgba(255,255,255,0.1); padding-top: 6px;">💡 解説: ${item.explanation}</div>` : '';
             card.innerHTML = `<div class="review-q">問${index + 1}: ${item.question}</div><div class="review-ans review-wrong">❌ あなたの解答: ${item.yourAnswer}</div><div class="review-ans review-correct">⭕ 正しい正解: ${item.correctAnswer}</div>${expHtml}`;
             listContainer.appendChild(card);
         });
@@ -1296,11 +1646,11 @@
         let data = [];
         if (isEnglish) { ["1", "2", "3", "4", "5"].forEach(g => { data = [...data, ...(allQuizData[`english_word_${g}`] || []), ...(allQuizData[`english_grammar_${g}`] || [])]; }); } else { data = allQuizData[apiKey] || []; }
         const wrongQuestions = data.filter(q => q.section === sectionName && stats[q.question] && stats[q.question].wrong_count > 0);
-        if (wrongQuestions.length === 0) { container.innerHTML = "<div style='text-align:center; color:#28a745; font-weight:bold; padding:40px 0;'>✨ この分野で一度も間違えた問題はありません！</div>"; return; }
+        if (wrongQuestions.length === 0) { container.innerHTML = "<div style='text-align:center; color:#10b981; font-weight:bold; padding:40px 0;'>✨ この分野で一度も間違えた問題はありません！</div>"; return; }
         wrongQuestions.forEach((q, index) => {
             const card = document.createElement('div'); card.className = "review-card";
             const correctText = q.type === "en_to_ja" || q.type === "ja_to_en" ? q.correctText : q.choices[q.correct]; const count = stats[q.question].wrong_count;
-            let expHtml = q.explanation ? `<div class="review-ans" style="color: #65748b; margin-top: 6px; font-size: 0.9rem; border-top: 1px dashed #feb2b2; padding-top: 6px;">💡 解説: ${q.explanation}</div>` : '';
+            let expHtml = q.explanation ? `<div class="review-ans" style="color: #94a3b8; margin-top: 6px; font-size: 0.9rem; border-top: 1px dashed rgba(255,255,255,0.1); padding-top: 6px;">💡 解説: ${q.explanation}</div>` : '';
             card.innerHTML = `<div class="review-q">問${index + 1}: ${q.question}</div><div class="review-ans review-wrong" style="font-size:0.85rem; margin-bottom:5px;">⚠️ 過去のミス回数: ${count} 回</div><div class="review-ans review-correct">⭕ 正しい正解: ${correctText}</div>${expHtml}`;
             container.appendChild(card);
         });
@@ -1312,11 +1662,11 @@
     function selectRateSubject(subject) { document.getElementById('rate-subject-selector-view').style.display = 'none'; document.getElementById('rate-detail-view').style.display = 'block'; switchRateTab(subject); toggleRateView('my'); }
     function backToRateSubjectSelector() { document.getElementById('rate-subject-selector-view').style.display = 'block'; document.getElementById('rate-detail-view').style.display = 'none'; }
 
-    // 【追加】折れ線グラフ描画処理
+    // 折れ線グラフ描画処理
     function renderRateChart(subject) {
         const ctx = document.getElementById('rate-history-chart').getContext('2d');
         if (rateChartInstance) {
-            rateChartInstance.destroy(); // 古いグラフの破棄
+            rateChartInstance.destroy(); 
         }
         let historyKey = `quiz_rate_history_${subject}_${studentKey}`;
         let history = JSON.parse(localStorage.getItem(historyKey) || "[]");
@@ -1324,7 +1674,6 @@
             history = [{ label: "初期", rate: 1500 }];
         }
         
-        // 直近20件に絞って見やすくする
         let displayData = history.slice(-20);
         const labels = displayData.map(d => d.label);
         const data = displayData.map(d => d.rate);
@@ -1335,8 +1684,8 @@
                 labels: labels,
                 datasets: [{
                     data: data,
-                    borderColor: '#2b6cb0',
-                    backgroundColor: 'rgba(66, 153, 225, 0.1)',
+                    borderColor: '#3b82f6',
+                    backgroundColor: 'rgba(59, 130, 246, 0.1)',
                     borderWidth: 2,
                     pointRadius: 3,
                     tension: 0.15,
@@ -1348,14 +1697,13 @@
                 maintainAspectRatio: false,
                 plugins: { legend: { display: false } },
                 scales: {
-                    x: { grid: { display: false }, ticks: { font: { size: 9 } } },
-                    y: { ticks: { font: { size: 10 } } }
+                    x: { grid: { display: false }, ticks: { font: { size: 9 }, color: '#64748b' } },
+                    y: { ticks: { font: { size: 10 }, color: '#64748b' } }
                 }
             }
         });
     }
 
-    // 【修正】匿名化・グラフ描画・限定表示ロジックの組み込み
     function switchRateTab(subject) {
         currentRateTab = subject; let subjectLabel = subject === 'social' ? '社会' : (subject === 'english' ? '英語' : '理科');
         document.getElementById('my-rate-subject-label').innerText = subjectLabel; document.getElementById('ranking-subject-label').innerText = subjectLabel;
@@ -1372,38 +1720,32 @@
         rankingList.forEach((s, idx) => { if (s.activeRate !== lastRate) { displayRank = idx + 1; lastRate = s.activeRate; } s.computedRank = displayRank; if (Number(s.id) === Number(studentId) && s.name === studentName) { myRankNum = displayRank; } });
         document.getElementById('my-rate-rank-text').innerText = `全体順位: ${myRankNum} 位`;
         
-        // 個人レート用のグラフを描画
         renderRateChart(subject);
         
         const container = document.getElementById('ranking-list-container'); container.innerHTML = "";
         
-        // 【修正】表示対象のインデックス集合を作成（上位3名 + 自分の前後3名）
         let myIdx = rankingList.findIndex(s => Number(s.id) === Number(studentId) && s.name === studentName);
         let targetIndices = new Set();
         
-        // 1. 上位3名を固定登録
         for (let i = 0; i < Math.min(3, rankingList.length); i++) {
             targetIndices.add(i);
         }
-        // 2. 自分の前後3名を登録
         if (myIdx !== -1) {
             for (let i = Math.max(0, myIdx - 3); i <= Math.min(rankingList.length - 1, myIdx + 3); i++) {
                 targetIndices.add(i);
             }
         }
         
-        // インデックス順（順位の高い順）に並び替え
         let sortedIndices = Array.from(targetIndices).sort((a, b) => a - b);
         let lastIdx = -1;
         
         sortedIndices.forEach(idx => {
-            // インデックスが離れている場合は省略線「···」を入れる
             if (lastIdx !== -1 && idx > lastIdx + 1) {
                 const divider = document.createElement('div');
-                divider.style.borderTop = "1px dashed #cbd5e0";
+                divider.style.borderTop = "1px dashed #334155";
                 divider.style.margin = "6px 0";
                 divider.style.textAlign = "center";
-                divider.style.color = "#a0aec0";
+                divider.style.color = "#475569";
                 divider.style.fontSize = "0.8rem";
                 divider.innerText = "···";
                 container.appendChild(divider);
@@ -1418,8 +1760,6 @@
             item.style.fontSize = "0.9rem";
             
             const isMe = (Number(s.id) === Number(studentId) && s.name === studentName);
-            
-            // 【修正】自分以外は名前を一律「プレイヤー」にして非表示化
             const displayName = isMe ? `${s.name} (あなた)` : `プレイヤー`;
             
             let rankPrefix = `${s.computedRank}位`;
@@ -1428,12 +1768,14 @@
             else if (s.computedRank === 3) rankPrefix = `🥉 3位`;
             
             if (isMe) {
-                item.style.backgroundColor = "#feebc8";
+                item.style.background = "rgba(217, 119, 6, 0.15)";
+                item.style.border = "1px solid rgba(217, 119, 6, 0.3)";
                 item.style.fontWeight = "bold";
-                item.style.color = "#c05621";
+                item.style.color = "#fbbf24";
                 item.innerHTML = `<div style="text-align:left;">👑 ${rankPrefix} : [${s.campus || '---'}] ${displayName} (${s.activeRate})</div>`;
             } else {
-                item.style.borderBottom = "1px solid #edf2f7";
+                item.style.borderBottom = "1px solid #1e293b";
+                item.style.color = "#cbd5e1";
                 item.innerHTML = `<div style="text-align:left;">${rankPrefix} : [${s.campus || '---'}] ${displayName} (${s.activeRate})</div>`;
             }
             container.appendChild(item);
