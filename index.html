@@ -683,7 +683,7 @@
     <div id="review-start-screen" class="screen" style="display: none;">
         <div class="flex-center">
             <div>
-                <div style="margin: 0 auto; position: relative; width: 100%; max-width: 280px; border-radius: 12px; overflow: hidden; box-shadow: 0 8px 24px rgba(0,0,0,0.2);">
+                <div id="review-image-wrapper" style="margin: 0 auto; position: relative; width: 100%; max-width: 280px; border-radius: 12px; overflow: hidden; box-shadow: 0 8px 24px rgba(0,0,0,0.2);">
                     <img src="https://i.ibb.co/tMv6ftCq/Chat-GPT-Image-2026-7-9-17-34-49.png" alt="復習タイム イラスト" style="width: 100%; height: auto; display: block;" onerror="this.style.display='none'; document.getElementById('review-emoji-fallback').style.display='flex';">
                     <div id="review-emoji-fallback" class="review-placeholder-card" style="display: none; margin: 40px auto;">
                         <span style="font-size: 4.5rem;">✍️</span>
@@ -733,7 +733,7 @@
     </div>
 
     <!-- ========================================================
-       🎚️ 結果画面（2段階スプリットUI）
+        🎚️ 結果画面（2段階スプリットUI）
     ======================================================== -->
     <div id="result-screen" class="screen" style="display: none;">
         
@@ -805,8 +805,10 @@
         </div>
         <p style="font-size: 0.9rem; color: #94a3b8; margin-bottom: 15px;">今日正解した問題が、分野の総問題数に対してどれくらいあるかの割合（ゲージ）です。</p>
         <div class="score-box" id="summary-list" style="max-height: 320px; overflow-y: auto; padding-right: 5px;"></div>
-        <button class="btn nav-btn" onclick="backToSectionSelectFromSummary()">テストを続ける</button>
-        <button class="btn" style="background: linear-gradient(135deg, #b91c1c 0%, #dc3545 100%); color: white; font-weight: bold;" onclick="tryFinishLearning()">学習を終了する</button>
+        <div style="display:flex; gap:10px;">
+            <button class="btn nav-btn" style="flex:1;" onclick="backToSectionSelectFromSummary()">テストを続ける</button>
+            <button class="btn" style="flex:1; background: linear-gradient(135deg, #b91c1c 0%, #dc3545 100%); color: white; font-weight: bold; margin: 12px 0;" onclick="tryFinishLearning()">学習を終了する</button>
+        </div>
     </div>
 
     <!-- 終了確認画面 -->
@@ -1083,6 +1085,9 @@
             unlocked = unlocked.filter(id => !id.startsWith("rate_"));
             localStorage.setItem(`quiz_unlocked_titles_${studentKey}`, JSON.stringify(unlocked));
             
+            localStorage.setItem(`quiz_selected_title_${studentKey}`, 'campus');
+            currentSelectedTitleValue = 'campus';
+            
             dailyRateChangeScience = 0; dailyRateChangeSocial = 0; dailyRateChangeEnglish = 0;
         }
     }
@@ -1212,6 +1217,7 @@
         localStorage.removeItem('quiz_saved_id'); localStorage.removeItem('quiz_saved_name'); localStorage.removeItem('quiz_saved_grade'); localStorage.removeItem('quiz_saved_campus'); localStorage.removeItem(`quiz_daily_summary_${studentKey}`);
         currentCombo = 0; maxCombo = 0; dailySummaryData = {}; dailyRateChangeScience = 0; dailyRateChangeSocial = 0; dailyRateChangeEnglish = 0;
         document.getElementById('student-id-input').value = ""; document.getElementById('student-name-input').value = "";
+        studentId = ""; studentName = ""; studentGrade = ""; studentCampus = ""; studentKey = "";
         hideAllScreens(); document.getElementById('login-screen').style.display = 'block';
     }
     
@@ -1883,6 +1889,14 @@
         if (!studentKey) return;
         let unlocked = JSON.parse(localStorage.getItem(`quiz_unlocked_titles_${studentKey}`) || "[]");
         
+        const savedTitle = localStorage.getItem(`quiz_selected_title_${studentKey}`);
+        if (savedTitle && (savedTitle === "campus" || unlocked.includes(savedTitle))) {
+            currentSelectedTitleValue = savedTitle;
+        } else {
+            currentSelectedTitleValue = "campus";
+            localStorage.setItem(`quiz_selected_title_${studentKey}`, "campus");
+        }
+        
         let optionsHtml = `<option value="campus" data-glow="">[${studentCampus}]</option>`;
         unlocked.forEach(id => {
             const master = TITLES_MASTER[id];
@@ -1916,6 +1930,11 @@
 
     function syncTitleSelection(triggerSelect) {
         currentSelectedTitleValue = triggerSelect.value;
+        
+        if (studentKey) {
+            localStorage.setItem(`quiz_selected_title_${studentKey}`, currentSelectedTitleValue);
+        }
+        
         const allSelects = document.querySelectorAll('.title-select');
         allSelects.forEach(sel => {
             sel.value = currentSelectedTitleValue;
@@ -1924,7 +1943,9 @@
     }
 
     function applyGlowEffect(selectEl) {
+        if (!selectEl || selectEl.selectedIndex < 0) return;
         const selectedOption = selectEl.options[selectEl.selectedIndex];
+        if (!selectedOption) return;
         const glowType = selectedOption.getAttribute('data-glow');
         selectEl.classList.remove('select-glow-silver', 'select-glow-gold', 'select-glow-rainbow');
         if (glowType === 'silver') selectEl.classList.add('select-glow-silver');
@@ -2086,6 +2107,8 @@
             const correctText = q.type === "en_to_ja" || q.type === "ja_to_en" ? q.correctText : q.choices[q.correct]; const count = stats[q.question].wrong_count;
             let expHtml = q.explanation ? `<div class="review-ans" style="color: #94a3b8; margin-top: 6px; font-size: 0.9rem; border-top: 1px dashed rgba(255,255,255,0.1); padding-top: 6px;">💡 解説: ${q.explanation}</div>` : '';
             card.innerHTML = `<div class="review-q">問${index + 1}: ${q.question}</div><div class="review-ans review-wrong" style="font-size:0.85rem; margin-bottom:5px;">⚠️ 過去のミス回数: ${count} 回</div><div class="review-ans review-correct">⭕ 正しい正解: ${correctText}</div>${expHtml}`;
+            
+            // 🛠️ 【バグ修正箇所】card.appendChild(card) から container.appendChild(card) へ修正！
             container.appendChild(card);
         });
     }
@@ -2100,7 +2123,7 @@
 
     function renderRateChart(subject) {
         const ctx = document.getElementById('rate-history-chart').getContext('2d');
-        if (rateChartInstance) { rateChartInstance.destroy(); }
+        if (rateChartInstance) { rateChartInstance.destroy(); rateChartInstance = null; }
         let historyKey = `quiz_rate_history_${subject}_${studentKey}`;
         let history = JSON.parse(localStorage.getItem(historyKey) || "[]");
         if (history.length === 0) { history = [{ label: "初期", rate: 1500 }]; }
@@ -2223,7 +2246,7 @@
     }
 
     // ========================================================
-    // 🌐 【通信機能修正箇所】GAS Web Appとのリアルタイム同期
+    // 🌐 GAS Web Appとのリアルタイム同期
     // ========================================================
     function sendRateToSpreadsheet(subject, rate) { 
         console.log(`[GAS Update] ${subject} rate synchronized: ${rate}`); 
