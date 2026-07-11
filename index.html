@@ -165,7 +165,6 @@
             transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
             box-shadow: 0 6px 12px rgba(0,0,0,0.4);
         }
-        /* テスト・成績（メタリックブルー） */
         .menu-card.blue-card {
             border-color: #2563eb;
             box-shadow: 0 4px 12px rgba(37, 99, 235, 0.15);
@@ -176,7 +175,6 @@
             box-shadow: 0 8px 25px rgba(59, 130, 246, 0.4);
             transform: translateY(-2px);
         }
-        /* 対戦（バトルパープル） */
         .menu-card.battle-card {
             border-color: #6d46c1;
             box-shadow: 0 4px 12px rgba(109, 70, 193, 0.15);
@@ -187,7 +185,6 @@
             box-shadow: 0 8px 25px rgba(167, 139, 250, 0.4);
             transform: translateY(-2px);
         }
-        /* レート（ラグジュアリーゴールド） */
         .menu-card.gold-card {
             border-color: #d97706;
             box-shadow: 0 4px 12px rgba(217, 119, 6, 0.15);
@@ -206,7 +203,6 @@
             letter-spacing: 0.5px;
             text-shadow: 0 2px 4px rgba(0,0,0,0.8);
         }
-        /* カードの後ろに潜む巨大なイラスト背景 */
         .menu-card-bg-icon {
             position: absolute;
             font-size: 5.5rem;
@@ -223,7 +219,6 @@
             opacity: 0.25;
         }
 
-        /* 右下の角の誤字報告コマンド */
         .report-corner-btn {
             position: absolute;
             bottom: 20px;
@@ -246,7 +241,6 @@
             box-shadow: 0 0 10px rgba(239, 68, 68, 0.2);
         }
         
-        /* ログイン画面 */
         #login-screen { 
             padding: 0; 
             background-image: url('https://i.ibb.co/RGx3mgyq/triple-png.png'); 
@@ -281,7 +275,6 @@
         }
         .input-dark::placeholder { color: #475569; }
 
-        /* 指定画像を搭載した右下情報フロー＆Tips付ローディング画面 */
         #loading-screen {
             padding: 0;
             background-image: url('https://i.ibb.co/mrn0FS18/image.png');
@@ -317,7 +310,6 @@
             min-height: 2.2rem;
             max-width: 280px;
         }
-        /* 青と金のハイブリッドサイバーススピナー */
         .cyber-spinner {
             width: 26px;
             height: 26px;
@@ -333,7 +325,6 @@
             100% { transform: rotate(360deg); }
         }
 
-        /* ステータス・スコアボックス（ダークグラス） */
         .score-box { 
             background: rgba(30, 41, 59, 0.4); 
             backdrop-filter: blur(10px);
@@ -347,17 +338,36 @@
         .score-line { font-size: 1rem; margin: 12px 0; color: #cbd5e1; }
         .score-highlight { font-weight: bold; font-size: 1.2rem; text-shadow: 0 0 10px rgba(255,255,255,0.2); }
         .result { font-size: 1.3rem; font-weight: bold; margin-top: 20px; min-height: 30px; }
-        .loading { font-size: 1.1rem; color: #94a3b8; }
         .progress-text { font-size: 0.85rem; color: #64748b; margin-bottom: 10px; text-align: right; font-weight: bold; }
         
-        /* アラート・バッジ */
         .wrong-alert { color: #f87171; font-size: 0.85rem; text-align: left; font-weight: bold; margin-bottom: 8px; min-height: 18px; }
         .combo-alert { color: #fbbf24; font-size: 0.95rem; text-align: left; font-weight: bold; margin-bottom: 5px; min-height: 18px; }
-        .student-badge { position: absolute; top: 20px; left: 30px; background: rgba(30, 41, 59, 0.7); border: 1px solid rgba(255,255,255,0.1); backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); color: #e2e8f0; font-size: 0.8rem; padding: 6px 14px; border-radius: 20px; display: inline-block; font-weight: bold; z-index: 10; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
-        .switch-student { font-size: 0.75rem; color: #3b82f6; text-decoration: none; cursor: pointer; margin-left: 10px; font-weight: bold; }
+        
+        /* 👤 称号2行化・縦幅可変バッジ */
+        .student-badge { 
+            position: absolute; 
+            top: 20px; 
+            left: 30px; 
+            background: rgba(15, 23, 42, 0.85); 
+            border: 1px solid rgba(255,255,255,0.1); 
+            backdrop-filter: blur(8px); 
+            -webkit-backdrop-filter: blur(8px); 
+            color: #e2e8f0; 
+            padding: 6px 14px; 
+            border-radius: 12px; 
+            display: flex; 
+            flex-direction: column;
+            align-items: flex-start;
+            text-align: left;
+            font-weight: bold; 
+            z-index: 10; 
+            box-shadow: 0 4px 12px rgba(0,0,0,0.4); 
+            width: calc(100% - 60px);
+            box-sizing: border-box;
+        }
+        .switch-student { font-size: 0.75rem; color: #3b82f6; text-decoration: none; cursor: pointer; margin-left: 8px; font-weight: bold; }
         .switch-student:hover { color: #60a5fa; }
         
-        /* 分野選択カード */
         .section-screen-desc { font-size: 0.8rem; color: #94a3b8; margin-bottom: 15px; background: rgba(30, 41, 59, 0.5); padding: 12px; border-radius: 8px; border-left: 4px solid #3b82f6; text-align: left; line-height: 1.5; }
         .section-card { 
             background: linear-gradient(135deg, #1e293b 0%, #111827 100%); 
@@ -380,16 +390,13 @@
         .section-status-badge { color: #ffffff; font-size: 0.65rem; padding: 2px 8px; border-radius: 12px; font-weight: bold; letter-spacing: 0.5px; }
         .section-card-footer { font-size: 0.75rem; color: #64748b; display: flex; justify-content: space-between; align-items: center; margin-top: 4px; }
         
-        /* ゲージ・進行バー */
         .progress-bar-bg { background-color: #0f172a; height: 8px; border-radius: 4px; margin: 6px 0 4px 0; overflow: hidden; border: 1px solid #1e293b; }
         .progress-bar-fill { height: 100%; width: 0%; transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1); }
         
-        /* メニュー・ドロップダウン */
         .menu-item { padding: 14px 18px; font-size: 0.85rem; color: #94a3b8; cursor: pointer; transition: all 0.15s; border-bottom: 1px solid #1e293b; text-align: left; font-weight: bold; }
         .menu-item:last-child { border-bottom: none; }
         .menu-item:hover { background-color: #1e293b; color: #ffffff; }
         
-        /* 復習・間違いリスト */
         .review-container { max-height: 280px; overflow-y: auto; text-align: left; margin: 15px 0; padding-right: 5px; }
         .review-card { background: rgba(239, 68, 68, 0.05); border: 1px solid rgba(239, 68, 68, 0.2); padding: 14px; border-radius: 8px; margin-bottom: 12px; font-size: 0.9rem; }
         .review-q { font-weight: bold; color: #f8fafc; margin-bottom: 8px; }
@@ -397,10 +404,8 @@
         .review-wrong { color: #f87171; font-weight: bold; }
         .review-correct { color: #34d399; font-weight: bold; }
         
-        /* インプット要素 */
         .input-style { width: 100%; padding: 14px; font-size: 1.05rem; border-radius: 8px; margin: 12px 0; box-sizing: border-box; text-align: center; font-weight: bold; }
         
-        /* オーバーレイ・対戦演出 */
         .correct-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background-color: rgba(9, 13, 22, 0.5); display: none; justify-content: center; align-items: center; font-size: 60vmin; color: #10b981; font-weight: bold; z-index: 9999; pointer-events: none; text-shadow: 0 0 40px rgba(16, 185, 129, 0.4); }
         .report-container { max-height: 360px; overflow-y: auto; padding-right: 5px; margin-bottom: 10px; }
         .report-cat-title { text-align: left; margin: 20px 0 8px 0; color: #94a3b8; font-size: 0.95rem; font-weight: bold; border-bottom: 1px solid #1e293b; padding-bottom: 5px; }
@@ -408,14 +413,10 @@
         #battle-result-banner { font-size: 1.6rem; font-weight: 900; margin-top: 5px; margin-bottom: 15px; text-shadow: 0 0 15px rgba(255,255,255,0.2); line-height: 1.4; letter-spacing: 1px; }
         .bonus-tag { display: inline-block; font-size: 0.7rem; font-weight: 800; padding: 2px 6px; border-radius: 4px; margin-right: 5px; color: white; }
         
-        /* リザルトバッジの背景色 */
         .bg-combo { background-color: #d97706 !important; }
         .bg-field { background-color: #2563eb !important; }
-        
-        /* 復習画面用のプレースホルダーカードスタイル */
         .review-placeholder-card { width: 140px; height: 140px; background: linear-gradient(135deg, #713f12, #a16207); border-radius: 50%; display: flex; justify-content: center; align-items: center; box-shadow: 0 8px 24px rgba(234,179,8,0.15); border: 4px solid #eab308; margin: 20px auto; }
 
-        /* 縦・横完全中央配置を約束するクラス */
         .flex-center { 
             display: flex; 
             flex-direction: column; 
@@ -425,11 +426,102 @@
             box-sizing: border-box; 
         }
         .flex-center > div { width: 100%; }
+
+        /* ========================================================
+           ✨ 演出スタイル：特殊カラーエフェクト（完全同期）
+        ======================================================== */
+        .title-silver {
+            background: linear-gradient(90deg, #94a3b8 0%, #ffffff 50%, #64748b 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-weight: 900;
+            text-shadow: 0 0 8px rgba(255,255,255,0.4);
+        }
+        .title-gold {
+            background: linear-gradient(90deg, #d97706 0%, #facc15 50%, #b45309 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-weight: 900;
+            text-shadow: 0 0 12px rgba(250,204,21,0.6);
+        }
+        .title-rainbow {
+            background: linear-gradient(90deg, #ff007f, #ff00ff, #00ffff, #00ff00, #ffff00, #ff7f00, #ff0000);
+            background-size: 400% 400%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-weight: 900;
+            animation: rainbow-text-move 6s linear infinite;
+            text-shadow: 0 0 10px rgba(0,255,255,0.5);
+        }
+        @keyframes rainbow-text-move {
+            0% { background-position: 0% 50%; }
+            100% { background-position: 100% 50%; }
+        }
+
+        /* 👑 プルダウンネオン発光カラー */
+        .title-select {
+            background: rgba(15, 23, 42, 0.8);
+            border: 1px solid #334155;
+            color: #cbd5e1;
+            font-weight: bold;
+            font-size: 0.75rem;
+            cursor: pointer;
+            outline: none;
+            padding: 4px 6px;
+            font-family: inherit;
+            border-radius: 6px;
+            width: 100%;
+            transition: all 0.2s;
+            box-shadow: inset 0 1px 3px rgba(0,0,0,0.5);
+        }
+        .title-select option { background-color: #0b0f19; color: #ffffff; font-weight: bold; }
+        .select-glow-silver { color: #ffffff !important; text-shadow: 0 0 8px rgba(255,255,255,0.8); font-weight: 900; border-color: #94a3b8; }
+        .select-glow-gold { color: #facc15 !important; text-shadow: 0 0 10px rgba(250,204,21,0.9); font-weight: 900; border-color: #d97706; }
+        .select-glow-rainbow { color: #ff00ff !important; text-shadow: 0 0 10px rgba(0,255,255,0.9); font-weight: 900; border-color: #a78bfa; }
+
+        /* 🏆 称号獲得ポップアップ */
+        .title-popup-overlay {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(4, 6, 10, 0.93);
+            z-index: 9999;
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+        .title-popup-card {
+            background: linear-gradient(135deg, #090d16 0%, #1e1b4b 100%);
+            border: 2px solid #3b82f6;
+            box-shadow: 0 0 35px rgba(59, 130, 246, 0.5);
+            border-radius: 16px;
+            width: 85%;
+            padding: 35px 20px;
+            text-align: center;
+            transform: scale(0.7);
+            animation: popUp 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+        }
+        @keyframes popUp { to { transform: scale(1); } }
+        .popup-badge-glow { font-size: 1.1rem; font-weight: 800; color: #fbbf24; letter-spacing: 2px; text-shadow: 0 0 10px rgba(251,191,36,0.5); margin-bottom: 15px; }
+
+        .result-stage { display: none; }
+        .vs-bar-container { padding: 8px 12px; border-radius: 8px; font-size: 0.8rem; text-align: left; box-sizing: border-box; }
     </style>
 </head>
 <body>
 
 <div id="correct-overlay" class="correct-overlay">⭕</div>
+
+<!-- 🏆 称号獲得ポップアップ画面 -->
+<div id="title-popup" class="title-popup-overlay">
+    <div class="title-popup-card">
+        <div class="popup-badge-glow">🚨 ACCOMPLISHED!</div>
+        <h3 style="margin:0; font-size:1.2rem; color:#ffffff;">新たな称号を獲得したぞ！</h3>
+        <div id="popup-title-name" style="font-size: 1.65rem; margin: 25px 0; font-weight:900;">【称号名】</div>
+        <p id="popup-title-desc" style="font-size:0.85rem; color:#94a3b8; line-height:1.4; min-height:40px;">称号獲得条件の説明文</p>
+        <button class="btn nav-btn" style="margin-top: 25px; padding: 12px;" onclick="closeTitlePopup()">称号を受け取る ➡️</button>
+    </div>
+</div>
 
 <div class="quiz-container">
     
@@ -444,7 +536,7 @@
 
     <!-- メインメニュー画面 -->
     <div id="main-menu-screen" class="screen" style="display: none; padding-bottom: 60px;">
-        <div class="student-badge">👤 <span id="user-badge-0"></span> <span class="switch-student" onclick="logoutStudent()">切り替え</span></div>
+        <div id="student-badge-container-0" class="student-badge"></div>
         <div class="flex-center">
             <div>
                 <h2>SELECT MENU</h2>
@@ -473,11 +565,10 @@
 
     <!-- 教科選択画面 -->
     <div id="subject-screen" class="screen" style="display: none;">
-        <div class="student-badge">👤 <span id="user-badge-1"></span> <span class="switch-student" onclick="logoutStudent()">切り替え</span></div>
+        <div id="student-badge-container-1" class="student-badge"></div>
         <div class="flex-center">
             <div>
                 <div id="battle-rule-box" style="display: none;"></div>
-
                 <h2>教科を選んでね</h2>
                 <button class="btn nav-btn" style="background: linear-gradient(135deg, #1e293b 0%, #475569 100%); border: 1px solid #64748b;" onclick="selectSubject('science')">理科</button>
                 <button class="btn nav-btn" style="background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 100%); border: 1px solid #3b82f6;" onclick="selectSubject('social')">社会</button>
@@ -489,7 +580,7 @@
 
     <!-- 英語形式選択画面 -->
     <div id="english-sub-screen" class="screen" style="display: none;">
-        <div class="student-badge">👤 <span id="user-badge-5"></span> <span class="switch-student" onclick="logoutStudent()">切り替え</span></div>
+        <div id="student-badge-container-5" class="student-badge"></div>
         <div class="flex-center">
             <div>
                 <h2>形式を選んでね 🔤</h2>
@@ -503,7 +594,7 @@
 
     <!-- 学年選択画面 -->
     <div id="grade-screen" class="screen" style="display: none;">
-        <div class="student-badge">👤 <span id="user-badge-3"></span> <span class="switch-student" onclick="logoutStudent()">切り替え</span></div>
+        <div id="student-badge-container-3" class="student-badge"></div>
         <div class="flex-center">
             <div>
                 <h2>学年を選んでね</h2>
@@ -517,7 +608,7 @@
 
     <!-- 社会分野選択画面 -->
     <div id="social-sub-screen" class="screen" style="display: none;">
-        <div class="student-badge">👤 <span id="user-badge-4"></span> <span class="switch-student" onclick="logoutStudent()">切り替え</span></div>
+        <div id="student-badge-container-4" class="student-badge"></div>
         <div class="flex-center">
             <div>
                 <h2>分野を選んでね</h2>
@@ -632,7 +723,7 @@
                 </div>
                 <div id="result" class="result"></div>
                 
-                <div id="review-end-message" class="review-end-box" style="display: none;">
+                <div id="review-end-message" class="review-end-box" style="display: none; color:#fbbf24; font-weight:bold; margin-top:10px;">
                     🎉 復習タイム終了！よく頑張ったね！
                 </div>
 
@@ -641,36 +732,56 @@
         </div>
     </div>
 
-    <!-- 結果画面 -->
+    <!-- ========================================================
+       🎚️ 結果画面（2段階スプリットUI）
+    ======================================================== -->
     <div id="result-screen" class="screen" style="display: none;">
-        <div class="flex-center">
-            <div>
-                <div id="battle-result-banner" style="display: none; font-size: 1.8rem; font-weight: bold; text-shadow: 0 2px 4px rgba(0,0,0,0.5); line-height: 1.3;">WIN 👑</div>
+        
+        <!-- 🛑 【第1段階】戦績・称号・見直しフェーズ -->
+        <div id="result-stage-1" class="result-stage" style="display: block;">
+            <div id="battle-result-banner" style="display: none;">WIN 👑</div>
+            <h2 id="result-screen-title">結果発表 🎉</h2>
+            <div id="student-badge-container-2" class="student-badge" style="position: static; margin-bottom: 15px; width:100%;"></div>
+            
+            <div class="score-box" style="margin-top: 5px;">
+                <div class="score-line">キミの正解数: <span id="current-score" class="score-highlight" style="color: #ffffff;">0</span> / <span id="total-questions">10</span> 問</div>
+                <div id="battle-rival-score-line" class="score-line" style="display: none;">相手の正解数: <span id="battle-rival-score-val" class="score-highlight" style="color: #f87171;">0</span> / 10 問</div>
+                <div class="score-line">🔥 最高コンボ数: <span id="max-combo-score" class="score-highlight" style="color: #fbbf24;">0</span> コンボ！</div>
+                <div class="score-line">📈 レート変動: <span id="rate-change-display" class="score-highlight">理科レート: 1500 (±0)</span></div>
                 
-                <h2 id="result-screen-title">結果発表 🎉</h2>
-                <div class="student-badge" style="position: static; display: inline-block; margin-bottom: 15px;">👤 <span id="user-badge-2"></span></div>
-                <div class="score-box" style="margin-top: 5px;">
-                    <div class="score-line">キミの正解数: <span id="current-score" class="score-highlight" style="color: #ffffff;">0</span> / <span id="total-questions">10</span> 問</div>
-                    <div id="battle-rival-score-line" class="score-line" style="display: none;">相手の正解数: <span id="battle-rival-score-val" class="score-highlight" style="color: #f87171;">0</span> / 10 問</div>
-                    <div class="score-line">🔥 最高コンボ数: <span id="max-combo-score" class="score-highlight" style="color: #fbbf24;">0</span> コンボ！</div>
-                    <div class="score-line">📈 レート変動: <span id="rate-change-display" class="score-highlight">理科レート: 1500 (±0)</span></div>
-                    
-                    <div id="bonus-breakdown-box" style="margin-top: 5px; font-size: 0.9rem; color: #cbd5e1; display: none; border-top: 1px solid #334155; padding-top: 8px;">
-                        <div id="combo-bonus-line" style="margin: 3px 0; text-align: left;"></div>
-                        <div id="field-bonus-line" style="margin: 3px 0; text-align: left;"></div>
-                    </div>
-
-                    <div class="score-line" style="margin-top: 15px;">
-                        今回の正解率: <span id="current-accuracy" class="score-highlight">0%</span>
-                        <div class="progress-bar-bg"><div id="current-accuracy-bar" class="progress-bar-fill"></div></div>
-                    </div>
+                <div id="bonus-breakdown-box" style="margin-top: 5px; font-size: 0.9rem; color: #cbd5e1; display: none; border-top: 1px solid #334155; padding-top: 8px;">
+                    <div id="combo-bonus-line" style="margin: 3px 0; text-align: left;"></div>
+                    <div id="field-bonus-line" style="margin: 3px 0; text-align: left;"></div>
                 </div>
-                <button id="review-trigger-btn" class="btn" style="background: linear-gradient(135deg, #b45309 0%, #eab308 100%); color: #0f172a; font-weight: bold; display: none;" onclick="showReviewScreen()">❌ 間違えた問題を見直す</button>
-                <button class="btn nav-btn" onclick="backToSectionSelect()">続けて別の問題を解く</button>
-                <button class="btn back-btn" style="margin-top: 10px;" onclick="backToSubjectFromResult()">教科を選び直す</button>
-                
-                <button class="btn" style="background: linear-gradient(135deg, #c2410c 0%, #ed8936 100%); color: white; font-weight: bold; margin-top: 15px;" onclick="showDailySummary()">🔍 今日の学習を振り返る</button>
+
+                <div class="score-line" style="margin-top: 15px;">
+                    今回の正解率: <span id="current-accuracy" class="score-highlight">0%</span>
+                    <div class="progress-bar-bg"><div id="current-accuracy-bar" class="progress-bar-fill"></div></div>
+                </div>
             </div>
+            
+            <button id="review-trigger-btn" class="btn" style="background: linear-gradient(135deg, #b45309 0%, #eab308 100%); color: #0f172a; font-weight: bold; display: none;" onclick="showReviewScreen()">❌ 間違えた問題を見直す</button>
+            <button class="btn nav-btn" style="background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%); font-size:1.1rem; margin-top: 25px;" onclick="goToResultStage2()">次へ進む (選択画面へ) ➡️</button>
+        </div>
+
+        <!-- 🔄 【第2段階】ネクストアクション選択フェーズ -->
+        <div id="result-stage-2" class="result-stage" style="display: none;">
+            <h2>NEXT ACTION</h2>
+            <p style="font-size:0.85rem; color:#94a3b8; margin-bottom:20px;">お疲れ様！次の一手を選ぼう。</p>
+            
+            <div class="score-box" style="background: rgba(217, 119, 6, 0.05); border: 1px solid rgba(217, 119, 6, 0.2); text-align: center; margin-bottom: 25px; padding: 15px;">
+                <div style="font-size: 0.9rem; color: #fbbf24; font-weight: bold;">📈 本日の各科目レート増減</div>
+                <div style="display: flex; justify-content: space-around; font-size: 0.95rem; font-weight: bold; margin-top: 8px;">
+                    <div>🌿 理科: <span id="result-stage2-rate-sci">±0</span></div>
+                    <div>🗺️ 社会: <span id="result-stage2-rate-soc">±0</span></div>
+                    <div>🔤 英語: <span id="result-stage2-rate-eng">±0</span></div>
+                </div>
+            </div>
+
+            <button class="btn nav-btn" style="background: linear-gradient(135deg, #059669 0%, #10b981 100%);" onclick="retrySameSection()">🔄 同じ分野にもう一度挑戦！</button>
+            <button class="btn nav-btn" style="background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);" onclick="backToSectionSelect()">続けて別の問題を解く</button>
+            <button class="btn back-btn" style="margin-top: 10px;" onclick="backToSubjectFromResult()">教科を選び直す</button>
+            <button class="btn" style="background: linear-gradient(135deg, #c2410c 0%, #ed8936 100%); color: white; font-weight: bold; margin-top: 15px;" onclick="showDailySummary()">🔍 今日の学習を振り返る</button>
         </div>
     </div>
 
@@ -874,6 +985,53 @@
     let currentPlayerRoundLogs = []; 
     let rateChartInstance = null;
 
+    // 🏆 称号システム制御用データ
+    let currentSelectedTitleValue = "campus";
+    let titleQueue = [];
+    let isPendingReload = false; // 終了処理時に演出待ちをするフラグ
+
+    const TITLES_MASTER = {
+        "rate_1_1600": { name: "【覚醒の兆し】", glow: "", desc: "1科目でレート1600達成！" },
+        "rate_1_1800": { name: "【新進気鋭のブレーン】", glow: "", desc: "1科目でレート1800達成！" },
+        "rate_1_2000": { name: "【我が道を往く】", glow: "", desc: "1科目でレート2000達成！" },
+        "rate_1_2500": { name: "【飽くなき探求心】", glow: "", desc: "1科目でレート2500達成！" },
+        "rate_1_3000": { name: "【一騎当千の知将】", glow: "silver", desc: "1科目で驚異のレート3000達成！" },
+        "rate_2_1600": { name: "【超新星】", glow: "", desc: "2科目でレート1600達成！" },
+        "rate_2_1800": { name: "【知将来る】", glow: "", desc: "2科目でレート1800達成！" },
+        "rate_2_2000": { name: "【限界無きチャレンジャー】", glow: "", desc: "2科目でレート2000達成！" },
+        "rate_2_2500": { name: "【天辺に君臨せし者】", glow: "", desc: "2科目でレート2500達成！" },
+        "rate_2_3000": { name: "【Mr.TRIPLE】", glow: "gold", desc: "2科目で驚異のレート3000達成！" },
+        "rate_3_3000": { name: "【栄冠を極めし者】", glow: "rainbow", desc: "全3科目すべてでレート3000を達成した伝説の証！" },
+        "win_1": { name: "【初陣の勝者】", glow: "", desc: "対戦バトルで初めて勝利を収めた！" },
+        "win_10": { name: "【戦場のエリート】", glow: "", desc: "対戦バトルで通算10勝を達成！" },
+        "win_50": { name: "【百戦錬磨のディフェンダー】", glow: "", desc: "対戦バトルで通算50勝を達成！" },
+        "win_100": { name: "【不敗の軍神】", glow: "silver", desc: "対戦バトルで通算100勝を達成した歴戦の猛者！" },
+        "streak_3": { name: "【連勝スプリンター】", glow: "", desc: "対戦バトルで3連勝を記録！" },
+        "streak_5": { name: "【怒涛の進撃】", glow: "", desc: "対戦バトルで5連勝を記録！" },
+        "streak_10": { name: "【完全なる絶対領域】", glow: "", desc: "対戦バトルで大いなる10連勝を記録！" },
+        "streak_20": { name: "【唯我独尊】", glow: "", desc: "対戦バトルで圧倒的な20連勝を記録！" },
+        "streak_30": { name: "【常勝無敗の王】", glow: "gold", desc: "対戦バトルで前人未到の30連勝を達成せし覇王！" },
+        "combo_5": { name: "【コンボスターター】", glow: "", desc: "クイズで5コンボを達成！" },
+        "combo_10": { name: "【無傷の天才】", glow: "", desc: "クイズで10コンボを達成！" },
+        "combo_20": { name: "【ミスを知らぬ脳】", glow: "", desc: "クイズで20コンボを達成！" },
+        "combo_30": { name: "【終わらない神話】", glow: "", desc: "クイズで30コンボを達成！" },
+        "combo_50": { name: "【無限に広がる知能】", glow: "silver", desc: "ミスなしで驚異の50コンボを叩き出した天才！" },
+        "field_3": { name: "【ブレイクスルー】", glow: "", desc: "3つの分野で達成率100%を達成！" },
+        "field_5": { name: "【マルチ・タレント】", glow: "", desc: "5つの分野で達成率100%を達成！" },
+        "field_10": { name: "【オールラウンダー】", glow: "", desc: "10の分野で達成率100%を達成！" },
+        "field_15": { name: "【異次元の知能】", glow: "", desc: "15の分野で達成率100%を達成！" },
+        "field_all": { name: "【TRIPLE完全攻略読本】", glow: "gold", desc: "すべての収録分野で達成率100%を網羅した神！" },
+        "daily_1": { name: "【一歩目】", glow: "", desc: "デイリー学習ミッションを1回達成！" },
+        "daily_7": { name: "【継続の鉄人】", glow: "", desc: "デイリー学習ミッションを1週間（7回）継続！" },
+        "daily_30": { name: "【努力の王】", glow: "", desc: "デイリー学習ミッションを1ヶ月（30回）継続！" },
+        "fast_10": { name: "【光速のブレーン】", glow: "", desc: "10問すべてを3秒未満の超神速で正解した！" },
+        "time_morning": { name: "【暁の青鳥】", glow: "", desc: "朝の澄んだ時間（5時〜7時）にクイズをクリア！" },
+        "review_fail": { name: "【二度あることは三度ある】", glow: "", desc: "復習モードで見直した問題をさらに間違えてしまった…！" },
+        "time_midnight": { name: "【テスト前夜の悪あがき】", glow: "", desc: "深夜2時〜4時の静寂のなかでクイズをクリア！" },
+        "battle_clutch_win": { name: "【タッチの差の英雄】", glow: "", desc: "100ミリ秒以内の極限のスピード勝負を制して対戦に勝利した！" },
+        "battle_clutch_lose": { name: "【神に見放された1コマ】", glow: "", desc: "100ミリ秒以内の極限のスピード勝負に一歩及ばず敗北した…" }
+    };
+
     const LOADING_TIPS = [
         "🧠 連続正解（コンボ）を繋げるとレートに特別ボーナスが入るよ！",
         "⚔️ 対戦バトルでは、スピードよりも『ミスゼロ』が最強の攻略法！",
@@ -921,6 +1079,10 @@
             localStorage.setItem(`quiz_rate_history_social_${studentKey}`, JSON.stringify([{ label: "初期", rate: 1500 }]));
             localStorage.setItem(`quiz_rate_history_english_${studentKey}`, JSON.stringify([{ label: "初期", rate: 1500 }]));
             
+            let unlocked = JSON.parse(localStorage.getItem(`quiz_unlocked_titles_${studentKey}`) || "[]");
+            unlocked = unlocked.filter(id => !id.startsWith("rate_"));
+            localStorage.setItem(`quiz_unlocked_titles_${studentKey}`, JSON.stringify(unlocked));
+            
             dailyRateChangeScience = 0; dailyRateChangeSocial = 0; dailyRateChangeEnglish = 0;
         }
     }
@@ -950,6 +1112,7 @@
     function startLearningMode() {
         hideAllScreens();
         document.getElementById('subject-screen').style.display = 'block';
+        updateAllStudentBadges();
     }
 
     async function loginStudent() {
@@ -1028,7 +1191,6 @@
                         if (cols.length < 8) continue; qText = cols[2].trim(); qChoices = [cols[3].trim(), cols[4].trim(), cols[5].trim(), cols[6].trim()]; qCorrect = parseInt(cols[7].trim()) - 1;
                         qSection = (cols[8] && cols[8].trim()) ? cols[8].trim() : (key.startsWith("english_grammar") ? "空欄補充" : "その他"); qExplanation = cols[9] ? cols[9].trim() : "";
                     } else {
-                        /* 【大改修】旧データの読み込み時にインデックスが壊れてデータが全消滅していた致命的バグを完全に補正 */
                         if (cols.length < 6) continue; qText = cols[0].trim(); qChoices = [cols[1].trim(), cols[2].trim(), cols[3].trim(), cols[4].trim()]; qCorrect = parseInt(cols[5].trim()) - 1;
                         qSection = cols[6] ? cols[6].trim() : "共通"; qExplanation = cols[7] ? cols[7].trim() : "";
                     }
@@ -1036,13 +1198,12 @@
                 }
             });
             hideAllScreens(); document.getElementById('main-menu-screen').style.display = 'block';
+            updateAllStudentBadges();
             stopLoadingTips();
         } catch (error) { alert("問題データの同期に失敗しました。"); console.error(error); hideAllScreens(); document.getElementById('login-screen').style.display = 'block'; stopLoadingTips(); }
     }
 
     function showMainScreen() {
-        const badgeText = `[${studentCampus}] ${studentName} さん`;
-        for(let i=0; i<=5; i++) { const el = document.getElementById(`user-badge-${i}`); if(el) el.innerText = badgeText; }
         const savedSummary = localStorage.getItem(`quiz_daily_summary_${studentKey}`); dailySummaryData = savedSummary ? JSON.parse(savedSummary) : {};
         loadAllQuizData();
     }
@@ -1063,8 +1224,8 @@
         selectedSubject = subject; 
         if (subject === 'english') { showEnglishSubScreen(); } 
         else if (subject === 'science') { 
-            hideAllScreens(); document.getElementById('grade-screen').style.display = 'block';
-        } else if (subject === 'social') { hideAllScreens(); document.getElementById('social-sub-screen').style.display = 'block'; }
+            hideAllScreens(); document.getElementById('grade-screen').style.display = 'block'; updateAllStudentBadges();
+        } else if (subject === 'social') { hideAllScreens(); document.getElementById('social-sub-screen').style.display = 'block'; updateAllStudentBadges(); }
     }
     
     function showEnglishSubScreen() {
@@ -1074,6 +1235,7 @@
             (allQuizData[`english_grammar_${grade}`] || []).forEach(q => quizData.push({ question: q.question, choices: [...q.choices], correct: q.correct, section: q.section, explanation: q.explanation }));
         });
         document.getElementById('english-sub-screen').style.display = 'block';
+        updateAllStudentBadges();
     }
 
     function selectEnglishMode(mode) {
@@ -1088,10 +1250,10 @@
         hideAllScreens(); renderSectionScreen(); document.getElementById('section-screen').style.display = 'block';
     }
 
-    function backToSubjectFromEnglish() { hideAllScreens(); document.getElementById('subject-screen').style.display = 'block'; }
+    function backToSubjectFromEnglish() { hideAllScreens(); document.getElementById('subject-screen').style.display = 'block'; updateAllStudentBadges(); }
     function selectSocialSub(subSubject) { selectGrade(subSubject); }
-    function backToSubjectFromSocial() { hideAllScreens(); document.getElementById('subject-screen').style.display = 'block'; }
-    function backToSubjectFromGrade() { hideAllScreens(); document.getElementById('subject-screen').style.display = 'block'; }
+    function backToSubjectFromSocial() { hideAllScreens(); document.getElementById('subject-screen').style.display = 'block'; updateAllStudentBadges(); }
+    function backToSubjectFromGrade() { hideAllScreens(); document.getElementById('subject-screen').style.display = 'block'; updateAllStudentBadges(); }
 
     function backToSubject() { 
         hideAllScreens(); 
@@ -1102,17 +1264,32 @@
         } else {
             document.getElementById('social-sub-screen').style.display = 'block'; 
         }
+        updateAllStudentBadges();
     }
 
-    function backToGrade() { hideAllScreens(); document.getElementById('grade-screen').style.display = 'block'; }
-    function backToResult() { hideAllScreens(); document.getElementById('result-screen').style.display = 'block'; }
-    function backToSectionSelect() { if (selectedSectionName) { if (currentMode === "report") { hideAllScreens(); document.getElementById('section-screen').style.display = 'block'; } else { prepareModeFlow(selectedSectionName); } } else backToMainMenu(); }
-    function backToSubjectFromResult() { hideAllScreens(); document.getElementById('subject-screen').style.display = 'block'; }
+    function backToGrade() { hideAllScreens(); document.getElementById('grade-screen').style.display = 'block'; updateAllStudentBadges(); }
+    
+    function backToResult() { 
+        hideAllScreens(); 
+        document.getElementById('result-screen').style.display = 'block'; 
+        document.getElementById('result-stage-1').style.display = 'block'; 
+        document.getElementById('result-stage-2').style.display = 'none'; 
+        updateAllStudentBadges();
+    }
+    
+    function backToSectionSelect() { 
+        hideAllScreens();
+        renderSectionScreen();
+        document.getElementById('section-screen').style.display = 'block';
+        updateAllStudentBadges();
+    }
+    
+    function backToSubjectFromResult() { hideAllScreens(); document.getElementById('subject-screen').style.display = 'block'; updateAllStudentBadges(); }
 
     function selectGrade(grade) {
         selectedGrade = grade; hideAllScreens(); const apiKey = `${selectedSubject}_${grade}`; const sourceData = allQuizData[apiKey] || []; quizData = [];
         sourceData.forEach(q => { quizData.push({ question: q.question, choices: [...q.choices], correct: q.correct, section: q.section, explanation: q.explanation }); });
-        if (quizData.length === 0) { alert("有効な問題データがありませんでした。"); document.getElementById('main-menu-screen').style.display = 'block'; return; }
+        if (quizData.length === 0) { alert("有効な問題データがありませんでした。"); document.getElementById('main-menu-screen').style.display = 'block'; updateAllStudentBadges(); return; }
         renderSectionScreen(); document.getElementById('section-screen').style.display = 'block';
     }
 
@@ -1204,8 +1381,14 @@
         })
         .catch(err => {
             console.error("ゴーストデータ取得に失敗:", err);
-            alert("対戦相手のデータ取得に失敗しました。通常テストモードに戻ります。");
-            setMode('test');
+            activeGhostData = {
+                id: "9999",
+                name: "対戦相手",
+                rate: myRate,
+                ghostLog: Array.from({length:10}, () => ({isCorrect: Math.random() > 0.4, timeMs: Math.round(3500 + (Math.random() * 2000 - 1000))}))
+            };
+            document.getElementById('rival-profile-rate').innerText = activeGhostData.rate;
+            document.getElementById('matched-rival-card').style.display = 'block';
         });
     }
 
@@ -1243,10 +1426,8 @@
                 
                 let sameInitialTexts = currentSectionAllQuestions.filter(q => { 
                     if (q.type !== quiz.type) return false; 
-                    
                     const word = (q.type === "ja_to_en") ? q.correctText : q.question; 
                     if (!word || !word.trim()) return false;
-                    
                     return word.trim()[0].toLowerCase() === targetChar; 
                 }).map(q => q.correctText).filter(txt => txt !== quiz.correctText);
                 
@@ -1302,11 +1483,9 @@
 
     function startGhostSimulationLoop() {
         if (ghostTimerInterval) clearTimeout(ghostTimerInterval);
-        
         function executeGhostLap() {
             if (ghostCurrentQuestion < 10) {
                 const currentLapData = activeGhostData.ghostLog[ghostCurrentQuestion];
-                
                 ghostTimerInterval = setTimeout(() => {
                     ghostCurrentQuestion++;
                     if (currentLapData.isCorrect) { ghostCurrentScore++; }
@@ -1384,11 +1563,10 @@
                 if (answerTimeMs < stats[currentQuiz.question].best_time) { stats[currentQuiz.question].best_time = answerTimeMs; }
                 stats[currentQuiz.question].status = currentStatus;
             } else {
-                resultDiv.innerText = "❌ 不正解..."; resultDiv.style.color = "#ef4444"; buttons[selectedIndex].classList.add('wrong-choice');
+                resultDiv.innerText = "❌ 不正解..."; buttons[selectedIndex].classList.add('wrong-choice');
                 currentCombo = 0; comboDiv.innerText = "❌ コンボ終了！";
                 wrongQuestionsList.push({ question: currentQuiz.question, yourAnswer: currentQuiz.choices[selectedIndex], correctAnswer: currentQuiz.choices[currentQuiz.correct], explanation: currentQuiz.explanation });
                 stats[currentQuiz.question].wrong_count++; stats[currentQuiz.question].status = 'wrong';
-                
                 reviewQuizData.push(currentQuiz);
             }
 
@@ -1407,6 +1585,8 @@
                 const overlay = document.getElementById('correct-overlay'); overlay.style.display = 'flex'; setTimeout(() => { overlay.style.display = 'none'; }, 500);
             } else {
                 resultDiv.innerText = "❌ 不正解...（次こそ合わせよう！）"; resultDiv.style.color = "#ef4444"; buttons[selectedIndex].classList.add('wrong-choice');
+                // 😈 【悪ノリ隠し称号判定】：見直しでさらにミス
+                unlockTitle("review_fail");
             }
 
             if (reviewQuestionIndex === reviewQuizData.length - 1) {
@@ -1457,7 +1637,11 @@
         if (isDataSubmitted) return; 
         isDataSubmitted = true; 
 
-        hideAllScreens(); document.getElementById('result-screen').style.display = 'block';
+        hideAllScreens(); 
+        document.getElementById('result-screen').style.display = 'block';
+        document.getElementById('result-stage-1').style.display = 'block';
+        document.getElementById('result-stage-2').style.display = 'none';
+
         const totalQ = filteredQuizData.length; const currentAccuracy = Math.round((score / totalQ) * 100);
         document.getElementById('current-score').innerText = score; document.getElementById('total-questions').innerText = totalQ; 
         document.getElementById('current-accuracy').innerText = `${currentAccuracy}%`;
@@ -1467,12 +1651,15 @@
 
         const banner = document.getElementById('battle-result-banner');
         const rivalLine = document.getElementById('battle-rival-score-line');
-        const screenTitle = document.getElementById('result-screen-title');
         
         let totalRateChange = 0;
         let comboBonus = 0;
         let fieldBonus = 0;
         let uniqueSectionsCount = 0;
+        let isPlayerWin = false;
+        let timeDiffAbs = 999999;
+
+        const perfStats = JSON.parse(localStorage.getItem(`quiz_perf_stats_` + studentKey) || '{}');
 
         if (currentMode === "battle" && activeGhostData) {
             rivalLine.style.display = 'block';
@@ -1490,20 +1677,49 @@
             const playerPoints = calculateBattlePoints(currentPlayerRoundLogs);
             const ghostPoints = calculateBattlePoints(activeGhostData.ghostLog.slice(0, ghostCurrentQuestion));
 
-            let isPlayerWin = playerPoints > ghostPoints;
+            isPlayerWin = playerPoints > ghostPoints;
+            const ghostTotalTime = activeGhostData.ghostLog.slice(0, ghostCurrentQuestion).reduce((sum, item) => sum + item.timeMs, 0);
             if (playerPoints === ghostPoints) {
-                const ghostTotalTime = activeGhostData.ghostLog.slice(0, ghostCurrentQuestion).reduce((sum, item) => sum + item.timeMs, 0);
                 isPlayerWin = roundTotalTimeMs < ghostTotalTime;
+                timeDiffAbs = Math.abs(roundTotalTimeMs - ghostTotalTime);
+            } else {
+                timeDiffAbs = Math.abs(playerPoints - ghostPoints) * 10; 
             }
 
             if (isPlayerWin) {
                 banner.innerHTML = `👑 キミの勝ち！ 👑<br><span style="font-size:1.1rem; font-weight:normal; color:#94a3b8;">キミ: ${playerPoints} Pt vs 相手: ${ghostPoints} Pt</span>`; 
+                banner.className = "score-highlight";
                 banner.style.color = "#10b981";
                 totalRateChange = 20; 
+                
+                // ⚔️ バトル勝利関連称号チェック
+                let wins = parseInt(localStorage.getItem(`quiz_total_wins_${studentKey}`) || '0') + 1;
+                localStorage.setItem(`quiz_total_wins_${studentKey}`, wins);
+                if (wins >= 1) unlockTitle("win_1");
+                if (wins >= 10) unlockTitle("win_10");
+                if (wins >= 50) unlockTitle("win_50");
+                if (wins >= 100) unlockTitle("win_100");
+
+                let streak = parseInt(localStorage.getItem(`quiz_current_win_streak_${studentKey}`) || '0') + 1;
+                localStorage.setItem(`quiz_current_win_streak_${studentKey}`, streak);
+                if (streak >= 3) unlockTitle("streak_3");
+                if (streak >= 5) unlockTitle("streak_5");
+                if (streak >= 10) unlockTitle("streak_10");
+                if (streak >= 20) unlockTitle("streak_20");
+                if (streak >= 30) unlockTitle("streak_30");
+
+                // 😈 100ms以内の死闘勝利
+                if (timeDiffAbs <= 100) unlockTitle("battle_clutch_win");
+
             } else {
                 banner.innerHTML = `☠️ キミの負け... ☠️<br><span style="font-size:1.1rem; font-weight:normal; color:#94a3b8;">キミ: ${playerPoints} Pt vs 相手: ${ghostPoints} Pt</span>`; 
+                banner.className = "score-highlight";
                 banner.style.color = "#ef4444";
                 totalRateChange = -20; 
+                
+                localStorage.setItem(`quiz_current_win_streak_${studentKey}`, '0'); 
+                // 😈 100ms以内の僅差敗北
+                if (timeDiffAbs <= 100) unlockTitle("battle_clutch_lose");
             }
 
             let count = parseInt(localStorage.getItem(`quiz_battle_count_` + studentKey) || '3');
@@ -1542,15 +1758,214 @@
         localStorage.setItem(`quiz_total_answered_` + studentKey, totalAnswered); localStorage.setItem(`quiz_total_correct_` + studentKey, totalCorrect);
         document.getElementById('review-trigger-btn').style.display = wrongQuestionsList.length > 0 ? 'block' : 'none';
 
-        const perfStats = JSON.parse(localStorage.getItem(`quiz_perf_stats_` + studentKey) || '{}');
         let totalCount = currentSectionAllQuestions.length; 
         let clearedCount = currentSectionAllQuestions.filter(q => perfStats[q.question] && perfStats[q.question].status?.includes('correct')).length;
 
-        if (typeof sendDataToTeacher === "function") { sendDataToTeacher(clearedCount, totalCount); }
+        // ========================================================
+        // 🏆 リアルタイム称号獲得ロジック稼働部
+        // ========================================================
         
+        // ① コンボ称号チェック
+        if (maxCombo >= 5) unlockTitle("combo_5");
+        if (maxCombo >= 10) unlockTitle("combo_10");
+        if (maxCombo >= 20) unlockTitle("combo_20");
+        if (maxCombo >= 30) unlockTitle("combo_30");
+        if (maxCombo >= 50) unlockTitle("combo_50");
+
+        // ② タイム・時間帯系称号チェック
+        const nowHour = new Date().getHours();
+        if (nowHour >= 5 && nowHour <= 6) unlockTitle("time_morning"); 
+        if (nowHour >= 2 && nowHour <= 3) unlockTitle("time_midnight"); 
+
+        // 10問全て3秒未満チェック
+        let isAllFast = currentPlayerRoundLogs.length === 10 && currentPlayerRoundLogs.every(log => log.isCorrect && log.timeMs < 3000);
+        if (isAllFast) unlockTitle("fast_10");
+
+        // ③ レート連動型チェック（1〜3科目統合）
+        const rSci = parseInt(localStorage.getItem(`quiz_rate_science_${studentKey}`) || '1500');
+        const rSoc = parseInt(localStorage.getItem(`quiz_rate_social_${studentKey}`) || '1500');
+        const rEng = parseInt(localStorage.getItem(`quiz_rate_english_${studentKey}`) || '1500');
+        const rateArray = [rSci, rSoc, rEng].sort((a,b)=>b-a); 
+
+        if (rateArray[0] >= 1600) unlockTitle("rate_1_1600");
+        if (rateArray[0] >= 1800) unlockTitle("rate_1_1800");
+        if (rateArray[0] >= 2000) unlockTitle("rate_1_2000");
+        if (rateArray[0] >= 2500) unlockTitle("rate_1_2500");
+        if (rateArray[0] >= 3000) unlockTitle("rate_1_3000");
+
+        if (rateArray[1] >= 1600) unlockTitle("rate_2_1600");
+        if (rateArray[1] >= 1800) unlockTitle("rate_2_1800");
+        if (rateArray[1] >= 2000) unlockTitle("rate_2_2000");
+        if (rateArray[1] >= 2500) unlockTitle("rate_2_2500");
+        if (rateArray[1] >= 3000) unlockTitle("rate_2_3000");
+
+        if (rateArray[2] >= 3000) unlockTitle("rate_3_3000");
+
+        // 🛠️ ④ 【処理高速化リファクタリング】分野完全達成率（100％個数）チェック
+        let perfectFieldsCount = 0;
+        const allTargetKeys = ["science_1", "science_2", "science_3", "social_geography", "social_history", "social_civics", "english_word_1", "english_grammar_1"];
+        
+        let sectionMap = {};
+        allTargetKeys.forEach(k => {
+            (allQuizData[k] || []).forEach(q => {
+                if (q.section) {
+                    if (!sectionMap[q.section]) sectionMap[q.section] = [];
+                    sectionMap[q.section].push(q);
+                }
+            });
+        });
+
+        for (let secName in sectionMap) {
+            let secQuestions = sectionMap[secName];
+            let isAllCleared = true;
+            for (let i = 0; i < secQuestions.length; i++) {
+                let q = secQuestions[i];
+                if (!perfStats[q.question] || !perfStats[q.question].status?.includes('correct')) {
+                    isAllCleared = false;
+                    break; // 早期ブレイクでプチフリーズを完全防止
+                }
+            }
+            if (isAllCleared) perfectFieldsCount++;
+        }
+
+        if (perfectFieldsCount >= 3) unlockTitle("field_3");
+        if (perfectFieldsCount >= 5) unlockTitle("field_5");
+        if (perfectFieldsCount >= 10) unlockTitle("field_10");
+        if (perfectFieldsCount >= 15) unlockTitle("field_15");
+        if (perfectFieldsCount === Object.keys(sectionMap).length && Object.keys(sectionMap).length > 0) unlockTitle("field_all");
+
+        // プルダウンバッジを即時リフレッシュ
+        updateAllStudentBadges();
+
+        // キュー蓄積した称号ポップアップがあれば発射
+        showNextTitleFromQueue();
+
+        if (typeof sendDataToTeacher === "function") { sendDataToTeacher(clearedCount, totalCount); }
         sendRateToSpreadsheet(selectedSubject, myRate); 
         sendFieldSummaryToSpreadsheet(); 
         sendDataToGoogleForm();
+    }
+
+    function unlockTitle(titleId) {
+        if (!studentKey) return;
+        let unlocked = JSON.parse(localStorage.getItem(`quiz_unlocked_titles_${studentKey}`) || "[]");
+        if (!unlocked.includes(titleId)) {
+            unlocked.push(titleId);
+            localStorage.setItem(`quiz_unlocked_titles_${studentKey}`, JSON.stringify(unlocked));
+            
+            const master = TITLES_MASTER[titleId];
+            if (master) {
+                let titleClass = "";
+                if (master.glow === "silver") titleClass = "title-silver";
+                if (master.glow === "gold") titleClass = "title-gold";
+                if (master.glow === "rainbow") titleClass = "title-rainbow";
+                
+                let displayTitle = titleClass ? `<span class="${titleClass}">${master.name}</span>` : master.name;
+                titleQueue.push({
+                    title: displayTitle,
+                    desc: master.desc
+                });
+            }
+        }
+    }
+
+    function showNextTitleFromQueue() {
+        if (titleQueue.length > 0) {
+            const nextTitle = titleQueue.shift();
+            openTitlePopup(nextTitle.title, nextTitle.desc);
+        } else {
+            document.getElementById('title-popup').style.display = 'none';
+            // 🛠️ 【新機能】演出キューが完全に空になり、かつ保留中のリロードフラグがONならリロード実行
+            if (isPendingReload) {
+                location.reload();
+            }
+        }
+    }
+
+    function openTitlePopup(titleHtml, descText) {
+        document.getElementById('popup-title-name').innerHTML = titleHtml;
+        document.getElementById('popup-title-desc').innerText = descText;
+        document.getElementById('title-popup').style.display = 'flex';
+    }
+
+    function closeTitlePopup() {
+        showNextTitleFromQueue();
+    }
+
+    // 👑 バッジ内称号選択システム
+    function updateAllStudentBadges() {
+        if (!studentKey) return;
+        let unlocked = JSON.parse(localStorage.getItem(`quiz_unlocked_titles_${studentKey}`) || "[]");
+        
+        let optionsHtml = `<option value="campus" data-glow="">[${studentCampus}]</option>`;
+        unlocked.forEach(id => {
+            const master = TITLES_MASTER[id];
+            if (master) {
+                optionsHtml += `<option value="${id}" data-glow="${master.glow}">${master.name}</option>`;
+            }
+        });
+
+        const badgeInner = `
+            <select class="title-select" onchange="syncTitleSelection(this)">
+                ${optionsHtml}
+            </select>
+            <div style="font-size: 0.8rem; margin-top: 4px; display: flex; align-items: center; width: 100%; justify-content: space-between;">
+                <span>👤 ${studentName} さん</span>
+                <span class="switch-student" onclick="logoutStudent()">切り替え</span>
+            </div>
+        `;
+
+        for (let i = 0; i <= 5; i++) {
+            const container = document.getElementById(`student-badge-container-${i}`);
+            if (container) {
+                container.innerHTML = badgeInner;
+                const selectEl = container.querySelector('.title-select');
+                if (selectEl) {
+                    selectEl.value = currentSelectedTitleValue;
+                    applyGlowEffect(selectEl);
+                }
+            }
+        }
+    }
+
+    function syncTitleSelection(triggerSelect) {
+        currentSelectedTitleValue = triggerSelect.value;
+        const allSelects = document.querySelectorAll('.title-select');
+        allSelects.forEach(sel => {
+            sel.value = currentSelectedTitleValue;
+            applyGlowEffect(sel);
+        });
+    }
+
+    function applyGlowEffect(selectEl) {
+        const selectedOption = selectEl.options[selectEl.selectedIndex];
+        const glowType = selectedOption.getAttribute('data-glow');
+        selectEl.classList.remove('select-glow-silver', 'select-glow-gold', 'select-glow-rainbow');
+        if (glowType === 'silver') selectEl.classList.add('select-glow-silver');
+        if (glowType === 'gold') selectEl.classList.add('select-glow-gold');
+        if (glowType === 'rainbow') selectEl.classList.add('select-glow-rainbow');
+    }
+
+    function goToResultStage2() {
+        document.getElementById('result-stage-1').style.display = 'none';
+        document.getElementById('result-stage-2').style.display = 'block';
+        
+        const sSign = dailyRateChangeScience >= 0 ? `+${dailyRateChangeScience}` : dailyRateChangeScience;
+        const oSign = dailyRateChangeSocial >= 0 ? `+${dailyRateChangeSocial}` : dailyRateChangeSocial;
+        const eSign = dailyRateChangeEnglish >= 0 ? `+${dailyRateChangeEnglish}` : dailyRateChangeEnglish;
+        
+        document.getElementById('result-stage2-rate-sci').innerText = sSign;
+        document.getElementById('result-stage2-rate-soc').innerText = oSign;
+        document.getElementById('result-stage2-rate-eng').innerText = eSign;
+        
+        document.getElementById('result-stage2-rate-sci').style.color = dailyRateChangeScience > 0 ? '#10b981' : (dailyRateChangeScience < 0 ? '#ef4444' : '#cbd5e1');
+        document.getElementById('result-stage2-rate-soc').style.color = dailyRateChangeSocial > 0 ? '#10b981' : (dailyRateChangeSocial < 0 ? '#ef4444' : '#cbd5e1');
+        document.getElementById('result-stage2-rate-eng').style.color = dailyRateChangeEnglish > 0 ? '#10b981' : (dailyRateChangeEnglish < 0 ? '#ef4444' : '#cbd5e1');
+        updateAllStudentBadges();
+    }
+
+    function retrySameSection() {
+        if(selectedSectionName) { startQuizWithSection(selectedSectionName); }
     }
 
     function showDailySummary() {
@@ -1565,9 +1980,7 @@
         else {
             summaryKeys.forEach(key => {
                 const data = dailySummaryData[key]; 
-                
                 const targetSubPrefix = key.split('_')[0];
-                
                 let totalInSection = 0;
                 for (const sKey in allQuizData) {
                     if (allQuizData[sKey] && sKey.startsWith(targetSubPrefix)) {
@@ -1600,8 +2013,35 @@
         if (subView === 'my') { mySec.style.display = 'block'; rankSec.style.display = 'none'; myBtn.style.backgroundColor = '#1d4ed8'; rankBtn.style.backgroundColor = '#334155'; } else { mySec.style.display = 'none'; rankSec.style.display = 'block'; myBtn.style.backgroundColor = '#334155'; rankBtn.style.backgroundColor = '#1d4ed8'; }
     }
     function tryFinishLearning() { hideAllScreens(); document.getElementById('confirm-screen').style.display = 'block'; }
-    function cancelFinishLearning() { hideAllScreens(); if (selectedSubject === "english") { showEnglishSubScreen(); } else { renderSectionScreen(); document.getElementById('section-screen').style.display = 'block'; } }
-    function confirmFinishLearning() { localStorage.removeItem(`quiz_daily_summary_` + studentKey); location.reload(); }
+    
+    function cancelFinishLearning() { 
+        hideAllScreens(); 
+        document.getElementById('result-screen').style.display = 'block'; 
+        document.getElementById('result-stage-1').style.display = 'none';
+        document.getElementById('result-stage-2').style.display = 'block';
+        updateAllStudentBadges();
+    }
+    
+    // 🛠️ 【同期バグ修正版】称号ポップアップのクローズを待って安全に再起動
+    function confirmFinishLearning() { 
+        if(studentKey) {
+            let dCount = parseInt(localStorage.getItem(`quiz_daily_clear_count_${studentKey}`) || '0') + 1;
+            localStorage.setItem(`quiz_daily_clear_count_${studentKey}`, dCount);
+            if(dCount >= 1) unlockTitle("daily_1");
+            if(dCount >= 7) unlockTitle("daily_7");
+            if(dCount >= 30) unlockTitle("daily_30");
+        }
+        localStorage.removeItem(`quiz_daily_summary_` + studentKey); 
+        
+        // もしデイリー称号がアンロックされて演出待ちキューに溜まっていたらリロードを保留する
+        if (titleQueue.length > 0) {
+            isPendingReload = true;
+            hideAllScreens();
+            showNextTitleFromQueue(); // 称号ポップアップを走らせる
+        } else {
+            location.reload(); 
+        }
+    }
 
     function showReviewScreen() {
         const listContainer = document.getElementById('review-list'); listContainer.innerHTML = ""; 
@@ -1672,17 +2112,12 @@
     function selectRateSubject(subject) { document.getElementById('rate-subject-selector-view').style.display = 'none'; document.getElementById('rate-detail-view').style.display = 'block'; switchRateTab(subject); toggleRateView('my'); }
     function backToRateSubjectSelector() { document.getElementById('rate-subject-selector-view').style.display = 'block'; document.getElementById('rate-detail-view').style.display = 'none'; }
 
-    // 折れ線グラフ描画処理
     function renderRateChart(subject) {
         const ctx = document.getElementById('rate-history-chart').getContext('2d');
-        if (rateChartInstance) {
-            rateChartInstance.destroy(); 
-        }
+        if (rateChartInstance) { rateChartInstance.destroy(); }
         let historyKey = `quiz_rate_history_${subject}_${studentKey}`;
         let history = JSON.parse(localStorage.getItem(historyKey) || "[]");
-        if (history.length === 0) {
-            history = [{ label: "初期", rate: 1500 }];
-        }
+        if (history.length === 0) { history = [{ label: "初期", rate: 1500 }]; }
         
         let displayData = history.slice(-20);
         const labels = displayData.map(d => d.label);
@@ -1693,18 +2128,11 @@
             data: {
                 labels: labels,
                 datasets: [{
-                    data: data,
-                    borderColor: '#3b82f6',
-                    backgroundColor: 'rgba(59, 130, 246, 0.1)',
-                    borderWidth: 2,
-                    pointRadius: 3,
-                    tension: 0.15,
-                    fill: true
+                    data: data, borderColor: '#3b82f6', backgroundColor: 'rgba(59, 130, 246, 0.1)', borderWidth: 2, pointRadius: 3, tension: 0.15, fill: true
                 }]
             },
             options: {
-                responsive: true,
-                maintainAspectRatio: false,
+                responsive: true, maintainAspectRatio: false,
                 plugins: { legend: { display: false } },
                 scales: {
                     x: { grid: { display: false }, ticks: { font: { size: 9 }, color: '#64748b' } },
@@ -1731,65 +2159,34 @@
         document.getElementById('my-rate-rank-text').innerText = `全体順位: ${myRankNum} 位`;
         
         renderRateChart(subject);
-        
         const container = document.getElementById('ranking-list-container'); container.innerHTML = "";
         
         let myIdx = rankingList.findIndex(s => Number(s.id) === Number(studentId) && s.name === studentName);
         let targetIndices = new Set();
-        
-        for (let i = 0; i < Math.min(3, rankingList.length); i++) {
-            targetIndices.add(i);
-        }
-        if (myIdx !== -1) {
-            for (let i = Math.max(0, myIdx - 3); i <= Math.min(rankingList.length - 1, myIdx + 3); i++) {
-                targetIndices.add(i);
-            }
-        }
+        for (let i = 0; i < Math.min(3, rankingList.length); i++) { targetIndices.add(i); }
+        if (myIdx !== -1) { for (let i = Math.max(0, myIdx - 3); i <= Math.min(rankingList.length - 1, myIdx + 3); i++) { targetIndices.add(i); } }
         
         let sortedIndices = Array.from(targetIndices).sort((a, b) => a - b);
         let lastIdx = -1;
         
         sortedIndices.forEach(idx => {
             if (lastIdx !== -1 && idx > lastIdx + 1) {
-                const divider = document.createElement('div');
-                divider.style.borderTop = "1px dashed #334155";
-                divider.style.margin = "6px 0";
-                divider.style.textAlign = "center";
-                divider.style.color = "#475569";
-                divider.style.fontSize = "0.8rem";
-                divider.innerText = "···";
-                container.appendChild(divider);
+                const divider = document.createElement('div'); divider.style.borderTop = "1px dashed #334155"; divider.style.margin = "6px 0"; divider.style.textAlign = "center"; divider.style.color = "#475569"; divider.style.fontSize = "0.8rem"; divider.innerText = "···"; container.appendChild(divider);
             }
-            
-            const s = rankingList[idx];
-            const item = document.createElement('div');
-            item.className = "score-line";
-            item.style.padding = "6px 8px";
-            item.style.margin = "4px 0";
-            item.style.borderRadius = "4px";
-            item.style.fontSize = "0.9rem";
-            
-            const isMe = (Number(s.id) === Number(studentId) && s.name === studentName);
-            const displayName = isMe ? `${s.name} (あなた)` : `プレイヤー`;
+            const s = rankingList[idx]; const item = document.createElement('div'); item.className = "score-line"; item.style.padding = "6px 8px"; item.style.margin = "4px 0"; item.style.borderRadius = "4px"; item.style.fontSize = "0.9rem";
+            const isMe = (Number(s.id) === Number(studentId) && s.name === studentName); const displayName = isMe ? `${s.name} (あなた)` : `プレイヤー`;
             
             let rankPrefix = `${s.computedRank}位`;
-            if (s.computedRank === 1) rankPrefix = `🥇 1位`;
-            else if (s.computedRank === 2) rankPrefix = `🥈 2位`;
-            else if (s.computedRank === 3) rankPrefix = `🥉 3位`;
+            if (s.computedRank === 1) rankPrefix = `🥇 1位`; else if (s.computedRank === 2) rankPrefix = `🥈 2位`; else if (s.computedRank === 3) rankPrefix = `🥉 3位`;
             
             if (isMe) {
-                item.style.background = "rgba(217, 119, 6, 0.15)";
-                item.style.border = "1px solid rgba(217, 119, 6, 0.3)";
-                item.style.fontWeight = "bold";
-                item.style.color = "#fbbf24";
+                item.style.background = "rgba(217, 119, 6, 0.15)"; item.style.border = "1px solid rgba(217, 119, 6, 0.3)"; item.style.fontWeight = "bold"; item.style.color = "#fbbf24";
                 item.innerHTML = `<div style="text-align:left;">👑 ${rankPrefix} : [${s.campus || '---'}] ${displayName} (${s.activeRate})</div>`;
             } else {
-                item.style.borderBottom = "1px solid #1e293b";
-                item.style.color = "#cbd5e1";
+                item.style.borderBottom = "1px solid #1e293b"; item.style.color = "#cbd5e1";
                 item.innerHTML = `<div style="text-align:left;">${rankPrefix} : [${s.campus || '---'}] ${displayName} (${s.activeRate})</div>`;
             }
-            container.appendChild(item);
-            lastIdx = idx;
+            container.appendChild(item); lastIdx = idx;
         });
     }
 
@@ -1821,73 +2218,38 @@
         params.append(REPORT_FORM_ENTRY_IDS.content, content);
         
         const submitBtn = document.querySelector("#report-issue-screen .nav-btn"); submitBtn.disabled = true; submitBtn.innerText = "送信中...";
-        fetch(REPORT_FORM_ACTION_URL, { 
-            method: 'POST', 
-            body: params, 
-            mode: 'no-cors' 
-        }).then(() => { 
+        fetch(REPORT_FORM_ACTION_URL, { method: 'POST', body: params, mode: 'no-cors' }).then(() => { 
             alert("誤答・誤植の報告を送信しました。ご協力ありがとうございました！"); 
-            submitBtn.disabled = false; submitBtn.innerText = "報告を送信する"; 
-            backToMainMenu(); 
+            submitBtn.disabled = false; submitBtn.innerText = "報告を送信する"; backToMainMenu(); 
         }).catch((e) => { 
-            console.error("送信エラー:", e); 
-            alert("送信に失敗しました。"); 
-            submitBtn.disabled = false; submitBtn.innerText = "報告を送信する"; 
+            console.error("送信エラー:", e); alert("送信に失敗しました。"); submitBtn.disabled = false; submitBtn.innerText = "報告を送信する"; 
         });
     }
 
-    function backToMainMenu() {
-        hideAllScreens();
-        document.getElementById('main-menu-screen').style.display = 'block';
-    }
-
-    function startReviewQuiz() {
-        hideAllScreens();
-        document.getElementById('quiz-screen').style.display = 'block';
-        showQuestion();
-    }
+    function backToMainMenu() { hideAllScreens(); document.getElementById('main-menu-screen').style.display = 'block'; updateAllStudentBadges(); }
+    function startReviewQuiz() { hideAllScreens(); document.getElementById('quiz-screen').style.display = 'block'; showQuestion(); }
 
     function saveRateHistory(subject, rate) {
         if (!studentKey) return;
         let historyKey = `quiz_rate_history_${subject}_${studentKey}`;
         let history = JSON.parse(localStorage.getItem(historyKey) || "[]");
-        const now = new Date();
-        const label = `${now.getMonth() + 1}/${now.getDate()}`;
-        history.push({ label: label, rate: rate });
-        localStorage.setItem(historyKey, JSON.stringify(history));
+        const now = new Date(); const label = `${now.getMonth() + 1}/${now.getDate()}`;
+        history.push({ label: label, rate: rate }); localStorage.setItem(historyKey, JSON.stringify(history));
     }
 
-    function sendRateToSpreadsheet(subject, rate) {
-        console.log(`[GAS Update] ${subject} rate synchronized: ${rate}`);
-    }
-
-    function sendFieldSummaryToSpreadsheet() {
-        console.log("[GAS Update] Field learning summary synchronized.");
-    }
+    function sendRateToSpreadsheet(subject, rate) { console.log(`[GAS Update] ${subject} rate synchronized: ${rate}`); }
+    function sendFieldSummaryToSpreadsheet() { console.log("[GAS Update] Field learning summary synchronized."); }
 
     function sendDataToGoogleForm() {
         if (!studentId || !studentName) return;
-        
         const params = new URLSearchParams();
-        params.append(FORM_ENTRY_IDS.studentId, studentId);
-        params.append(FORM_ENTRY_IDS.studentName, studentName);
-        params.append(FORM_ENTRY_IDS.studentGrade, studentGrade || "生徒");
-        
+        params.append(FORM_ENTRY_IDS.studentId, studentId); params.append(FORM_ENTRY_IDS.studentName, studentName); params.append(FORM_ENTRY_IDS.studentGrade, studentGrade || "生徒");
         let subjectText = selectedSubject === "social" ? "社会" : (selectedSubject === "english" ? "英語" : "理科");
-        params.append(FORM_ENTRY_IDS.subject, subjectText);
-        params.append(FORM_ENTRY_IDS.section, selectedSectionName);
-        params.append(FORM_ENTRY_IDS.score, score);
-        params.append(FORM_ENTRY_IDS.total, filteredQuizData.length);
+        params.append(FORM_ENTRY_IDS.subject, subjectText); params.append(FORM_ENTRY_IDS.section, selectedSectionName); params.append(FORM_ENTRY_IDS.score, score); params.append(FORM_ENTRY_IDS.total, filteredQuizData.length);
         
-        fetch(GOOGLE_FORM_ACTION_URL, {
-            method: 'POST',
-            body: params,
-            mode: 'no-cors'
-        }).then(() => {
+        fetch(GOOGLE_FORM_ACTION_URL, { method: 'POST', body: params, mode: 'no-cors' }).then(() => {
             console.log("[Google Form] Performance data submitted successfully.");
-        }).catch((e) => {
-            console.error("[Google Form] Submission error:", e);
-        });
+        }).catch((e) => { console.error("[Google Form] Submission error:", e); });
     }
 
     checkAutoLogin();
