@@ -428,7 +428,7 @@
         .flex-center > div { width: 100%; }
 
         /* ========================================================
-           ✨ 演出スタイル：特殊カラーエフェクト（完全同期）
+            ✨ 演出スタイル：特殊カラーエフェクト（完全同期）
         ======================================================== */
         .title-silver {
             background: linear-gradient(90deg, #94a3b8 0%, #ffffff 50%, #64748b 100%);
@@ -1585,7 +1585,6 @@
                 const overlay = document.getElementById('correct-overlay'); overlay.style.display = 'flex'; setTimeout(() => { overlay.style.display = 'none'; }, 500);
             } else {
                 resultDiv.innerText = "❌ 不正解...（次こそ合わせよう！）"; resultDiv.style.color = "#ef4444"; buttons[selectedIndex].classList.add('wrong-choice');
-                // 😈 【悪ノリ隠し称号判定】：見直しでさらにミス
                 unlockTitle("review_fail");
             }
 
@@ -1692,7 +1691,6 @@
                 banner.style.color = "#10b981";
                 totalRateChange = 20; 
                 
-                // ⚔️ バトル勝利関連称号チェック
                 let wins = parseInt(localStorage.getItem(`quiz_total_wins_${studentKey}`) || '0') + 1;
                 localStorage.setItem(`quiz_total_wins_${studentKey}`, wins);
                 if (wins >= 1) unlockTitle("win_1");
@@ -1708,7 +1706,6 @@
                 if (streak >= 20) unlockTitle("streak_20");
                 if (streak >= 30) unlockTitle("streak_30");
 
-                // 😈 100ms以内の死闘勝利
                 if (timeDiffAbs <= 100) unlockTitle("battle_clutch_win");
 
             } else {
@@ -1718,7 +1715,6 @@
                 totalRateChange = -20; 
                 
                 localStorage.setItem(`quiz_current_win_streak_${studentKey}`, '0'); 
-                // 😈 100ms以内の僅差敗北
                 if (timeDiffAbs <= 100) unlockTitle("battle_clutch_lose");
             }
 
@@ -1765,23 +1761,19 @@
         // 🏆 リアルタイム称号獲得ロジック稼働部
         // ========================================================
         
-        // ① コンボ称号チェック
         if (maxCombo >= 5) unlockTitle("combo_5");
         if (maxCombo >= 10) unlockTitle("combo_10");
         if (maxCombo >= 20) unlockTitle("combo_20");
         if (maxCombo >= 30) unlockTitle("combo_30");
         if (maxCombo >= 50) unlockTitle("combo_50");
 
-        // ② タイム・時間帯系称号チェック
         const nowHour = new Date().getHours();
         if (nowHour >= 5 && nowHour <= 6) unlockTitle("time_morning"); 
         if (nowHour >= 2 && nowHour <= 3) unlockTitle("time_midnight"); 
 
-        // 10問全て3秒未満チェック
         let isAllFast = currentPlayerRoundLogs.length === 10 && currentPlayerRoundLogs.every(log => log.isCorrect && log.timeMs < 3000);
         if (isAllFast) unlockTitle("fast_10");
 
-        // ③ レート連動型チェック（1〜3科目統合）
         const rSci = parseInt(localStorage.getItem(`quiz_rate_science_${studentKey}`) || '1500');
         const rSoc = parseInt(localStorage.getItem(`quiz_rate_social_${studentKey}`) || '1500');
         const rEng = parseInt(localStorage.getItem(`quiz_rate_english_${studentKey}`) || '1500');
@@ -1801,7 +1793,6 @@
 
         if (rateArray[2] >= 3000) unlockTitle("rate_3_3000");
 
-        // 🛠️ ④ 【処理高速化リファクタリング】分野完全達成率（100％個数）チェック
         let perfectFieldsCount = 0;
         const allTargetKeys = ["science_1", "science_2", "science_3", "social_geography", "social_history", "social_civics", "english_word_1", "english_grammar_1"];
         
@@ -1822,7 +1813,7 @@
                 let q = secQuestions[i];
                 if (!perfStats[q.question] || !perfStats[q.question].status?.includes('correct')) {
                     isAllCleared = false;
-                    break; // 早期ブレイクでプチフリーズを完全防止
+                    break; 
                 }
             }
             if (isAllCleared) perfectFieldsCount++;
@@ -1834,10 +1825,7 @@
         if (perfectFieldsCount >= 15) unlockTitle("field_15");
         if (perfectFieldsCount === Object.keys(sectionMap).length && Object.keys(sectionMap).length > 0) unlockTitle("field_all");
 
-        // プルダウンバッジを即時リフレッシュ
         updateAllStudentBadges();
-
-        // キュー蓄積した称号ポップアップがあれば発射
         showNextTitleFromQueue();
 
         if (typeof sendDataToTeacher === "function") { sendDataToTeacher(clearedCount, totalCount); }
@@ -1875,7 +1863,6 @@
             openTitlePopup(nextTitle.title, nextTitle.desc);
         } else {
             document.getElementById('title-popup').style.display = 'none';
-            // 🛠️ 【新機能】演出キューが完全に空になり、かつ保留中のリロードフラグがONならリロード実行
             if (isPendingReload) {
                 location.reload();
             }
@@ -1892,7 +1879,6 @@
         showNextTitleFromQueue();
     }
 
-    // 👑 バッジ内称号選択システム
     function updateAllStudentBadges() {
         if (!studentKey) return;
         let unlocked = JSON.parse(localStorage.getItem(`quiz_unlocked_titles_${studentKey}`) || "[]");
@@ -2022,7 +2008,6 @@
         updateAllStudentBadges();
     }
     
-    // 🛠️ 【同期バグ修正版】称号ポップアップのクローズを待って安全に再起動
     function confirmFinishLearning() { 
         if(studentKey) {
             let dCount = parseInt(localStorage.getItem(`quiz_daily_clear_count_${studentKey}`) || '0') + 1;
@@ -2033,11 +2018,10 @@
         }
         localStorage.removeItem(`quiz_daily_summary_` + studentKey); 
         
-        // もしデイリー称号がアンロックされて演出待ちキューに溜まっていたらリロードを保留する
         if (titleQueue.length > 0) {
             isPendingReload = true;
             hideAllScreens();
-            showNextTitleFromQueue(); // 称号ポップアップを走らせる
+            showNextTitleFromQueue(); 
         } else {
             location.reload(); 
         }
@@ -2105,6 +2089,8 @@
             container.appendChild(card);
         });
     }
+
+    document.addEventListener('click', function(e) { const menu = document.getElementById('section-menu-dropdown'); const trigger = document.getElementById('menu-trigger'); if (menu && menu.style.display === 'block') { if (e.target !== menu && e.target !== trigger && !menu.contains(e.target)) { menu.style.display = 'none'; } } });
 
     function showRateScreen() { hideAllScreens(); document.getElementById('rate-screen').style.display = 'block'; document.getElementById('rate-subject-selector-view').style.display = 'block'; document.getElementById('rate-detail-view').style.display = 'none'; }
     function showRateHelp() { hideAllScreens(); document.getElementById('rate-help-screen').style.display = 'block'; }
@@ -2192,7 +2178,6 @@
 
     function toggleSectionMenu(event) { if (event) event.stopPropagation(); const menu = document.getElementById('section-menu-dropdown'); menu.style.display = (menu.style.display === 'none' || menu.style.display === '') ? 'block' : 'none'; }
     function handleMenuAction(action) { document.getElementById('section-menu-dropdown').style.display = 'none'; if (action === 'main') backToMainMenu(); else if (action === 'subject') setMode('test'); else if (action === 'rate') showRateScreen(); else if (action === 'report') showReportScreen(); else if (action === 'summary') showDailySummary(); }
-    document.addEventListener('click', function(e) { const menu = document.getElementById('section-menu-dropdown'); const trigger = document.getElementById('menu-trigger'); if (menu && menu.style.display === 'block') { if (e.target !== menu && e.target !== trigger && !menu.contains(e.target)) { menu.style.display = 'none'; } } });
 
     function showReportIssueScreen() { hideAllScreens(); document.getElementById('report-issue-screen').style.display = 'block'; document.getElementById('report-content').value = ""; document.getElementById('report-subject').value = "science"; updateReportSections(); }
     
@@ -2202,7 +2187,7 @@
             const opt = document.createElement('option'); opt.value = "気になること"; opt.innerText = "気になること"; sectionSelect.appendChild(opt);
         } else {
             for (const key in allQuizData) { if (key.startsWith(subject)) { allQuizData[key].forEach(q => { if (q.section) sectionsSet.add(q.section); }); } }
-            if (sectionsSet.size === 0) { const opt = document.createElement('option'); opt.value = "共通・その他"; opt.innerText = "共通・その他"; sectionSelect.appendChild(opt); }
+            if (sectionsSet.size === 0) { const opt = document.createElement('option'); opt.value = "共通・その他"; opt.innerText = "共通・other"; sectionSelect.appendChild(opt); }
             else { sectionsSet.forEach(sec => { const opt = document.createElement('option'); opt.value = sec; opt.innerText = sec; sectionSelect.appendChild(opt); }); }
         }
     }
@@ -2237,8 +2222,41 @@
         history.push({ label: label, rate: rate }); localStorage.setItem(historyKey, JSON.stringify(history));
     }
 
-    function sendRateToSpreadsheet(subject, rate) { console.log(`[GAS Update] ${subject} rate synchronized: ${rate}`); }
-    function sendFieldSummaryToSpreadsheet() { console.log("[GAS Update] Field learning summary synchronized."); }
+    // ========================================================
+    // 🌐 【通信機能修正箇所】GAS Web Appとのリアルタイム同期
+    // ========================================================
+    function sendRateToSpreadsheet(subject, rate) { 
+        console.log(`[GAS Update] ${subject} rate synchronized: ${rate}`); 
+        if (!studentId) return;
+
+        const url = `${GAS_WEB_APP_URL}?action=update_rate&studentId=${studentId}&subject=${subject}&rate=${rate}`;
+
+        fetch(url)
+        .then(res => res.json())
+        .then(data => {
+            console.log("[GAS Update] レート同期成功:", data);
+        })
+        .catch(err => {
+            console.error("[GAS Update] レート同期エラー:", err);
+        });
+    }
+
+    function sendFieldSummaryToSpreadsheet() { 
+        console.log("[GAS Update] Field learning summary synchronized.");
+        if (!studentId) return;
+
+        const summaryDataStr = encodeURIComponent(JSON.stringify(dailySummaryData));
+        const url = `${GAS_WEB_APP_URL}?action=update_summary&studentId=${studentId}&summary=${summaryDataStr}`;
+
+        fetch(url)
+        .then(res => res.json())
+        .then(data => {
+            console.log("[GAS Update] サマリー同期成功:", data);
+        })
+        .catch(err => {
+            console.error("[GAS Update] サマリー同期エラー:", err);
+        });
+    }
 
     function sendDataToGoogleForm() {
         if (!studentId || !studentName) return;
