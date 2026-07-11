@@ -399,6 +399,7 @@
         
         .review-container { max-height: 280px; overflow-y: auto; text-align: left; margin: 15px 0; padding-right: 5px; }
         .review-card { background: rgba(239, 68, 68, 0.05); border: 1px solid rgba(239, 68, 68, 0.2); padding: 14px; border-radius: 8px; margin-bottom: 12px; font-size: 0.9rem; }
+        .review-card:last-child { margin-bottom: 0; }
         .review-q { font-weight: bold; color: #f8fafc; margin-bottom: 8px; }
         .review-ans { margin: 4px 0; padding-left: 10px; }
         .review-wrong { color: #f87171; font-weight: bold; }
@@ -2108,7 +2109,6 @@
             let expHtml = q.explanation ? `<div class="review-ans" style="color: #94a3b8; margin-top: 6px; font-size: 0.9rem; border-top: 1px dashed rgba(255,255,255,0.1); padding-top: 6px;">💡 解説: ${q.explanation}</div>` : '';
             card.innerHTML = `<div class="review-q">問${index + 1}: ${q.question}</div><div class="review-ans review-wrong" style="font-size:0.85rem; margin-bottom:5px;">⚠️ 過去のミス回数: ${count} 回</div><div class="review-ans review-correct">⭕ 正しい正解: ${correctText}</div>${expHtml}`;
             
-            // 🛠️ 【バグ修正箇所】card.appendChild(card) から container.appendChild(card) へ修正！
             container.appendChild(card);
         });
     }
@@ -2249,13 +2249,21 @@
     // 🌐 GAS Web Appとのリアルタイム同期
     // ========================================================
     function sendRateToSpreadsheet(subject, rate) { 
-        console.log(`[GAS Update] ${subject} rate synchronized: ${rate}`); 
+        console.log(`[GAS Update] ${subject} rate synchronization target: ${rate}`); 
         if (!studentId) return;
 
-        const url = `${GAS_WEB_APP_URL}?action=update_rate&studentId=${studentId}&subject=${subject}&rate=${rate}`;
+        // GASのdoPost仕様に合わせ、URLSearchParamsをPOSTする形に変更
+        const params = new URLSearchParams();
+        params.append("action", "update_rate"); 
+        params.append("studentId", studentId);
+        params.append("subject", subject);
+        params.append("rate", rate);
 
-        fetch(url)
-        .then(res => res.json())
+        fetch(GAS_WEB_APP_URL, {
+            method: 'POST',
+            body: params
+        })
+        .then(res => res.text()) // GAS側はテキスト("done")を返すためtext()で受け取る
         .then(data => {
             console.log("[GAS Update] レート同期成功:", data);
         })
@@ -2265,14 +2273,30 @@
     }
 
     function sendFieldSummaryToSpreadsheet() { 
-        console.log("[GAS Update] Field learning summary synchronized.");
+        console.log("[GAS Update] Field learning summary serialization started.");
         if (!studentId) return;
 
-        const summaryDataStr = encodeURIComponent(JSON.stringify(dailySummaryData));
-        const url = `${GAS_WEB_APP_URL}?action=update_summary&studentId=${studentId}&summary=${summaryDataStr}`;
+        // GASの updateFieldSummary(ss, p.data) の構造に合わせてオブジェクトを作成
+        const payload = {
+            studentId: studentId,
+            studentName: studentName,
+            campus: studentCampus,
+            subject: selectedSubject,
+            section: selectedSectionName,
+            totalTimeMs: roundTotalTimeMs,       // 総解答ミリ秒
+            correctCount: score,                 // 正解数
+            ghostLog: currentPlayerRoundLogs     // ラップタイム詳細
+        };
 
-        fetch(url)
-        .then(res => res.json())
+        const params = new URLSearchParams();
+        params.append("action", "update_field_summary"); 
+        params.append("data", JSON.stringify(payload));   
+
+        fetch(GAS_WEB_APP_URL, {
+            method: 'POST',
+            body: params
+        })
+        .then(res => res.text())
         .then(data => {
             console.log("[GAS Update] サマリー同期成功:", data);
         })
