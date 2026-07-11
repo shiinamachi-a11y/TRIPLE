@@ -459,21 +459,21 @@
             100% { background-position: 100% 50%; }
         }
 
-        /* 👑 プルダウンネオン発光カラー */
+        /* 👑 プルダウンネオン発光カラー (バグ回避＆視認性大幅強化版) */
         .title-select {
-            background: rgba(15, 23, 42, 0.8);
-            border: 1px solid #334155;
+            background: rgba(15, 23, 42, 0.85);
+            border: 2px solid #3b82f6; /* 青色の太いエッジで目立たせる */
             color: #cbd5e1;
             font-weight: bold;
-            font-size: 0.75rem;
+            font-size: 0.95rem; 
             cursor: pointer;
             outline: none;
-            padding: 4px 6px;
+            padding: 8px 12px; 
             font-family: inherit;
-            border-radius: 6px;
+            border-radius: 8px;
             width: 100%;
             transition: all 0.2s;
-            box-shadow: inset 0 1px 3px rgba(0,0,0,0.5);
+            box-shadow: inset 0 1px 3px rgba(0,0,0,0.5), 0 0 10px rgba(37, 99, 235, 0.2);
         }
         .title-select option { background-color: #0b0f19; color: #ffffff; font-weight: bold; }
         .select-glow-silver { color: #ffffff !important; text-shadow: 0 0 8px rgba(255,255,255,0.8); font-weight: 900; border-color: #94a3b8; }
@@ -524,6 +524,17 @@
     </div>
 </div>
 
+<!-- 🔍 称号取得条件確認用ポップアップ画面 -->
+<div id="title-detail-popup" class="title-popup-overlay">
+    <div class="title-popup-card" style="border-color: #eab308; box-shadow: 0 0 35px rgba(234, 179, 8, 0.4); background: linear-gradient(135deg, #090d16 0%, #2d2206 100%);">
+        <div class="popup-badge-glow" style="color: #eab308;">🏆 TITLE DETAILS</div>
+        <h3 style="margin:0; font-size:1.2rem; color:#ffffff;">称号の取得条件</h3>
+        <div id="detail-title-name" style="font-size: 1.65rem; margin: 25px 0; font-weight:900;">【称号名】</div>
+        <p id="detail-title-desc" style="font-size:0.85rem; color:#94a3b8; line-height:1.4; min-height:40px;">称号獲得条件の説明文</p>
+        <button class="btn nav-btn" style="margin-top: 25px; padding: 12px; background: linear-gradient(135deg, #475569 0%, #334155 100%); box-shadow: none;" onclick="closeTitleDetailPopup()">閉じる ↩️</button>
+    </div>
+</div>
+
 <div class="quiz-container">
     
     <!-- ログイン画面 -->
@@ -559,6 +570,9 @@
                         <span class="menu-card-bg-icon">🏆</span>
                     </div>
                 </div>
+                
+                <!-- 🏆 獲得称号一覧へ遷移する横長コマンド -->
+                <button class="btn nav-btn" style="background: linear-gradient(135deg, #334155 0%, #1e293b 100%); border: 1px solid #475569; margin-top: 22px; box-shadow: 0 4px 12px rgba(0,0,0,0.3);" onclick="showTitleListScreen()">🏆 獲得した称号を確認する</button>
             </div>
         </div>
         <div class="report-corner-btn" onclick="showReportIssueScreen()">⚠️ 誤字・誤植報告</div>
@@ -641,7 +655,7 @@
         <button class="btn back-btn" onclick="backToSubject()">戻る</button>
     </div>
 
-    <!-- 対戦マッチング画面 -->
+    <!-- 对戦マッチング画面 -->
     <div id="battle-match-screen" class="screen" style="display: none;">
         <div class="flex-center">
             <div>
@@ -701,6 +715,12 @@
     <div id="quiz-screen" class="screen" style="display: none;">
         <div class="flex-center">
             <div>
+                <!-- 📈 レートのリアルタイム常時表示 ＆ 中止コマンドエリア -->
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                    <div id="quiz-rate-display" style="font-size: 0.85rem; color: #94a3b8; font-weight: bold; text-align: left;">📈 レート: ---</div>
+                    <button id="quiz-abort-btn" style="background: linear-gradient(135deg, #7f1d1d 0%, #b91c1c 100%); color: white; border: 1px solid #f87171; padding: 5px 12px; border-radius: 6px; font-size: 0.8rem; font-weight: bold; cursor: pointer; display: none; box-shadow: 0 2px 6px rgba(0,0,0,0.4);" onclick="abortQuiz()">中止</button>
+                </div>
+
                 <div id="vs-live-panel" style="display: none;">
                     <div class="vs-bar-container" style="background: rgba(30, 41, 59, 0.4); border: 1px solid #1e293b;">
                         <div>👤 キミの進捗: <span id="player-live-txt" style="font-weight:bold;">0 / 10問</span></div>
@@ -780,7 +800,7 @@
             </div>
 
             <button class="btn nav-btn" style="background: linear-gradient(135deg, #059669 0%, #10b981 100%);" onclick="retrySameSection()">🔄 同じ分野にもう一度挑戦！</button>
-            <button class="btn nav-btn" style="background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);" onclick="backToSectionSelect()">続けて別の問題を解く</button>
+            <button class="btn nav-btn" style="background: linear-gradient(135deg, #334155 0%, #1e293b 100%);" onclick="backToSectionSelect()">続けて別の問題を解く</button>
             <button class="btn back-btn" style="margin-top: 10px;" onclick="backToSubjectFromResult()">教科を選び直す</button>
             <button class="btn" style="background: linear-gradient(135deg, #c2410c 0%, #ed8936 100%); color: white; font-weight: bold; margin-top: 15px;" onclick="showDailySummary()">🔍 今日の学習を振り返る</button>
         </div>
@@ -818,7 +838,7 @@
             <div>
                 <h2>終了の確認 🛑</h2>
                 <p style="font-size: 1.1rem; font-weight: bold; margin: 30px 0; color: #ffffff;">本当に終了しますか?</p>
-                <p style="font-size: 0.85rem; color: #f87171; margin-bottom: 30px; line-height: 1.4;">※終了すると、本日の連続正解数（コンボ）や振り返りデータはリセットされます。</p>
+                <p style="font-size: 0.85rem; color: #f87171; margin-bottom: 30px; line-height: 1.4;">※終了すると、本日の振り返りデータはリセットされます。（コンボ数は維持されます）</p>
                 <button class="btn nav-btn" style="background: linear-gradient(135deg, #334155 0%, #1e293b 100%); border: 1px solid #475569;" onclick="cancelFinishLearning()">いいえ（テストに戻る）</button>
                 <button class="btn" style="background: linear-gradient(135deg, #b91c1c 0%, #dc3545 100%); color: white; font-weight: bold; margin-top: 10px;" onclick="confirmFinishLearning()">はい（終了する）</button>
             </div>
@@ -833,7 +853,15 @@
         <button class="btn back-btn" onclick="backToMainMenu()">トップに戻る</button>
     </div>
 
-    <!-- 間違えた問題詳細画面 -->
+    <!-- 🏆 獲得称号一覧画面 -->
+    <div id="title-list-screen" class="screen" style="display: none;">
+        <h2>獲得称号一覧 🏆</h2>
+        <p style="font-size: 0.8rem; color: #94a3b8; text-align: left; margin-bottom: 10px; background: rgba(30, 41, 59, 0.5); padding: 8px; border-radius: 5px; border-left: 4px solid #eab308;">💡 称号カードを押すと「取得条件」を確認できます。</p>
+        <div id="unlocked-titles-container" class="report-container" style="max-height: 480px;"></div>
+        <button class="btn back-btn" onclick="backToMainMenu()">トップに戻る</button>
+    </div>
+
+    <!-- 間間違えた問題詳細画面 -->
     <div id="wrong-details-screen" class="screen" style="display: none;">
         <h2 id="wrong-details-title">間違えた問題一覧</h2> <div id="wrong-details-list" class="review-container" style="max-height: 460px;"></div>
         <button class="btn back-btn" onclick="backFromWrongDetails()">戻る</button>
@@ -1045,6 +1073,126 @@
     ];
     let loadingTipsInterval = null;
 
+    // ========================================================
+    // 💾 コンボ・セッション永続化用ヘルパー関数 (鉄壁チート対策版)
+    // ========================================================
+    function saveCombo() {
+        if (!studentKey) return;
+        localStorage.setItem(`quiz_current_combo_${studentKey}`, currentCombo);
+        localStorage.setItem(`quiz_max_combo_${studentKey}`, maxCombo);
+    }
+    
+    function loadCombo() {
+        if (!studentKey) return;
+        currentCombo = parseInt(localStorage.getItem(`quiz_current_combo_${studentKey}`) || '0');
+        maxCombo = parseInt(localStorage.getItem(`quiz_max_combo_${studentKey}`) || '0');
+    }
+
+    // 🔒 内部インデックス書き換え対応型のセッションセーブロジック
+    function saveSuspendedSession(advanceIndex = false) {
+        if (!studentKey || filteredQuizData.length === 0) return;
+        
+        let savedIndex = currentQuestionIndex;
+        let savedReviewQuestionIndex = reviewQuestionIndex;
+        
+        // 回答した瞬間の「次の問題開始直前」をマーキングする処理
+        if (advanceIndex) {
+            if (!isReviewMode) {
+                savedIndex = currentQuestionIndex + 1;
+            } else {
+                savedReviewQuestionIndex = reviewQuestionIndex + 1;
+            }
+        }
+
+        const session = {
+            currentMode: currentMode,
+            selectedSubject: selectedSubject,
+            selectedGrade: selectedGrade,
+            selectedSectionName: selectedSectionName,
+            filteredQuizData: filteredQuizData,
+            currentQuestionIndex: savedIndex,
+            score: score,
+            wrongQuestionsList: wrongQuestionsList,
+            currentPlayerRoundLogs: currentPlayerRoundLogs,
+            roundTotalTimeMs: roundTotalTimeMs,
+            isReviewMode: isReviewMode,
+            reviewQuizData: reviewQuizData,
+            reviewQuestionIndex: savedReviewQuestionIndex,
+            activeGhostData: activeGhostData,
+            ghostCurrentQuestion: ghostCurrentQuestion,
+            ghostCurrentScore: ghostCurrentScore
+        };
+        localStorage.setItem(`quiz_suspended_session_${studentKey}`, JSON.stringify(session));
+    }
+
+    function clearSuspendedSession() {
+        if (!studentKey) return;
+        localStorage.removeItem(`quiz_suspended_session_${studentKey}`);
+    }
+
+    // 🛡️ レジューム制御（バトル切断ペナルティ対応）
+    function checkAndResumeSession() {
+        if (!studentKey) return false;
+        const saved = localStorage.getItem(`quiz_suspended_session_${studentKey}`);
+        if (!saved) return false;
+        try {
+            const session = JSON.parse(saved);
+            
+            // 🛑 バトルモード中のタスクキル・切断は「即時強制敗北」ペナルティ
+            if (session.currentMode === "battle") {
+                let myRate = parseInt(localStorage.getItem(`quiz_rate_${session.selectedSubject}_${studentKey}`) || '1500');
+                myRate = Math.max(0, myRate - 20); // レート大マイナス
+                localStorage.setItem(`quiz_rate_${session.selectedSubject}_${studentKey}`, myRate);
+                saveRateHistory(session.selectedSubject, myRate);
+                sendRateToSpreadsheet(session.selectedSubject, myRate);
+                
+                let count = parseInt(localStorage.getItem(`quiz_battle_count_${studentKey}`) || '3');
+                localStorage.setItem(`quiz_battle_count_${studentKey}`, String(Math.max(0, count - 1)));
+                
+                alert("⚠️ 警告: 前回の対戦バトルが途中で切断されたため、チート防止ペナルティ（強制敗北・レート-20・バトル回数-1）が適用されました。");
+                clearSuspendedSession();
+                return false;
+            }
+
+            // テストモードのレジューム復元
+            currentMode = session.currentMode;
+            selectedSubject = session.selectedSubject;
+            selectedGrade = session.selectedGrade;
+            selectedSectionName = session.selectedSectionName;
+            filteredQuizData = session.filteredQuizData;
+            currentQuestionIndex = session.currentQuestionIndex;
+            score = session.score;
+            wrongQuestionsList = session.wrongQuestionsList;
+            currentPlayerRoundLogs = session.currentPlayerRoundLogs;
+            roundTotalTimeMs = session.roundTotalTimeMs;
+            isReviewMode = session.isReviewMode;
+            reviewQuizData = session.reviewQuizData;
+            reviewQuestionIndex = session.reviewQuestionIndex;
+            
+            // 境界値（最終問題クリア直後のタスクキル）の安全な分岐復元
+            if (!isReviewMode && currentQuestionIndex >= filteredQuizData.length) {
+                if (reviewQuizData && reviewQuizData.length > 0) {
+                    isReviewMode = true; reviewQuestionIndex = 0;
+                    hideAllScreens(); document.getElementById('review-start-screen').style.display = 'block';
+                } else { showFinalResult(); }
+                return true;
+            }
+            if (isReviewMode && reviewQuestionIndex >= reviewQuizData.length) {
+                showFinalResult(); return true;
+            }
+
+            hideAllScreens();
+            document.getElementById('quiz-screen').style.display = 'block';
+            document.getElementById('vs-live-panel').style.display = 'none';
+            showQuestion();
+            return true;
+        } catch (e) {
+            console.error("セッションの復元エラー:", e);
+            clearSuspendedSession();
+            return false;
+        }
+    }
+
     function startLoadingTips() {
         const tipsEl = document.getElementById('loading-tips');
         if (!tipsEl) return;
@@ -1138,7 +1286,9 @@
                 }
             }
             if (!isUserFound) { alert("生徒番号または氏名が登録されていません。"); loginBtn.disabled = false; loginBtn.innerText = "ログイン"; return; }
-            currentCombo = 0; maxCombo = 0; dailySummaryData = {}; dailyRateChangeScience = 0; dailyRateChangeSocial = 0; dailyRateChangeEnglish = 0;
+            
+            loadCombo();
+            dailySummaryData = {}; dailyRateChangeScience = 0; dailyRateChangeSocial = 0; dailyRateChangeEnglish = 0;
             localStorage.setItem('quiz_saved_id', studentId); localStorage.setItem('quiz_saved_name', studentName); localStorage.setItem('quiz_saved_grade', studentGrade); localStorage.setItem('quiz_saved_campus', studentCampus); 
             
             ['science', 'social', 'english'].forEach(sub => {
@@ -1203,7 +1353,13 @@
                     if (isNaN(qCorrect)) continue; allQuizData[key].push({ question: qText, choices: qChoices, correct: qCorrect, section: qSection, explanation: qExplanation });
                 }
             });
-            hideAllScreens(); document.getElementById('main-menu-screen').style.display = 'block';
+            
+            // 安全対策チェック付きレジュームの実行
+            const resumed = checkAndResumeSession();
+            if (!resumed) {
+                hideAllScreens(); 
+                document.getElementById('main-menu-screen').style.display = 'block';
+            }
             updateAllStudentBadges();
             stopLoadingTips();
         } catch (error) { alert("問題データの同期に失敗しました。"); console.error(error); hideAllScreens(); document.getElementById('login-screen').style.display = 'block'; stopLoadingTips(); }
@@ -1216,6 +1372,7 @@
     
     function logoutStudent() {
         localStorage.removeItem('quiz_saved_id'); localStorage.removeItem('quiz_saved_name'); localStorage.removeItem('quiz_saved_grade'); localStorage.removeItem('quiz_saved_campus'); localStorage.removeItem(`quiz_daily_summary_${studentKey}`);
+        clearSuspendedSession();
         currentCombo = 0; maxCombo = 0; dailySummaryData = {}; dailyRateChangeScience = 0; dailyRateChangeSocial = 0; dailyRateChangeEnglish = 0;
         document.getElementById('student-id-input').value = ""; document.getElementById('student-name-input').value = "";
         studentId = ""; studentName = ""; studentGrade = ""; studentCampus = ""; studentKey = "";
@@ -1485,6 +1642,8 @@
         } else {
             document.getElementById('vs-live-panel').style.display = 'none';
         }
+        
+        saveSuspendedSession(false);
         showQuestion();
     }
 
@@ -1515,6 +1674,18 @@
     function showQuestion() {
         const currentQuiz = isReviewMode ? reviewQuizData[reviewQuestionIndex] : filteredQuizData[currentQuestionIndex];
         
+        // 📈 クイズ画面上部に現在の対象科目レートを小さく表示
+        const myRate = parseInt(localStorage.getItem(`quiz_rate_${selectedSubject}_${studentKey}`) || '1500');
+        let subjectLabel = selectedSubject === "social" ? "社会" : (selectedSubject === "english" ? "英語" : "理科");
+        document.getElementById('quiz-rate-display').innerText = `📈 現在の${subjectLabel}レート: ${myRate}`;
+
+        // 🛑 「テスト」モードの時だけ中止コマンドボタンを表示
+        if (currentMode === "test") {
+            document.getElementById('quiz-abort-btn').style.display = 'block';
+        } else {
+            document.getElementById('quiz-abort-btn').style.display = 'none';
+        }
+
         if (!isReviewMode) {
             document.getElementById('progress').innerText = `${currentQuestionIndex + 1} / ${filteredQuizData.length} 問目`;
             const comboDiv = document.getElementById('combo-alert'); comboDiv.innerText = currentCombo > 0 ? `🔥 ${currentCombo}コンボ中！` : "";
@@ -1527,6 +1698,7 @@
             document.getElementById('combo-alert').innerText = "";
             document.getElementById('wrong-alert').innerText = "";
             document.getElementById('vs-live-panel').style.display = 'none'; 
+            document.getElementById('quiz-abort-btn').style.display = 'none'; // 復習中は中止不可
         }
 
         document.getElementById('question').innerText = currentQuiz.question;
@@ -1565,6 +1737,9 @@
                 resultDiv.innerText = `⭕ 正解！ (${(answerTimeMs / 1000).toFixed(2)}秒)`; resultDiv.style.color = "#10b981"; score++;
                 const overlay = document.getElementById('correct-overlay'); overlay.style.display = 'flex'; setTimeout(() => { overlay.style.display = 'none'; }, 500);
                 currentCombo++; if (currentCombo > maxCombo) { maxCombo = currentCombo; } comboDiv.innerText = `🔥 ${currentCombo}コンボ中！`;
+                
+                saveCombo();
+                
                 dailySummaryData[summaryKey].correct++;
                 currentStatus = (answerTimeMs <= FAST_ANSWER_THRESHOLD) ? 'fast_correct' : 'slow_correct';
                 if (answerTimeMs < stats[currentQuiz.question].best_time) { stats[currentQuiz.question].best_time = answerTimeMs; }
@@ -1572,6 +1747,9 @@
             } else {
                 resultDiv.innerText = "❌ 不正解..."; buttons[selectedIndex].classList.add('wrong-choice');
                 currentCombo = 0; comboDiv.innerText = "❌ コンボ終了！";
+                
+                saveCombo();
+                
                 wrongQuestionsList.push({ question: currentQuiz.question, yourAnswer: currentQuiz.choices[selectedIndex], correctAnswer: currentQuiz.choices[currentQuiz.correct], explanation: currentQuiz.explanation });
                 stats[currentQuiz.question].wrong_count++; stats[currentQuiz.question].status = 'wrong';
                 reviewQuizData.push(currentQuiz);
@@ -1581,6 +1759,9 @@
             localStorage.setItem(`quiz_daily_summary_` + studentKey, JSON.stringify(dailySummaryData));
             if (currentMode === "battle") updateLiveVSUI();
             
+            // 🔒 選択肢を押して⭕❌が出た瞬間に、内部データを「次の問題(Index+1)」に書き換えて上書き保存
+            saveSuspendedSession(true);
+
             document.getElementById('next-btn').innerText = "次へ ➡️";
             document.getElementById('next-btn').style.background = "";
             document.getElementById('next-btn').style.color = "#ffffff";
@@ -1594,6 +1775,9 @@
                 resultDiv.innerText = "❌ 不正解...（次こそ合わせよう！）"; resultDiv.style.color = "#ef4444"; buttons[selectedIndex].classList.add('wrong-choice');
                 unlockTitle("review_fail");
             }
+
+            // 復習モード中も選択直後に次問の状態を即時マーキング保存
+            saveSuspendedSession(true);
 
             if (reviewQuestionIndex === reviewQuizData.length - 1) {
                 document.getElementById('next-btn').innerText = "結果発表画面へ 📊";
@@ -1614,6 +1798,7 @@
         if (!isReviewMode) {
             currentQuestionIndex++; 
             if (currentQuestionIndex < filteredQuizData.length) { 
+                saveSuspendedSession(false);
                 showQuestion(); 
             } else { 
                 if (ghostTimerInterval) { clearTimeout(ghostTimerInterval); ghostTimerInterval = null; } 
@@ -1623,6 +1808,7 @@
                     reviewQuestionIndex = 0;
                     hideAllScreens();
                     document.getElementById('review-start-screen').style.display = 'block';
+                    saveSuspendedSession(false);
                 } else {
                     showFinalResult(); 
                 }
@@ -1630,6 +1816,7 @@
         } else {
             reviewQuestionIndex++;
             if (reviewQuestionIndex < reviewQuizData.length) {
+                saveSuspendedSession(false);
                 showQuestion();
             } else {
                 document.getElementById('next-btn').style.background = "";
@@ -1639,7 +1826,25 @@
         }
     }
 
+    // 🛑 「テスト」中断コマンドの実行ロジック
+    function abortQuiz() {
+        if (confirm("テストを中止しますか？\n（次回ログイン時は自動的に『次の問題』から始まります）")) {
+            const nextBtn = document.getElementById('next-btn');
+            
+            // まだ回答していない（次へボタンが出ていない）状態で中止した場合は、現在の問を強制スキップ保存
+            if (nextBtn.style.display === 'none') {
+                saveSuspendedSession(true); 
+            }
+            
+            hideAllScreens();
+            // ログアウトはさせずセッションを保持したまま、画面だけログイン画面へ遷移
+            document.getElementById('login-screen').style.display = 'block'; 
+        }
+    }
+
     function showFinalResult() {
+        clearSuspendedSession();
+
         if (isDataSubmitted) return; 
         isDataSubmitted = true; 
 
@@ -1898,7 +2103,7 @@
             localStorage.setItem(`quiz_selected_title_${studentKey}`, "campus");
         }
         
-        let optionsHtml = `<option value="campus" data-glow="">[${studentCampus}]</option>`;
+        let optionsHtml = `<option value="campus" data-glow="">【称号を設定しよう！】</option>`;
         unlocked.forEach(id => {
             const master = TITLES_MASTER[id];
             if (master) {
@@ -2095,10 +2300,81 @@
         });
     }
 
+    // 🏆 獲得称号一覧画面のレンダリング
+    function showTitleListScreen() {
+        currentMode = "title-list";
+        hideAllScreens();
+        document.getElementById('title-list-screen').style.display = 'block';
+        
+        const container = document.getElementById('unlocked-titles-container');
+        container.innerHTML = "";
+        
+        if (!studentKey) {
+            container.innerHTML = "<div class='score-line' style='text-align:center; color:#64748b; padding:20px 0;'>ログインが必要です。</div>";
+            return;
+        }
+
+        let unlocked = JSON.parse(localStorage.getItem(`quiz_unlocked_titles_${studentKey}`) || "[]");
+        
+        if (unlocked.length === 0) {
+            container.innerHTML = "<div class='score-line' style='text-align:center; color:#64748b; padding:40px 0; line-height:1.6;'>まだ獲得した称号はありません。<br>クイズや対戦バトルで条件を達成しよう！🔥</div>";
+            return;
+        }
+
+        unlocked.forEach(id => {
+            const master = TITLES_MASTER[id];
+            if (master) {
+                const card = document.createElement('div');
+                card.className = "section-card";
+                card.style.borderLeft = "4px solid #eab308";
+                card.onclick = () => openTitleDetailPopup(id);
+                
+                let titleClass = "";
+                if (master.glow === "silver") titleClass = "title-silver";
+                if (master.glow === "gold") titleClass = "title-gold";
+                if (master.glow === "rainbow") titleClass = "title-rainbow";
+                
+                let displayTitle = titleClass ? `<span class="${titleClass}">${master.name}</span>` : master.name;
+                
+                card.innerHTML = `
+                    <div class="section-card-title" style="margin-bottom:0; display:flex; justify-content:space-between; align-items:center;">
+                        <span>${displayTitle}</span>
+                        <span style="color:#64748b; font-size:0.75rem; font-weight:bold;">🔍 条件を見る</span>
+                    </div>
+                `;
+                container.appendChild(card);
+            }
+        });
+    }
+
+    // 🏆 称号条件ポップアップの開閉制御
+    function openTitleDetailPopup(titleId) {
+        const master = TITLES_MASTER[titleId];
+        if (!master) return;
+        
+        let titleClass = "";
+        if (master.glow === "silver") titleClass = "title-silver";
+        if (master.glow === "gold") titleClass = "title-gold";
+        if (master.glow === "rainbow") titleClass = "title-rainbow";
+        
+        let displayTitle = titleClass ? `<span class="${titleClass}">${master.name}</span>` : master.name;
+        
+        document.getElementById('detail-title-name').innerHTML = displayTitle;
+        document.getElementById('detail-title-desc').innerText = master.desc;
+        document.getElementById('title-detail-popup').style.display = 'flex';
+    }
+
+    function closeTitleDetailPopup() {
+        document.getElementById('title-detail-popup').style.display = 'none';
+    }
+
     function showWrongQuestionsDetail(apiKey, sectionName, isEnglish = false, grade = "") {
         hideAllScreens(); document.getElementById('wrong-details-screen').style.display = 'block'; document.getElementById('wrong-details-title').innerText = `❌ 過去の間違い (${sectionName})`;
         const container = document.getElementById('wrong-details-list'); container.innerHTML = "";
+        
+        // 🛠️ 【バグ修正】誤ったキー 'wrong-details-list' から正しい 'quiz_perf_stats_' へ修正
         const stats = JSON.parse(localStorage.getItem('quiz_perf_stats_' + studentKey) || '{}');
+        
         let data = [];
         if (isEnglish) { ["1", "2", "3", "4", "5"].forEach(g => { data = [...data, ...(allQuizData[`english_word_${g}`] || []), ...(allQuizData[`english_grammar_${g}`] || [])]; }); } else { data = allQuizData[apiKey] || []; }
         const wrongQuestions = data.filter(q => q.section === sectionName && stats[q.question] && stats[q.question].wrong_count > 0);
@@ -2235,7 +2511,13 @@
     }
 
     function backToMainMenu() { hideAllScreens(); document.getElementById('main-menu-screen').style.display = 'block'; updateAllStudentBadges(); }
-    function startReviewQuiz() { hideAllScreens(); document.getElementById('quiz-screen').style.display = 'block'; showQuestion(); }
+    
+    function startReviewQuiz() { 
+        hideAllScreens(); 
+        document.getElementById('quiz-screen').style.display = 'block'; 
+        saveSuspendedSession(false);
+        showQuestion(); 
+    }
 
     function saveRateHistory(subject, rate) {
         if (!studentKey) return;
@@ -2252,7 +2534,6 @@
         console.log(`[GAS Update] ${subject} rate synchronization target: ${rate}`); 
         if (!studentId) return;
 
-        // GASのdoPost仕様に合わせ、URLSearchParamsをPOSTする形に変更
         const params = new URLSearchParams();
         params.append("action", "update_rate"); 
         params.append("studentId", studentId);
@@ -2263,7 +2544,7 @@
             method: 'POST',
             body: params
         })
-        .then(res => res.text()) // GAS側はテキスト("done")を返すためtext()で受け取る
+        .then(res => res.text())
         .then(data => {
             console.log("[GAS Update] レート同期成功:", data);
         })
@@ -2276,16 +2557,15 @@
         console.log("[GAS Update] Field learning summary serialization started.");
         if (!studentId) return;
 
-        // GASの updateFieldSummary(ss, p.data) の構造に合わせてオブジェクトを作成
         const payload = {
             studentId: studentId,
             studentName: studentName,
             campus: studentCampus,
             subject: selectedSubject,
             section: selectedSectionName,
-            totalTimeMs: roundTotalTimeMs,       // 総解答ミリ秒
-            correctCount: score,                 // 正解数
-            ghostLog: currentPlayerRoundLogs     // ラップタイム詳細
+            totalTimeMs: roundTotalTimeMs,       
+            correctCount: score,                 
+            ghostLog: currentPlayerRoundLogs     
         };
 
         const params = new URLSearchParams();
