@@ -2630,11 +2630,23 @@
 
     function sendFieldSummaryToSpreadsheet() {
         if (!studentId) return;
-        const summaryStr = JSON.stringify(dailySummaryData);
-        const url = `${GAS_WEB_APP_URL}?action=update_summary&studentId=${studentId}&summary=${encodeURIComponent(summaryStr)}`;
-        fetch(url).catch(e => console.error("GAS summary log error:", e));
-    }
-
+    
+    // 💡 GAS側が期待しているデータ構造（今回の10問のラップタイムや正誤）をここで作成
+    const payload = {
+        studentId: studentId,
+        studentName: studentName,
+        campus: studentCampus,
+        subject: selectedSubject,
+        section: selectedSectionName,
+        totalTimeMs: roundTotalTimeMs,      // 10問にかかった合計ミリ秒
+        correctCount: score,               // 今回の正解数
+        ghostLog: currentPlayerRoundLogs   // 10問それぞれの正誤とタイムの配列
+    };
+    
+    const summaryStr = JSON.stringify(payload);
+    const url = `${GAS_WEB_APP_URL}?action=update_summary&studentId=${studentId}&summary=${encodeURIComponent(summaryStr)}`;
+    fetch(url).catch(e => console.error("GAS summary log error:", e));
+}
     function sendDataToGoogleForm() {
         if (!studentKey) return;
         const formData = new FormData();
