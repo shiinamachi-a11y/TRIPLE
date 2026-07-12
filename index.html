@@ -721,7 +721,7 @@
 
                 <div id="vs-live-panel" style="display: none;">
                     <div class="vs-bar-container" style="background: rgba(30, 41, 59, 0.4); border: 1px solid #1e293b;">
-                        <div>👤 キミの進捗: <span id="player-live-txt" style="font-weight:bold;">0 / 10問</span></div>
+                        <div>👤 あなたの進捗: <span id="player-live-txt" style="font-weight:bold;">0 / 10問</span></div>
                         <div class="progress-bar-bg" style="height: 6px; margin-top:3px;"><div id="player-live-fill" class="progress-bar-fill" style="width:0%; background-color:#3b82f6;"></div></div>
                     </div>
                     <div class="vs-bar-container" style="background-color: rgba(239, 68, 68, 0.05); border-color: rgba(239, 68, 68, 0.2); margin-top: 8px;">
@@ -763,7 +763,7 @@
             <div id="student-badge-container-2" class="student-badge" style="position: static; margin-bottom: 15px; width:100%;"></div>
             
             <div class="score-box" style="margin-top: 5px;">
-                <div class="score-line">キミの正解数: <span id="current-score" class="score-highlight" style="color: #ffffff;">0</span> / <span id="total-questions">10</span> 問</div>
+                <div class="score-line">あなたの正解数: <span id="current-score" class="score-highlight" style="color: #ffffff;">0</span> / <span id="total-questions">10</span> 問</div>
                 <div id="battle-rival-score-line" class="score-line" style="display: none;">相手の正解数: <span id="battle-rival-score-val" class="score-highlight" style="color: #f87171;">0</span> / 10 問</div>
                 <div class="score-line">🔥 最高コンボ数: <span id="max-combo-score" class="score-highlight" style="color: #fbbf24;">0</span> コンボ！</div>
                 <div class="score-line">📈 レート変動: <span id="rate-change-display" class="score-highlight">理科レート: 1500 (±0)</span></div>
@@ -870,7 +870,7 @@
     <div id="rate-screen" class="screen" style="display: none;">
         <h2>レート・ランキング 🏆</h2>
         <div class="section-screen-desc" style="background: rgba(30, 41, 59, 0.4); border-left-color: #eab308; color: #cbd5e1; margin-bottom: 15px;">
-            🏆 <b>目指せランキング１位！</b> キミの努力がリアルタイムで形になる！ライバルたちを全員ぶち抜いて、今月の絶対王者の座を掴み取れ！天下無双の学力を証明しよう！天辺で待ってるぞ！🔥
+            🏆 <b>目指せランキング１位！</b> 今の努力がリアルタイムで形になる！ライバルたちを全員ぶち抜いて、今月の絶対王者の座を掴み取れ！天下無双の学力を証明しよう！天辺で待ってるぞ！🔥
         </div>
         <div id="rate-subject-selector-view">
             <p style="font-size: 0.95rem; color: #94a3b8; margin-bottom: 15px; font-weight: bold;">見たい教科を選んでね</p>
@@ -1065,7 +1065,7 @@
         "daily_30": { name: "【努力の王】", glow: "", desc: "デイリー学習ミッションを1ヶ月（30回）継続！" },
         "fast_10": { name: "【光速のブレーン】", glow: "", desc: "10問すべてを3秒未満の超神速で正解した！" },
         "time_morning": { name: "【暁の青鳥】", glow: "", desc: "朝の澄んだ時間（5時〜7時）にクイズをクリア！" },
-        "review_fail": { name: "【二度あることは三度ある】", glow: "", desc: "復習モードで見見直した問題をさらに間違えてしまった…！" },
+        "review_fail": { name: "【二度あることは三度ある】", glow: "", desc: "復習モードで見直した問題をさらに間違えてしまった…！" },
         "time_midnight": { name: "【テスト前夜の悪あがき】", glow: "", desc: "深夜2時〜4時の静寂のなかでクイズをクリア！" },
         "battle_clutch_win": { name: "【タッチの差の英雄】", glow: "", desc: "100ミリ秒以内の極限のスピード勝負を制して対戦に勝利した！" },
         "battle_clutch_lose": { name: "【神に見放された1コマ】", glow: "", desc: "100ミリ秒以内の極限のスピード勝負に一歩及ばず敗北した…" }
@@ -1935,7 +1935,7 @@
             }
 
             if (isPlayerWin) {
-                banner.innerHTML = `👑 キミの勝ち！ 👑<br><span style="font-size:1.1rem; font-weight:normal; color:#94a3b8;">キミ: ${playerPoints} Pt vs 相手: ${ghostPoints} Pt</span>`; 
+                banner.innerHTML = `👑 あなたの勝ち！ 👑<br><span style="font-size:1.1rem; font-weight:normal; color:#94a3b8;">あなた: ${playerPoints} Pt vs 相手: ${ghostPoints} Pt</span>`; 
                 banner.className = "score-highlight";
                 banner.style.color = "#10b981";
                 totalRateChange = 20; 
@@ -1958,7 +1958,7 @@
                 if (timeDiffAbs <= 100) unlockTitle("battle_clutch_win");
 
             } else {
-                banner.innerHTML = `☠️ キミの負け... ☠️<br><span style="font-size:1.1rem; font-weight:normal; color:#94a3b8;">キミ: ${playerPoints} Pt vs 相手: ${ghostPoints} Pt</span>`; 
+                banner.innerHTML = `☠️ あなたの負け... ☠️<br><span style="font-size:1.1rem; font-weight:normal; color:#94a3b8;">あなた: ${playerPoints} Pt vs 相手: ${ghostPoints} Pt</span>`; 
                 banner.className = "score-highlight";
                 banner.style.color = "#ef4444";
                 
@@ -2276,11 +2276,19 @@
     
     function confirmFinishLearning() { 
         if(studentKey) {
-            let dCount = parseInt(localStorage.getItem(`quiz_daily_clear_count_${studentKey}`) || '0') + 1;
-            localStorage.setItem(`quiz_daily_clear_count_${studentKey}`, dCount);
-            if(dCount >= 1) unlockTitle("daily_1");
-            if(dCount >= 7) unlockTitle("daily_7");
-            if(dCount >= 30) unlockTitle("daily_30");
+            // 💡【修正】連打対策：本日すでに終了ログがある場合はカウントを進めない
+            const now = new Date();
+            const todayStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+            const lastClearDate = localStorage.getItem(`quiz_last_clear_date_${studentKey}`);
+            
+            if (lastClearDate !== todayStr) {
+                localStorage.setItem(`quiz_last_clear_date_${studentKey}`, todayStr);
+                let dCount = parseInt(localStorage.getItem(`quiz_daily_clear_count_${studentKey}`) || '0') + 1;
+                localStorage.setItem(`quiz_daily_clear_count_${studentKey}`, dCount);
+                if(dCount >= 1) unlockTitle("daily_1");
+                if(dCount >= 7) unlockTitle("daily_7");
+                if(dCount >= 30) unlockTitle("daily_30");
+            }
         }
         localStorage.removeItem(`quiz_daily_summary_` + studentKey); 
         
@@ -2535,7 +2543,7 @@
                 plugins: { legend: { display: false } },
                 scales: {
                     x: { grid: { color: '#1e293b' }, ticks: { color: '#94a3b8', font: { size: 9 } } },
-                    y: { grid: { color: '#1e293b' }, ticks: { color: '#94a3b8', font: { size: 10 } } }
+                    y: { grid: { grid: { color: '#1e293b' }, ticks: { color: '#94a3b8', font: { size: 10 } } } }
                 }
             }
         });
@@ -2596,7 +2604,11 @@
         let targetKeys = [];
         if (subject === "science") targetKeys = ["science_1", "science_2", "science_3"];
         else if (subject === "social") targetKeys = ["social_geography", "social_history", "social_civics"];
-        else if (subject === "english") targetKeys = ["english_word_1", "english_grammar_1"];
+        // 💡【修正】英語の全データシート（中学1〜3年・word/grammar含む全10枚）に拡張対応
+        else if (subject === "english") targetKeys = [
+            "english_word_1", "english_word_2", "english_word_3", "english_word_4", "english_word_5",
+            "english_grammar_1", "english_grammar_2", "english_grammar_3", "english_grammar_4", "english_grammar_5"
+        ];
         
         const sectionsSet = new Set();
         sectionsSet.add("共通・その他");
