@@ -1209,7 +1209,8 @@
         if (rate <= 30) return "#dc3545"; if (rate <= 70) return "#eab308"; if (rate <= 90) return "#10b981"; return "#3b82f6"; 
     }
     
-    function hideAllScreens() { 
+    function hideAllScreens() {
+        document.body.style.pointerEvents = "auto"; 
         const screens = document.querySelectorAll('.screen'); screens.forEach(s => s.style.display = 'none'); 
         if (ghostTimerInterval) { clearTimeout(ghostTimerInterval); ghostTimerInterval = null; }
     }
