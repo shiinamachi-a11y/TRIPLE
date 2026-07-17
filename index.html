@@ -635,6 +635,13 @@
             box-shadow: 0 15px 40px rgba(109, 84, 64, 0.25) !important;
             color: #6d5440 !important;
         }
+        .theme-cute #mission-popup h3 { color: #6d5440 !important; }
+        .theme-cute #mission-list-daily > div,
+        .theme-cute #mission-list-weekly > div,
+        .theme-cute #mission-list-daily span,
+        .theme-cute #mission-list-weekly span {
+            color: #7d6f62 !important;
+        }
     </style>
 </head>
 <body>
@@ -952,8 +959,13 @@
             </div>
 
             <button class="btn nav-btn" style="background: linear-gradient(135deg, #059669 0%, #10b981 100%);" onclick="retrySameSection()">🔄 同じ分野にもう一度挑戦！</button>
+            <div id="retry-battle-count-display" style="color: #f87171; font-size: 0.85rem; font-weight: bold; margin-top: -6px; margin-bottom: 10px; text-align: center; display: none;"></div>
             <button class="btn nav-btn" style="background: linear-gradient(135deg, #334155 0%, #1e293b 100%);" onclick="backToSectionSelect()">続けて別の問題を解く</button>
             <button class="btn back-btn" style="margin-top: 10px;" onclick="backToSubjectFromResult()">教科を選び直す</button>
+            
+            <!-- ⚔️ 対戦終了ボタンをここに確実にはめ込みました -->
+            <button id="battle-finish-btn" class="btn" style="background: linear-gradient(135deg, #475569 0%, #334155 100%); color: white; font-weight: bold; margin-top: 15px; display: none;" onclick="finishBattleMode()">⚔️ 対戦を終了してトップに戻る</button>
+            
             <button class="btn" style="background: linear-gradient(135deg, #c2410c 0%, #ed8936 100%); color: white; font-weight: bold; margin-top: 15px;" onclick="showDailySummary()">🔍 今日の学習を振り返る</button>
         </div>
     </div>
@@ -1544,7 +1556,8 @@
         } else {
             if (rate <= 30) return "#dc3545"; if (rate <= 70) return "#eab308"; if (rate <= 90) return "#10b981"; return "#3b82f6"; 
         }
-    }    function hideAllScreens() {
+    }    
+    function hideAllScreens() {
         document.body.style.pointerEvents = "auto"; 
         const screens = document.querySelectorAll('.screen'); screens.forEach(s => s.style.display = 'none'); 
         if (ghostTimerInterval) { clearTimeout(ghostTimerInterval); ghostTimerInterval = null; }
@@ -1608,7 +1621,7 @@
         if (!studentKey) return 3;
         checkBattleLimit(); return parseInt(localStorage.getItem(`quiz_battle_count_${studentKey}`) || '3');
     }
-
+    let isMainMenuBlocked = false;
     function setMode(mode) { 
         if (mode === 'battle' && getBattleRemainingCount() <= 0) { alert("本日の対戦上限（3回）に達しました。また明日挑戦してね！"); return; }
         currentMode = mode; startLearningMode(); 
@@ -1621,6 +1634,7 @@
     }
 
     async function loginStudent() {
+        isMainMenuBlocked = false;
         const idInput = document.getElementById('student-id-input').value.trim(); const nameInput = document.getElementById('student-name-input').value.trim(); const loginBtn = document.getElementById('login-submit-btn');
         if (!idInput || !nameInput) { alert("生徒番号と氏名を入力してください。"); return; }
         loginBtn.disabled = true; loginBtn.innerText = "認証中...";
@@ -2233,7 +2247,7 @@
 
         if (isDataSubmitted) return; 
         isDataSubmitted = true; 
-
+        isMainMenuBlocked = true;
         // ⚙️ デイリーミッション①: 「1回、テストに挑戦する」を自動計算
         if (currentMode === "test") {
             updateDailyMission('test_play');
@@ -2544,6 +2558,19 @@
         document.getElementById('result-stage-1').style.display = 'none';
         document.getElementById('result-stage-2').style.display = 'block';
         
+        const countDisplay = document.getElementById('retry-battle-count-display');
+        const finishBattleBtn = document.getElementById('battle-finish-btn');
+        
+        if (currentMode === "battle") {
+            const remaining = getBattleRemainingCount();
+            countDisplay.innerText = `⚠️ 残り対戦回数: ${remaining}回`;
+            countDisplay.style.display = "block";
+            if (finishBattleBtn) finishBattleBtn.style.display = "block"; // 終了ボタンを表示
+        } else {
+            countDisplay.style.display = "none";
+            if (finishBattleBtn) finishBattleBtn.style.display = "none";  // 通常テスト時は非表示
+        }
+        
         const sSign = dailyRateChangeScience >= 0 ? `+${dailyRateChangeScience}` : dailyRateChangeScience;
         const oSign = dailyRateChangeSocial >= 0 ? `+${dailyRateChangeSocial}` : dailyRateChangeSocial;
         const eSign = dailyRateChangeEnglish >= 0 ? `+${dailyRateChangeEnglish}` : dailyRateChangeEnglish;
@@ -2559,9 +2586,20 @@
     }
 
     function retrySameSection() {
-        if(selectedSectionName) { startQuizWithSection(selectedSectionName); }
+        if(selectedSectionName) { 
+            if (currentMode === "battle") {
+                prepareModeFlow(selectedSectionName);
+            } else {
+                startQuizWithSection(selectedSectionName); 
+            }
+        }
     }
-
+    
+    // 💡 対戦を途中でやめて安全にメインメニュー（トップ）へ直帰する関数
+    function finishBattleMode() {
+        isMainMenuBlocked = false; // 不正戻りロックを解除
+        backToMainMenu();          // メインメニュー画面へ
+    }    
     function showDailySummary() {
         hideAllScreens();
         const sciEl = document.getElementById('daily-total-rate-sci'); const socEl = document.getElementById('daily-total-rate-soc'); const engEl = document.getElementById('daily-total-rate-eng');
@@ -2659,13 +2697,14 @@
         dailyRateChangeScience = 0;
         dailyRateChangeSocial = 0;
         dailyRateChangeEnglish = 0;
+        isMainMenuBlocked = false;
         
         if (titleQueue.length > 0) {
             isPendingReload = true;
             hideAllScreens();
             showNextTitleFromQueue(); 
         } else {
-            location.reload(); 
+            backToMainMenu();
         }
     }
 
@@ -2796,6 +2835,11 @@
     }
 
     function backToMainMenu() {
+        if (isMainMenuBlocked) {
+            clearSuspendedSession();
+            location.reload(); 
+            return;
+        }
         hideAllScreens();
         currentMode = "test";
         document.getElementById('main-menu-screen').style.display = 'block';
