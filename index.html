@@ -75,7 +75,7 @@
             box-sizing: border-box; 
             transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); 
             text-shadow: 0 1px 2px rgba(0,0,0,0.5);
-            pointer-events: auto; /* 💡 親のロックをすり抜けてクリックできるように設定 */
+            pointer-events: auto; 
         }
         
         /* ナビゲーション・主導線（深みのあるサイバーグリーン） */
@@ -220,10 +220,11 @@
             opacity: 0.25;
         }
 
+        /* ⚠️ 誤字・誤植報告ボタン（左下） */
         .report-corner-btn {
             position: absolute;
             bottom: 20px;
-            right: 25px;
+            left: 25px;
             background: rgba(15, 23, 42, 0.6);
             border: 1px solid #334155;
             color: #64748b;
@@ -240,6 +241,31 @@
             border-color: #ef4444;
             color: #f87171;
             box-shadow: 0 0 10px rgba(239, 68, 68, 0.2);
+        }
+
+        /* 🎯 ミッションを確認ボタン（右下・白文字） */
+        .mission-corner-btn {
+            position: absolute;
+            bottom: 20px;
+            right: 25px;
+            background: rgba(30, 41, 59, 0.4);
+            border: 1px solid #3b82f6;
+            color: #ffffff;
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            font-size: 0.75rem;
+            padding: 6px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-weight: bold;
+            z-index: 10;
+            letter-spacing: 0.5px;
+            text-shadow: 0 0 8px rgba(255,255,255,0.3);
+        }
+        .mission-corner-btn:hover {
+            background: rgba(59, 130, 246, 0.25);
+            border-color: #60a5fa;
+            box-shadow: 0 0 12px rgba(59, 130, 246, 0.4);
         }
         
         #login-screen { 
@@ -429,9 +455,7 @@
         }
         .flex-center > div { width: 100%; }
 
-        /* ========================================================
-            ✨ 演出スタイル：特殊カラーエフェクト（完全同期）
-        ======================================================== */
+        /* 特殊カラーエフェクト */
         .title-silver {
             background: linear-gradient(90deg, #94a3b8 0%, #ffffff 50%, #64748b 100%);
             -webkit-background-clip: text;
@@ -460,7 +484,7 @@
             100% { background-position: 100% 50%; }
         }
 
-        /* 👑 プルダウンネオン発光カラー */
+        /* プルダウンネオン発光カラー */
         .title-select {
             background: rgba(15, 23, 42, 0.85);
             border: 2px solid #3b82f6;
@@ -505,36 +529,168 @@
         }
         @keyframes popUp { to { transform: scale(1); } }
         .vs-bar-container { padding: 8px 12px; border-radius: 8px; font-size: 0.8rem; text-align: left; box-sizing: border-box; }
+    .theme-corner-btn {
+            position: absolute;
+            bottom: 20px;
+            right: 25px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: #ffffff;
+            font-size: 0.75rem;
+            padding: 6px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-weight: bold;
+            z-index: 10;
+        }
+
+        /* ========================================================
+            🌿 メルヘン・ネイチャーテーマ（どうぶつの森風）の上書き設定
+        ======================================================== */
+        .theme-cute {
+            font-family: 'Hiragino Maru Gothic ProN', 'Yu Gothic', sans-serif !important;
+        }
+        /* 筐体（やわらかいクリーム色×ナチュラルフレーム） */
+        .theme-cute .quiz-container {
+            background: linear-gradient(135deg, #fdfbf7 0%, #f5ebd9 100%) !important;
+            border: 3px solid #dcc6b5 !important;
+            box-shadow: 0 15px 40px rgba(109, 84, 64, 0.15) !important;
+        }
+        /* 全体テキスト（ほっこりブラウン） */
+        .theme-cute h2 { color: #6d5440 !important; text-shadow: none !important; }
+        .theme-cute .question { color: #4a3b2c !important; }
+        .theme-cute .progress-text { color: #a69382 !important; }
+        .theme-cute .score-line { color: #6d5440 !important; }
+        .theme-cute .score-highlight { color: #e76f51 !important; text-shadow: none !important; }
+        
+        /* ボタン（ぷっくり立体感のあるおひさまフラットデザイン） */
+        .theme-cute .btn { text-shadow: none !important; border-radius: 12px !important; }
+        .theme-cute .nav-btn {
+            background: #8fcb9b !important; /* 新緑ミントグリーン */
+            color: #ffffff !important;
+            box-shadow: 0 4px 0 #6da878 !important;
+        }
+        .theme-cute .nav-btn:hover { transform: translateY(2px) !important; box-shadow: 0 2px 0 #6da878 !important; }
+        .theme-cute .btn-gold {
+            background: #fbc687 !important; /* アプリコットオレンジ */
+            color: #ffffff !important;
+            border: none !important;
+            box-shadow: 0 4px 0 #e09f53 !important;
+        }
+        .theme-cute .btn-gold:hover { transform: translateY(2px) !important; box-shadow: 0 2px 0 #e09f53 !important; }
+        .theme-cute .back-btn {
+            background: #e2dbcd !important;
+            color: #7d6f62 !important;
+            border: none !important;
+            box-shadow: 0 4px 0 #c2b59b !important;
+        }
+        .theme-cute .back-btn:hover { transform: translateY(2px) !important; box-shadow: 0 2px 0 #c2b59b !important; }
+        
+        /* 選択肢ボタン（おしろいホワイトベース） */
+        .theme-cute .ans-btn {
+            background: #ffffff !important;
+            border: 2px solid #ebdcc5 !important;
+            color: #6d5440 !important;
+            box-shadow: 0 3px 0 #ebdcc5 !important;
+            border-radius: 12px !important;
+        }
+        .theme-cute .ans-btn:hover {
+            background: #fff9e6 !important;
+            border-color: #f3cc8c !important;
+            color: #b2733d !important;
+            box-shadow: 0 3px 0 #f3cc8c !important;
+            transform: translateX(2px) !important;
+        }
+        .theme-cute .ans-btn.correct-choice { background: #8fcb9b !important; border-color: #6da878 !important; color: #fff !important; box-shadow: none !important; }
+        .theme-cute .ans-btn.wrong-choice { background: #f28482 !important; border-color: #e56b69 !important; color: #fff !important; box-shadow: none !important; }
+
+        /* メニューカード（絵本のような白木調タイル） */
+        .theme-cute .menu-card {
+            background: #ffffff !important;
+            border: 2px solid #ebdcc5 !important;
+            box-shadow: 0 4px 10px rgba(139,120,104,0.08) !important;
+            border-radius: 18px !important;
+        }
+        .theme-cute .menu-card:hover {
+            background: #fff9e8 !important;
+            border-color: #f7b267 !important;
+            transform: translateY(-2px) !important;
+        }
+        .theme-cute .menu-item-title { color: #6d5440 !important; text-shadow: none !important; }
+        .theme-cute .menu-card-bg-icon { opacity: 0.35 !important; }
+
+        /* スコアボックス・バッジ類 */
+        .theme-cute .score-box { background: #ffffff !important; border: 2px solid #ebdcc5 !important; box-shadow: none !important; backdrop-filter: none !important; }
+        .theme-cute .student-badge { background: #ffffff !important; border: 2px solid #ebdcc5 !important; color: #6d5440 !important; box-shadow: 0 4px 12px rgba(0,0,0,0.04) !important; }
+        .theme-cute .title-select { background: #ffffff !important; border: 2px solid #ebdcc5 !important; color: #6d5440 !important; box-shadow: none !important; }
+        .theme-cute .title-select option { background-color: #ffffff; color: #6d5440; }
+        .theme-cute .report-corner-btn { background: #ffffff; border-color: #ebdcc5; color: #a69382; }
+        .theme-cute .theme-corner-btn { background: #6d5440; border-color: #6d5440; color: #ffffff; }
+
+        /* ポップアップ関連 */
+        .theme-cute .title-popup-card {
+            background: linear-gradient(135deg, #fdfbf7 0%, #fdf5e6 100%) !important;
+            border: 3px solid #f7b267 !important;
+            box-shadow: 0 15px 40px rgba(109, 84, 64, 0.25) !important;
+            color: #6d5440 !important;
+        }
     </style>
 </head>
 <body>
 
-<div id="correct-overlay" class="correct-overlay">⭕</div>
-
-<!-- 🏆 称号獲得ポップアップ画面 -->
-<div id="title-popup" class="title-popup-overlay">
-    <div class="title-popup-card">
-        <div class="popup-badge-glow">🚨 ACCOMPLISHED!</div>
-        <h3 style="margin:0; font-size:1.2rem; color:#ffffff;">新たな称号を獲得したぞ！</h3>
-        <div id="popup-title-name" style="font-size: 1.65rem; margin: 25px 0; font-weight:900;">【称号名】</div>
-        <p id="popup-title-desc" style="font-size:0.85rem; color:#94a3b8; line-height:1.4; min-height:40px;">称号獲得条件の説明文</p>
-        <button class="btn nav-btn" style="margin-top: 25px; padding: 12px;" onclick="closeTitlePopup()">称号を受け取る ➡️</button>
-    </div>
-</div>
-
-<!-- 🔍 称号取得条件確認用ポップアップ画面 -->
-<div id="title-detail-popup" class="title-popup-overlay">
-    <div class="title-popup-card" style="border-color: #eab308; box-shadow: 0 0 35px rgba(234, 179, 8, 0.4); background: linear-gradient(135deg, #090d16 0%, #2d2206 100%);">
-        <div class="popup-badge-glow" style="color: #eab308;">🏆 TITLE DETAILS</div>
-        <h3 style="margin:0; font-size:1.2rem; color:#ffffff;">称号の取得条件</h3>
-        <div id="detail-title-name" style="font-size: 1.65rem; margin: 25px 0; font-weight:900;">【称号名】</div>
-        <p id="detail-title-desc" style="font-size:0.85rem; color:#94a3b8; line-height:1.4; min-height:40px;">称号獲得条件の説明文</p>
-        <button class="btn nav-btn" style="margin-top: 25px; padding: 12px; background: linear-gradient(135deg, #475569 0%, #334155 100%); box-shadow: none;" onclick="closeTitleDetailPopup()">閉じる ↩️</button>
-    </div>
-</div>
-
 <div class="quiz-container">
     
+    <!-- 💡 UI崩れを防ぐため、すべてのオーバーレイ画面を筐体コンテナの内側に集約しました -->
+    <div id="correct-overlay" class="correct-overlay">⭕</div>
+
+    <!-- 🏆 称号獲得ポップアップ画面 -->
+    <div id="title-popup" class="title-popup-overlay">
+        <div class="title-popup-card">
+            <div class="popup-badge-glow">🚨 ACCOMPLISHED!</div>
+            <h3 style="margin:0; font-size:1.2rem; color:#ffffff;">新たな称号を獲得したぞ！</h3>
+            <div id="popup-title-name" style="font-size: 1.65rem; margin: 25px 0; font-weight:900;">【称号名】</div>
+            <p id="popup-title-desc" style="font-size:0.85rem; color:#94a3b8; line-height:1.4; min-height:40px;">称号獲得条件の説明文</p>
+            <button class="btn nav-btn" style="margin-top: 25px; padding: 12px;" onclick="closeTitlePopup()">称号を受け取る ➡️</button>
+        </div>
+    </div>
+
+    <!-- 🔍 称号取得条件確認用ポップアップ画面 -->
+    <div id="title-detail-popup" class="title-popup-overlay">
+        <div class="title-popup-card" style="border-color: #eab308; box-shadow: 0 0 35px rgba(234, 179, 8, 0.4); background: linear-gradient(135deg, #090d16 0%, #2d2206 100%);">
+            <div class="popup-badge-glow" style="color: #eab308;">🏆 TITLE DETAILS</div>
+            <h3 style="margin:0; font-size:1.2rem; color:#ffffff;">称号の取得条件</h3>
+            <div id="detail-title-name" style="font-size: 1.65rem; margin: 25px 0; font-weight:900;">【称号名】</div>
+            <p id="detail-title-desc" style="font-size:0.85rem; color:#94a3b8; line-height:1.4; min-height:40px;">称号獲得条件の説明文</p>
+            <button class="btn nav-btn" style="margin-top: 25px; padding: 12px; background: linear-gradient(135deg, #475569 0%, #334155 100%); box-shadow: none;" onclick="closeTitleDetailPopup()">閉じる ↩️</button>
+        </div>
+    </div>
+
+    <!-- 🎯 ミッションポップアップ画面 -->
+    <div id="mission-popup" class="title-popup-overlay">
+        <div class="title-popup-card" style="border-color: #3b82f6; box-shadow: 0 0 35px rgba(37, 99, 235, 0.4); width: 85%; max-width: 340px; padding: 25px 20px; position: relative; text-align: left; background: linear-gradient(135deg, #090d16 0%, #111827 100%);">
+            <span style="position: absolute; top: 15px; right: 20px; font-size: 1.5rem; color: #94a3b8; cursor: pointer; font-weight: bold; user-select: none;" onclick="closeMissionPopup()">✕</span>
+            <div class="popup-badge-glow" style="color: #3b82f6; font-size: 0.85rem; font-weight: bold; margin-bottom: 5px; text-align: center; letter-spacing: 1px;">🎯 MISSION CENTER</div>
+            <h3 style="margin: 0 0 15px 0; font-size: 1.15rem; color: #ffffff; font-weight: 800; text-align: center; text-shadow: 0 0 8px rgba(255,255,255,0.2);">ミッション状況</h3>
+            
+            <div style="display: flex; gap: 8px; margin-bottom: 15px;">
+                <button id="mission-tab-daily" class="btn" style="margin: 0; flex: 1; font-size: 0.8rem; padding: 10px; background: linear-gradient(135deg, #1d4ed8 0%, #1e40af 100%);" onclick="switchMissionTab('daily')">デイリー</button>
+                <button id="mission-tab-weekly" class="btn" style="margin: 0; flex: 1; font-size: 0.8rem; padding: 10px; background: linear-gradient(135deg, #334155 0%, #1e293b 100%); box-shadow: none;" onclick="switchMissionTab('weekly')">ウィークリー</button>
+            </div>
+            
+            <div id="mission-list-daily" style="display: block; max-height: 250px; overflow-y: auto; padding-right: 4px;"></div>
+            <div id="mission-list-weekly" style="display: none; max-height: 250px; overflow-y: auto; padding-right: 4px;"></div>
+        </div>
+    </div>
+    <div id="mission-clear-popup" class="title-popup-overlay">
+        <div class="title-popup-card" style="border-color: #10b981; box-shadow: 0 0 35px rgba(16, 185, 129, 0.5); background: linear-gradient(135deg, #090d16 0%, #064e3b 100%);">
+            <div class="popup-badge-glow" style="color: #10b981;">🎯 MISSION CLEARED!</div>
+            <h3 style="margin:0; font-size:1.2rem; color:#ffffff;">ミッションを達成したぞ！</h3>
+            <div id="popup-mission-name" style="font-size: 1.35rem; margin: 25px 0; font-weight:900; color: #ffffff; text-align: center;">【ミッション名】</div>
+            <button class="btn nav-btn" style="margin-top: 25px; padding: 12px; background: linear-gradient(135deg, #059669 0%, #10b981 100%);" onclick="closeMissionClearPopup()">確認 ➡️</button>
+        </div>
+    </div>
+
     <!-- ログイン画面 -->
     <div id="login-screen" class="screen">
         <div class="login-box">
@@ -569,13 +725,14 @@
                     </div>
                 </div>
                 
-                <!-- 🏆 獲得称号一覧へ遷移する横長コマンド -->
                 <button class="btn nav-btn" style="background: linear-gradient(135deg, #334155 0%, #1e293b 100%); border: 1px solid #475569; margin-top: 22px; box-shadow: 0 4px 12px rgba(0,0,0,0.3);" onclick="showTitleListScreen()">🏆 獲得した称号を確認する</button>
+                 <button class="btn nav-btn" style="background: linear-gradient(135deg, #1d4ed8 0%, #2563eb 100%); border: 1px solid #3b82f6; margin-top: 12px; box-shadow: 0 4px 15px rgba(37, 99, 235, 0.3);" onclick="openMissionPopup()">🎯 ミッションを確認する</button>
             </div>
         </div>
+        <!-- 💡 誤字報告は左下に維持、右下は次の新しいコマンド用に空けてあります -->
         <div class="report-corner-btn" onclick="showReportIssueScreen()">⚠️ 誤字・誤植報告</div>
-    </div>
-
+        <div class="theme-corner-btn" onclick="toggleTheme()">🎨 スタイル切替</div>
+    </div>       
     <!-- 教科選択画面 -->
     <div id="subject-screen" class="screen" style="display: none;">
         <div id="student-badge-container-1" class="student-badge"></div>
@@ -713,7 +870,6 @@
     <div id="quiz-screen" class="screen" style="display: none;">
         <div class="flex-center">
             <div>
-                <!-- 📈 レートのリアルタイム常時表示 ＆ 中止コマンドエリア -->
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
                     <div id="quiz-rate-display" style="font-size: 0.85rem; color: #94a3b8; font-weight: bold; text-align: left;">📈 レート: ---</div>
                     <button id="quiz-abort-btn" style="background: linear-gradient(135deg, #7f1d1d 0%, #b91c1c 100%); color: white; border: 1px solid #f87171; padding: 5px 12px; border-radius: 6px; font-size: 0.8rem; font-weight: bold; cursor: pointer; display: none; box-shadow: 0 2px 6px rgba(0,0,0,0.4);" onclick="abortQuiz()">中止</button>
@@ -751,9 +907,7 @@
         </div>
     </div>
 
-    <!-- ========================================================
-        🎚️ 結果画面（2段階スプリットUI）
-    ======================================================== -->
+    <!-- 結果画面（2段階スプリットUI） -->
     <div id="result-screen" class="screen" style="display: none;">
         
         <!-- 🛑 【第1段階】戦績・称号・見直しフェーズ -->
@@ -1071,6 +1225,179 @@
         "battle_clutch_lose": { name: "【神に見放された1コマ】", glow: "", desc: "100ミリ秒以内の極限のスピード勝負に一歩及ばず敗北した…" }
     };
 
+    // ========================================================
+    // ⚙️ ミッションシステム（朝5:00リセット & 自動更新）
+    // ========================================================
+    let activeMissionTab = "daily";
+
+    function getInitialMissionData() {
+        return {
+            dailyLastReset: "",
+            weeklyLastReset: "",
+            daily: { test_play: 0, battle_play: 0, review_perfect: 0 },
+            weekly: { daily_clear_count: 0, battle_wins: 0, total_correct: 0, max_combo_reached: 0 },
+            dailyClearedToday: { test_play: false, battle_play: false, review_perfect: false },
+            notifiedMissions: []
+        };
+    }
+
+    function getMissionsTargetDay() {
+        const now = new Date();
+        const d = new Date(now.getTime() - 5 * 60 * 60 * 1000); // AM 5:00 基準
+        return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+    }
+
+    function getMissionsTargetWeek() {
+        const now = new Date();
+        const d = new Date(now.getTime() - 5 * 60 * 60 * 1000); // AM 5:00 基準
+        const day = d.getDay();
+        const diff = d.getDate() - day + (day === 0 ? -6 : 1); // 月曜日を取得
+        const monday = new Date(d.setDate(diff));
+        return `${monday.getFullYear()}-${String(monday.getMonth() + 1).padStart(2, '0')}-${String(monday.getDate()).padStart(2, '0')}`;
+    }
+
+    function getMissionProgress() {
+        if (!studentKey) return getInitialMissionData();
+        let data = localStorage.getItem(`quiz_missions_${studentKey}`);
+        if (!data) { data = getInitialMissionData(); }
+        else {
+            try { data = JSON.parse(data); } catch(e) { data = getInitialMissionData(); }
+        }
+        if (data && !data.dailyClearedToday) { data.dailyClearedToday = { test_play: false, battle_play: false, review_perfect: false }; }
+        const today = getMissionsTargetDay();
+        const thisWeek = getMissionsTargetWeek();
+        let changed = false;
+        
+        if (data.dailyLastReset !== today) {
+            data.dailyLastReset = today;
+            data.daily.test_play = 0;
+            data.daily.battle_play = 0;
+            data.daily.review_perfect = 0;
+            data.dailyClearedToday.test_play = false;
+            data.dailyClearedToday.battle_play = false;
+            data.dailyClearedToday.review_perfect = false;
+            if (data.notifiedMissions) data.notifiedMissions = data.notifiedMissions.filter(id => !id.startsWith("daily_"));
+            changed = true;
+        }
+        if (data.weeklyLastReset !== thisWeek) {
+            data.weeklyLastReset = thisWeek;
+            data.weekly.daily_clear_count = 0;
+            data.weekly.battle_wins = 0;
+            data.weekly.total_correct = 0;
+            data.weekly.max_combo_reached = 0;
+            if (data.notifiedMissions) data.notifiedMissions = data.notifiedMissions.filter(id => !id.startsWith("weekly_"));
+            changed = true;
+        }
+        if (changed) { saveMissionProgress(data); }
+        return data;
+    }
+
+    function saveMissionProgress(data) {
+        if (!studentKey) return;
+        localStorage.setItem(`quiz_missions_${studentKey}`, JSON.stringify(data));
+    }
+
+    function updateDailyMission(type) {
+        if (!studentKey) return;
+        const data = getMissionProgress();
+        if (data.daily[type] === 0) {
+            data.daily[type] = 1;
+            if (!data.dailyClearedToday[type]) {
+                data.dailyClearedToday[type] = true;
+                data.weekly.daily_clear_count = Math.min(21, (data.weekly.daily_clear_count || 0) + 1);
+            }
+            saveMissionProgress(data);
+        }
+    }
+
+    function openMissionPopup() {
+        if (!studentKey) { alert("ログイン後に利用可能です。"); return; }
+        renderMissions();
+        document.getElementById('mission-popup').style.display = 'flex';
+    }
+
+    function closeMissionPopup() {
+        document.getElementById('mission-popup').style.display = 'none';
+    }
+
+    function switchMissionTab(tab) {
+        activeMissionTab = tab;
+        const dailyBtn = document.getElementById('mission-tab-daily');
+        const weeklyBtn = document.getElementById('mission-tab-weekly');
+        const dailyList = document.getElementById('mission-list-daily');
+        const weeklyList = document.getElementById('mission-list-weekly');
+        
+        if (tab === 'daily') {
+            dailyBtn.style.background = "linear-gradient(135deg, #1d4ed8 0%, #1e40af 100%)";
+            dailyBtn.style.boxShadow = "0 4px 12px rgba(37, 99, 235, 0.2)";
+            weeklyBtn.style.background = "linear-gradient(135deg, #334155 0%, #1e293b 100%)";
+            weeklyBtn.style.boxShadow = "none";
+            dailyList.style.display = 'block';
+            weeklyList.style.display = 'none';
+        } else {
+            weeklyBtn.style.background = "linear-gradient(135deg, #1d4ed8 0%, #1e40af 100%)";
+            weeklyBtn.style.boxShadow = "0 4px 12px rgba(37, 99, 235, 0.2)";
+            dailyBtn.style.background = "linear-gradient(135deg, #334155 0%, #1e293b 100%)";
+            dailyBtn.style.boxShadow = "none";
+            dailyList.style.display = 'none';
+            weeklyList.style.display = 'block';
+        }
+        renderMissions();
+    }
+
+    function renderMissions() {
+        const data = getMissionProgress();
+        const dailyContainer = document.getElementById('mission-list-daily');
+        const weeklyContainer = document.getElementById('mission-list-weekly');
+        dailyContainer.innerHTML = "";
+        weeklyContainer.innerHTML = "";
+        
+        const dailyDefs = [
+            { key: "test_play", text: "1回、テストに挑戦する", target: 1, current: data.daily.test_play },
+            { key: "battle_play", text: "1回、対戦を行う (勝敗は不問)", target: 1, current: data.daily.battle_play },
+            { key: "review_perfect", text: "1回、復習タイムで完答する", target: 1, current: data.daily.review_perfect }
+        ];
+        
+        dailyDefs.forEach((m, idx) => {
+            const isCleared = m.current >= m.target;
+            const row = document.createElement('div');
+            row.style.display = "flex";
+            row.style.alignItems = "center";
+            row.style.margin = "12px 0";
+            row.style.fontSize = "0.9rem";
+            row.style.fontWeight = "bold";
+            row.style.color = isCleared ? "#64748b" : "#ffffff";
+            
+            const checkbox = `<span style="font-size: 1.25rem; margin-right: 10px; color: ${isCleared ? '#10b981' : '#475569'}; user-select:none;">${isCleared ? '☑' : '☐'}</span>`;
+            const numLabel = idx === 0 ? '①' : idx === 1 ? '②' : '③';
+            row.innerHTML = `${checkbox}<span>${numLabel} ${m.text}</span>`;
+            dailyContainer.appendChild(row);
+        });
+        
+        const weeklyDefs = [
+            { text: "デイリーミッションを累計15個達成", target: 15, current: data.weekly.daily_clear_count },
+            { text: "週に対戦で９回勝利をおさめる", target: 9, current: data.weekly.battle_wins },
+            { text: "週にクイズで70問正解する", target: 70, current: data.weekly.total_correct },
+            { text: "週に１回でも20コンボを達成する", target: 20, current: data.weekly.max_combo_reached }
+        ];
+        
+        weeklyDefs.forEach((m, idx) => {
+            const isCleared = m.current >= m.target;
+            const row = document.createElement('div');
+            row.style.display = "flex";
+            row.style.alignItems = "center";
+            row.style.margin = "12px 0";
+            row.style.fontSize = "0.9rem";
+            row.style.fontWeight = "bold";
+            row.style.color = isCleared ? "#64748b" : "#ffffff";
+            
+            const checkbox = `<span style="font-size: 1.25rem; margin-right: 10px; color: ${isCleared ? '#10b981' : '#475569'}; user-select:none;">${isCleared ? '☑' : '☐'}</span>`;
+            const numLabel = idx === 0 ? '①' : idx === 1 ? '②' : idx === 2 ? '③' : '④';
+            row.innerHTML = `${checkbox}<div><div>${numLabel} ${m.text}</div><div style="font-size: 0.7rem; color: #64748b; font-weight: normal; margin-top:2px;">現在の進捗: ${m.current} / ${m.target}</div></div>`;
+            weeklyContainer.appendChild(row);
+        });
+    }
+
     function startLoadingTips() {
         const tipsEl = document.getElementById('loading-tips');
         if (!tipsEl || !LOADING_TIPS || LOADING_TIPS.length === 0) return;
@@ -1206,6 +1533,15 @@
     }
 
     function getGaugeColor(rate) {
+        const isCute = document.body.classList.contains("theme-cute");
+        
+        if (isCute) {
+            // 🌿 どうぶつの森風パステルナチュラルカラー
+            if (rate <= 30) return "#f28482"; // 🚨 弱点：やわらかサーモンピンク
+            if (rate <= 70) return "#fbc687"; // ⚠️ あと少し：アプリコットオレンジ
+            if (rate <= 90) return "#a3caa6"; // 🍏 克服：マイルドリーフグリーン
+            return "#b79477";                 // 👑 完璧：おいしそうなキャラメルモカ
+        } else {
         if (rate <= 30) return "#dc3545"; if (rate <= 70) return "#eab308"; if (rate <= 90) return "#10b981"; return "#3b82f6"; 
     }
     
@@ -1381,6 +1717,7 @@
             }
             updateAllStudentBadges();
             stopLoadingTips();
+            getMissionProgress(); 
         } catch (error) { alert("問題データの同期に失敗しました。"); console.error(error); hideAllScreens(); document.getElementById('login-screen').style.display = 'block'; stopLoadingTips(); }
     }
 
@@ -1780,6 +2117,16 @@
                 currentStatus = (answerTimeMs <= FAST_ANSWER_THRESHOLD) ? 'fast_correct' : 'slow_correct';
                 if (answerTimeMs < stats[currentQuiz.question].best_time) { stats[currentQuiz.question].best_time = answerTimeMs; }
                 stats[currentQuiz.question].status = currentStatus;
+
+                // ⚙️ ウィークリーミッション③: 「週にクイズで70問正解する」を自動計算
+                // ⚙️ ウィークリーミッション④: 「20コンボ」の自動計算
+                const mData = getMissionProgress();
+                mData.weekly.total_correct = (mData.weekly.total_correct || 0) + 1;
+                if (currentCombo >= 20) {
+                    mData.weekly.max_combo_reached = Math.max(mData.weekly.max_combo_reached || 0, currentCombo);
+                }
+                saveMissionProgress(mData);
+
             } else {
                 resultDiv.innerText = "❌ 不正解..."; buttons[selectedIndex].classList.add('wrong-choice');
                 currentCombo = 0; comboDiv.innerText = "❌ コンボ終了！";
@@ -1803,7 +2150,7 @@
             document.getElementById('next-btn').innerText = "次へ ➡️";
             document.getElementById('next-btn').style.background = "";
             document.getElementById('next-btn').style.color = "#ffffff";
-            document.getElementById('next-btn').style.pointerEvents = "auto"; // ★強制的にクリックを通す
+            document.getElementById('next-btn').style.pointerEvents = "auto"; 
             document.getElementById('next-btn').style.display = 'block';
 
         } else {
@@ -1821,14 +2168,14 @@
                 document.getElementById('next-btn').innerText = "結果発表画面へ 📊";
                 document.getElementById('next-btn').style.background = "linear-gradient(135deg, #9a3412 0%, #d97706 50%, #f59e0b 100%)";
                 document.getElementById('next-btn').style.color = "#0f172a";
-                document.getElementById('next-btn').style.pointerEvents = "auto"; // ★強制的にクリックを通す
+                document.getElementById('next-btn').style.pointerEvents = "auto"; 
                 document.getElementById('next-btn').style.display = 'block';
                 document.getElementById('review-end-message').style.display = 'block';
             } else {
                 document.getElementById('next-btn').innerText = "次へ ➡️";
                 document.getElementById('next-btn').style.background = "";
                 document.getElementById('next-btn').style.color = "#ffffff";
-                document.getElementById('next-btn').style.pointerEvents = "auto"; // ★強制的にクリックを通す
+                document.getElementById('next-btn').style.pointerEvents = "auto"; 
                 document.getElementById('next-btn').style.display = 'block';
             }
         }
@@ -1843,7 +2190,7 @@
             } else { 
                 if (ghostTimerInterval) { clearTimeout(ghostTimerInterval); ghostTimerInterval = null; } 
                 
-                if (reviewQuizData.length > 0) {
+                if (currentMode !== "battle" && reviewQuizData.length > 0) {
                     isReviewMode = true;
                     reviewQuestionIndex = 0;
                     hideAllScreens();
@@ -1859,6 +2206,9 @@
                 saveSuspendedSession(false);
                 showQuestion();
             } else {
+                // ⚙️ デイリーミッション③: 「1回、復習タイムで完答する」を自動計算
+                updateDailyMission('review_perfect');
+
                 document.getElementById('next-btn').style.background = "";
                 document.getElementById('next-btn').style.color = "#ffffff";
                 showFinalResult(); 
@@ -1884,6 +2234,11 @@
 
         if (isDataSubmitted) return; 
         isDataSubmitted = true; 
+
+        // ⚙️ デイリーミッション①: 「1回、テストに挑戦する」を自動計算
+        if (currentMode === "test") {
+            updateDailyMission('test_play');
+        }
 
         hideAllScreens(); 
         document.getElementById('result-screen').style.display = 'block';
@@ -1914,6 +2269,9 @@
             rivalLine.style.display = 'block';
             document.getElementById('battle-rival-score-val').innerText = ghostCurrentScore;
             banner.style.display = 'block';
+
+            // ⚙️ デイリーミッション②: 「1回、対戦を行う」を自動計算
+            updateDailyMission('battle_play');
             
             const calculateBattlePoints = (log) => {
                 return log.reduce((total, q) => {
@@ -1957,6 +2315,11 @@
                 if (streak >= 30) unlockTitle("streak_30");
 
                 if (timeDiffAbs <= 100) unlockTitle("battle_clutch_win");
+
+                // ⚙️ ウィークリーミッション②: 「週に対戦で９回勝利をおさめる」を自動計算
+                const mData = getMissionProgress();
+                mData.weekly.battle_wins = (mData.weekly.battle_wins || 0) + 1;
+                saveMissionProgress(mData);
 
             } else {
                 banner.innerHTML = `☠️ あなたの負け... ☠️<br><span style="font-size:1.1rem; font-weight:normal; color:#94a3b8;">あなた: ${playerPoints} Pt vs 相手: ${ghostPoints} Pt</span>`; 
@@ -2104,7 +2467,7 @@
 
         updateAllStudentBadges();
         showNextTitleFromQueue();
-
+        checkMissionMilestones();
         if (typeof sendDataToTeacher === "function") { sendDataToTeacher(clearedCount, totalCount); }
         sendRateToSpreadsheet(selectedSubject, myRate); 
         sendFieldSummaryToSpreadsheet(); 
@@ -2156,7 +2519,6 @@
 
     function syncTitleSelection(triggerSelect) {
         currentSelectedTitleValue = triggerSelect.value;
-        
         if (studentKey) {
             localStorage.setItem(`quiz_selected_title_${studentKey}`, currentSelectedTitleValue);
         }
@@ -2277,7 +2639,6 @@
     
     function confirmFinishLearning() { 
         if(studentKey) {
-            // 💡【修正】連打対策：本日すでに終了ログがある場合はカウントを進めない
             const now = new Date();
             const todayStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
             const lastClearDate = localStorage.getItem(`quiz_last_clear_date_${studentKey}`);
@@ -2335,7 +2696,6 @@
             const correctText = q.type === "en_to_ja" || q.type === "ja_to_en" ? q.correctText : q.choices[q.correct]; const count = stats[q.question].wrong_count;
             let expHtml = q.explanation ? `<div class="review-ans" style="color: #94a3b8; margin-top: 6px; font-size: 0.9rem; border-top: 1px dashed rgba(255,255,255,0.1); padding-top: 6px;">💡 解説: ${q.explanation}</div>` : '';
             card.innerHTML = `<div class="review-q">問${index + 1}: ${q.question}</div><div class="review-ans review-wrong" style="font-size:0.85rem; margin-bottom:5px;">⚠️ 過去のミス回数: ${count} 回</div><div class="review-ans review-correct">⭕ 正しい正解: ${correctText}</div>${expHtml}`;
-            
             container.appendChild(card);
         });
     }
@@ -2544,7 +2904,7 @@
                 plugins: { legend: { display: false } },
                 scales: {
                     x: { grid: { color: '#1e293b' }, ticks: { color: '#94a3b8', font: { size: 9 } } },
-                    y: { grid: { grid: { color: '#1e293b' }, ticks: { color: '#94a3b8', font: { size: 10 } } } }
+                    y: { grid: { color: '#1e293b' }, ticks: { color: '#94a3b8', font: { size: 10 } } }
                 }
             }
         });
@@ -2605,7 +2965,6 @@
         let targetKeys = [];
         if (subject === "science") targetKeys = ["science_1", "science_2", "science_3"];
         else if (subject === "social") targetKeys = ["social_geography", "social_history", "social_civics"];
-        // 💡【修正】英語の全データシート（中学1〜3年・word/grammar含む全10枚）に拡張対応
         else if (subject === "english") targetKeys = [
             "english_word_1", "english_word_2", "english_word_3", "english_word_4", "english_word_5",
             "english_grammar_1", "english_grammar_2", "english_grammar_3", "english_grammar_4", "english_grammar_5"
@@ -2690,11 +3049,6 @@
         showQuestion();
     }
 
-    // ========================================================
-    // 🛠 追加・精査されたアクティブ関数群
-    // ========================================================
-
-    // 1. 自動ログイン用フォーム復元チェック
     function checkAutoLogin() {
         const savedId = localStorage.getItem('quiz_saved_id');
         const savedName = localStorage.getItem('quiz_saved_name');
@@ -2706,7 +3060,6 @@
         }
     }
 
-    // 2. ログアウト処理（生徒の切り替え機能）
     function logoutStudent() {
         if (confirm("ログアウトして生徒を切り替えますか？")) {
             localStorage.removeItem('quiz_saved_id');
@@ -2718,7 +3071,6 @@
         }
     }
 
-    // 3. 称号の解放判定とキューへの格納
     function unlockTitle(titleId) {
         if (!studentKey) return;
         let unlocked = JSON.parse(localStorage.getItem(`quiz_unlocked_titles_${studentKey}`) || "[]");
@@ -2730,7 +3082,6 @@
         }
     }
 
-    // 4. キューに格納された新規獲得称号を順番にポップアップ表示する処理
     function showNextTitleFromQueue() {
         if (titleQueue.length === 0) {
             if (isPendingReload) {
@@ -2756,10 +3107,56 @@
         document.getElementById('title-popup').style.display = 'flex';
     }
 
-    // 5. 称号ポップアップを閉じる処理
     function closeTitlePopup() {
         document.getElementById('title-popup').style.display = 'none';
         showNextTitleFromQueue();
+    }
+    let missionQueue = [];
+
+    function checkMissionMilestones() {
+        if (!studentKey) return;
+        const data = getMissionProgress();
+        if (!data.notifiedMissions) data.notifiedMissions = [];
+        
+        const dailyDefs = [
+            { id: "daily_test_play", text: "デイリー：① 1回、テストに挑戦する", target: 1, current: data.daily.test_play },
+            { id: "daily_battle_play", text: "デイリー：② 1回、対戦を行う (勝敗は不問)", target: 1, current: data.daily.battle_play },
+            { id: "daily_review_perfect", text: "デイリー：③ 1回、復習タイムで完答する", target: 1, current: data.daily.review_perfect }
+        ];
+        
+        const weeklyDefs = [
+            { id: "weekly_daily_15", text: "ウィークリー：① デイリーミッションを累計15個達成", target: 15, current: data.weekly.daily_clear_count },
+            { id: "weekly_battle_9", text: "ウィークリー：② 週に対戦で９回勝利をおさめる", target: 9, current: data.weekly.battle_wins },
+            { id: "weekly_correct_70", text: "ウィークリー：③ 週にクイズで70問正解する", target: 70, current: data.weekly.total_correct },
+            { id: "weekly_combo_20", text: "ウィークリー：④ 週に１回でも20コンボを達成する", target: 20, current: data.weekly.max_combo_reached }
+        ];
+        
+        let newlyCleared = false;
+        
+        [...dailyDefs, ...weeklyDefs].forEach(m => {
+            if (m.current >= m.target && !data.notifiedMissions.includes(m.id)) {
+                data.notifiedMissions.push(m.id);
+                missionQueue.push(m.text);
+                newlyCleared = true;
+            }
+        });
+        
+        if (newlyCleared) {
+            saveMissionProgress(data);
+            showNextMissionFromQueue();
+        }
+    }
+
+    function showNextMissionFromQueue() {
+        if (missionQueue.length === 0) return;
+        const nextMissionText = missionQueue.shift();
+        document.getElementById('popup-mission-name').innerText = nextMissionText;
+        document.getElementById('mission-clear-popup').style.display = 'flex';
+    }
+
+    function closeMissionClearPopup() {
+        document.getElementById('mission-clear-popup').style.display = 'none';
+        showNextMissionFromQueue();
     }
 
     // イベントリスナー設定
@@ -2770,8 +3167,32 @@
 
     document.getElementById('student-id-input').addEventListener('keypress', function(e) { if (e.key === 'Enter') loginStudent(); });
     document.getElementById('student-name-input').addEventListener('keypress', function(e) { if (e.key === 'Enter') loginStudent(); });
+    function toggleTheme() {
+        const currentTheme = localStorage.getItem("quiz_app_theme") || "cyber";
+        const newTheme = (currentTheme === "cyber") ? "cute" : "cyber";
+        localStorage.setItem("quiz_app_theme", newTheme);
+        applyTheme(newTheme);
+    }
 
-    // アプリ初期化実行（前回の入力内容を復元）
+    function applyTheme(theme) {
+        if (theme === "cute") {
+            document.body.classList.add("theme-cute");
+            // アプリ起動時のメタテーマカラーも優しいベージュに変更
+            document.querySelector('meta[name="theme-color"]').setAttribute("content", "#fdfbf7");
+        } else {
+            document.body.classList.remove("theme-cute");
+            document.querySelector('meta[name="theme-color"]').setAttribute("content", "#0b0f19");
+        }
+        if (studentKey) updateAllStudentBadges(); // プルダウンの色を再反映
+    }
+
+    function initTheme() {
+        const savedTheme = localStorage.getItem("quiz_app_theme") || "cyber";
+        applyTheme(savedTheme);
+    }
+
+    // アプリ起動時に保存されたテーマを読み込む
+    initTheme();
     checkAutoLogin();
 </script>
 </body>
