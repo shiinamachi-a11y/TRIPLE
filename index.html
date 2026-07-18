@@ -635,6 +635,9 @@
             box-shadow: 0 15px 40px rgba(109, 84, 64, 0.25) !important;
             color: #6d5440 !important;
         }
+        .theme-cute #menu-battle-count { color: #b2733d !important; }
+        .theme-cute #popup-mission-reward { color: #b2733d !important; }
+        .theme-cute #menu-battle-count { color: #b2733d !important; }
         .theme-cute #mission-popup h3 { color: #6d5440 !important; }
         .theme-cute #mission-list-daily > div,
         .theme-cute #mission-list-weekly > div,
@@ -694,6 +697,7 @@
             <div class="popup-badge-glow" style="color: #10b981;">🎯 MISSION CLEARED!</div>
             <h3 style="margin:0; font-size:1.2rem; color:#ffffff;">ミッションを達成したぞ！</h3>
             <div id="popup-mission-name" style="font-size: 1.35rem; margin: 25px 0; font-weight:900; color: #ffffff; text-align: center;">【ミッション名】</div>
+            <div id="popup-mission-reward" style="font-size: 1.05rem; color: #fbbf24; font-weight: bold; margin-top: -10px; margin-bottom: 15px; text-align: center;">🎫 対戦チケットを1枚入手！</div>
             <button class="btn nav-btn" style="margin-top: 25px; padding: 12px; background: linear-gradient(135deg, #059669 0%, #10b981 100%);" onclick="closeMissionClearPopup()">確認 ➡️</button>
         </div>
     </div>
@@ -720,6 +724,7 @@
                     </div>
                     <div class="menu-card battle-card" onclick="setMode('battle')">
                         <span class="menu-item-title">⚔️ 対戦バトル</span>
+                        <span id="menu-battle-count" style="font-size: 0.75rem; color: #a78bfa; margin-top: 4px; font-weight: bold; z-index: 2;">残り 3 回 / 🎫 0枚</span>
                         <span class="menu-card-bg-icon">⚔️</span>
                     </div>
                     <div class="menu-card blue-card" onclick="showReportScreen()">
@@ -963,9 +968,7 @@
             <button class="btn nav-btn" style="background: linear-gradient(135deg, #334155 0%, #1e293b 100%);" onclick="backToSectionSelect()">続けて別の問題を解く</button>
             <button class="btn back-btn" style="margin-top: 10px;" onclick="backToSubjectFromResult()">教科を選び直す</button>
             
-            <!-- ⚔️ 対戦終了ボタンをここに確実にはめ込みました -->
-            <button id="battle-finish-btn" class="btn" style="background: linear-gradient(135deg, #475569 0%, #334155 100%); color: white; font-weight: bold; margin-top: 15px; display: none;" onclick="finishBattleMode()">⚔️ 対戦を終了してトップに戻る</button>
-            
+            <button id="menu-back-to-top-btn" class="btn" style="background: linear-gradient(135deg, #475569 0%, #334155 100%); color: white; font-weight: bold; margin-top: 15px;" onclick="exitToMainMenu()">🏠 トップページに戻る</button>            
             <button class="btn" style="background: linear-gradient(135deg, #c2410c 0%, #ed8936 100%); color: white; font-weight: bold; margin-top: 15px;" onclick="showDailySummary()">🔍 今日の学習を振り返る</button>
         </div>
     </div>
@@ -1623,7 +1626,28 @@
     }
     let isMainMenuBlocked = false;
     function setMode(mode) { 
-        if (mode === 'battle' && getBattleRemainingCount() <= 0) { alert("本日の対戦上限（3回）に達しました。また明日挑戦してね！"); return; }
+        if (mode === 'battle') {
+            let remaining = getBattleRemainingCount();
+            // 💡 対戦回数が0回になってしまった場合
+            if (remaining <= 0) {
+                let tickets = parseInt(localStorage.getItem(`quiz_battle_tickets_${studentKey}`) || '0');
+                // チケットを持っていれば使用を確認
+                if (tickets > 0) {
+                    if (confirm(`本日の対戦上限（3回）に達しています。\n🎫対戦チケットを1枚使って回数を1回増やしますか？\n(所持チケット: ${tickets}枚)`)) {
+                        tickets--;
+                        localStorage.setItem(`quiz_battle_tickets_${studentKey}`, String(tickets));
+                        localStorage.setItem(`quiz_battle_count_${studentKey}`, String(remaining + 1));
+                        alert("対戦回数が1回回復しました！さあ、ライバルとのバトルに挑戦しよう！⚔️");
+                    } else {
+                        return; // キャンセルしたらそのままメニューに留まる
+                    }
+                } else {
+                    alert("本日の対戦上限（3回）に達しました。また明日挑戦してね！\n🎯ミッションをクリアすると対戦チケットが手に入るよ！"); 
+                    return; 
+                }
+            }
+        }
+        isMainMenuBlocked = false;
         currentMode = mode; startLearningMode(); 
     }
 
@@ -2531,6 +2555,15 @@
                 }
             }
         }
+    
+        if (studentKey) {
+            const remaining = getBattleRemainingCount();
+            const tickets = parseInt(localStorage.getItem(`quiz_battle_tickets_${studentKey}`) || '0');
+            const countEl = document.getElementById('menu-battle-count');
+            if (countEl) {
+                countEl.innerText = `残り ${remaining} 回 / 🎫 ${tickets}枚`;
+            }
+        }
     }
 
     function syncTitleSelection(triggerSelect) {
@@ -2562,16 +2595,14 @@
         document.getElementById('result-stage-2').style.display = 'block';
         
         const countDisplay = document.getElementById('retry-battle-count-display');
-        const finishBattleBtn = document.getElementById('battle-finish-btn');
+        // 💡 変更：特定のボタンの表示・非表示制御を無くし、HTML側で共通ボタンとして常時表示させます
         
         if (currentMode === "battle") {
             const remaining = getBattleRemainingCount();
             countDisplay.innerText = `⚠️ 残り対戦回数: ${remaining}回`;
             countDisplay.style.display = "block";
-            if (finishBattleBtn) finishBattleBtn.style.display = "block"; // 終了ボタンを表示
         } else {
             countDisplay.style.display = "none";
-            if (finishBattleBtn) finishBattleBtn.style.display = "none";  // 通常テスト時は非表示
         }
         
         const sSign = dailyRateChangeScience >= 0 ? `+${dailyRateChangeScience}` : dailyRateChangeScience;
@@ -2598,9 +2629,9 @@
         }
     }
     
-    // 💡 対戦を途中でやめて安全にメインメニュー（トップ）へ直帰する関数
-    function finishBattleMode() {
-        isMainMenuBlocked = false; // 不正戻りロックを解除
+    // 💡 変更：テストでも対戦でも、この正規のボタンを押した時だけ安全にロックを解除してトップへ戻します
+    function exitToMainMenu() {
+        isMainMenuBlocked = false; // 不正戻りロックを解除！
         backToMainMenu();          // メインメニュー画面へ
     }    
     function showDailySummary() {
@@ -3183,6 +3214,9 @@
             if (m.current >= m.target && !data.notifiedMissions.includes(m.id)) {
                 data.notifiedMissions.push(m.id);
                 missionQueue.push(m.text);
+                let tickets = parseInt(localStorage.getItem(`quiz_battle_tickets_${studentKey}`) || '0');
+                tickets++;
+                localStorage.setItem(`quiz_battle_tickets_${studentKey}`, String(tickets));
                 newlyCleared = true;
             }
         });
