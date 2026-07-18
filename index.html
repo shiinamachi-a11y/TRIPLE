@@ -1367,7 +1367,7 @@
         const dailyDefs = [
             { key: "test_play", text: "1回、テストに挑戦する", target: 1, current: data.daily.test_play },
             { key: "battle_play", text: "1回、対戦を行う (勝敗は不問)", target: 1, current: data.daily.battle_play },
-            { key: "review_perfect", text: "1回、復習タイムで完答する", target: 1, current: data.daily.review_perfect }
+            { key: "review_perfect", text: "1回、復習タイム完答 または 10問全問正解", target: 1, current: data.daily.review_perfect }
         ];
         
         dailyDefs.forEach((m, idx) => {
@@ -2248,6 +2248,9 @@
         if (isDataSubmitted) return; 
         isDataSubmitted = true; 
         isMainMenuBlocked = true;
+        if (score === 10) {
+            updateDailyMission('review_perfect');
+        }
         // ⚙️ デイリーミッション①: 「1回、テストに挑戦する」を自動計算
         if (currentMode === "test") {
             updateDailyMission('test_play');
@@ -3164,7 +3167,7 @@
         const dailyDefs = [
             { id: "daily_test_play", text: "デイリー：① 1回、テストに挑戦する", target: 1, current: data.daily.test_play },
             { id: "daily_battle_play", text: "デイリー：② 1回、対戦を行う (勝敗は不問)", target: 1, current: data.daily.battle_play },
-            { id: "daily_review_perfect", text: "デイリー：③ 1回、復習タイムで完答する", target: 1, current: data.daily.review_perfect }
+            { id: "daily_review_perfect", text: "デイリー：③ 1回、復習タイム完答 または 10問全問正解", target: 1, current: data.daily.review_perfect }        
         ];
         
         const weeklyDefs = [
