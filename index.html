@@ -1669,9 +1669,15 @@
             for (let i = 1; i < lines.length; i++) {
                 const line = lines[i].trim(); if (!line) continue; const currentCols = line.split("\t"); if (currentCols.length < 2) continue;
                 const sheetName = currentCols[1].trim(); const cleanSheetName = sheetName.replace(/\s+/g, '');
+                const sRate = currentCols[3] ? parseInt(currentCols[3].trim()) : 1500;
+                const oRate = currentCols[4] ? parseInt(currentCols[4].trim()) : 1500;
+                const eRate = currentCols[5] ? parseInt(currentCols[5].trim()) : 1500;
                 allStudentsList.push({ id: currentCols[0].trim(), name: sheetName, grade: "生徒", scienceRate: currentCols[3]?parseInt(currentCols[3].trim()):1500, socialRate: currentCols[4]?parseInt(currentCols[4].trim()):1500, englishRate: currentCols[5]?parseInt(currentCols[5].trim()):1500, campus: currentCols[2]?currentCols[2].trim():"---" });
                 if (Number(currentCols[0].trim()) === Number(idInput) && cleanSheetName === cleanNameInput) {
                     studentId = currentCols[0].trim(); studentName = sheetName; studentGrade = "生徒"; studentCampus = currentCols[2]?currentCols[2].trim():"---"; studentKey = `${studentId}_${studentName}`; isUserFound = true;
+            localStorage.setItem(`quiz_rate_science_${studentKey}`, sRate);
+            localStorage.setItem(`quiz_rate_social_${studentKey}`, oRate);
+            localStorage.setItem(`quiz_rate_english_${studentKey}`, eRate);
                 }
             }
             if (!isUserFound) { alert("生徒番号または氏名が登録されていません。"); loginBtn.disabled = false; loginBtn.innerText = "ログイン"; return; }
