@@ -1570,6 +1570,18 @@
         if (!studentKey) return;
         const now = new Date(); const currentMonthString = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
         const savedMonthString = localStorage.getItem(`quiz_rate_month_${studentKey}`);
+        if (!studentKey) return;
+        const now = new Date(); 
+        const currentMonthString = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+        const savedMonthString = localStorage.getItem(`quiz_rate_month_${studentKey}`);
+        
+        // 💡 初めての端末でログインした時は、リセットを行わずに今月の記録だけを残して終了！
+        if (!savedMonthString) {
+            localStorage.setItem(`quiz_rate_month_${studentKey}`, currentMonthString);
+            return;
+        }
+
+        // 実際に月が替わった場合のみ1500にリセット
         if (savedMonthString !== currentMonthString) {
             localStorage.setItem(`quiz_rate_science_${studentKey}`, '1500'); 
             localStorage.setItem(`quiz_rate_social_${studentKey}`, '1500'); 
@@ -1597,7 +1609,6 @@
             sendRateToSpreadsheet('english', 1500);
         }
     }
-
     function checkBattleLimit() {
         if (!studentKey) return true;
         const savedDate = localStorage.getItem(`quiz_battle_date_${studentKey}`);
