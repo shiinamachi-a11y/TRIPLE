@@ -1670,31 +1670,57 @@
         const idInput = document.getElementById('student-id-input').value.trim(); 
         const nameInput = document.getElementById('student-name-input').value.trim(); 
         const loginBtn = document.getElementById('login-submit-btn');
-        if (!idInput || !nameInput) { alert("生徒番号と氏名を入力してください。"); return; }
-        loginBtn.disabled = true; loginBtn.innerText = "認証中...";
+        
+        if (!idInput || !nameInput) { 
+            alert("生徒番号と氏名を入力してください。"); 
+            return; 
+        }
+        
+        loginBtn.disabled = true; 
+        loginBtn.innerText = "認証中...";
+        
         try {
             const response = await fetch(STUDENT_LIST_URL); 
+            if (!response.ok) {
+                throw new Error(`生徒名簿シートの取得に失敗しました (HTTP ${response.status})`);
+            }
+            
             const text = await response.text(); 
             const lines = text.split("\n");
-            let isUserFound = false; allStudentsList = []; 
+            let isUserFound = false; 
+            allStudentsList = []; 
             const cleanNameInput = nameInput.replace(/\s+/g, '');
+            
             for (let i = 1; i < lines.length; i++) {
-                const line = lines[i].trim(); if (!line) continue; 
-                const currentCols = line.split("\t"); if (currentCols.length < 2) continue;
+                const line = lines[i].trim(); 
+                if (!line) continue; 
+                
+                const currentCols = line.split("\t"); 
+                if (currentCols.length < 2) continue;
+                
                 const sheetName = currentCols[1].trim(); 
                 const cleanSheetName = sheetName.replace(/\s+/g, '');
                 
-                const sRate = currentCols[3] ? parseInt(currentCols[3].trim()) : 1500;
-                const oRate = currentCols[4] ? parseInt(currentCols[4].trim()) : 1500;
-                const eRate = currentCols[5] ? parseInt(currentCols[5].trim()) : 1500;
+                // 数値変換の安全化（NaN対策）
+                const sRate = parseInt(currentCols[3]) || 1500;
+                const oRate = parseInt(currentCols[4]) || 1500;
+                const eRate = parseInt(currentCols[5]) || 1500;
 
-                allStudentsList.push({ id: currentCols[0].trim(), name: sheetName, grade: "生徒", scienceRate: sRate, socialRate: oRate, englishRate: eRate, campus: currentCols[2]?currentCols[2].trim():"---" });
+                allStudentsList.push({ 
+                    id: currentCols[0].trim(), 
+                    name: sheetName, 
+                    grade: "生徒", 
+                    scienceRate: sRate, 
+                    socialRate: oRate, 
+                    englishRate: eRate, 
+                    campus: currentCols[2] ? currentCols[2].trim() : "---" 
+                });
                 
                 if (Number(currentCols[0].trim()) === Number(idInput) && cleanSheetName === cleanNameInput) {
                     studentId = currentCols[0].trim(); 
                     studentName = sheetName; 
                     studentGrade = "生徒"; 
-                    studentCampus = currentCols[2]?currentCols[2].trim():"---"; 
+                    studentCampus = currentCols[2] ? currentCols[2].trim() : "---"; 
                     studentKey = `${studentId}_${studentName}`; 
                     isUserFound = true;
                     
@@ -1703,16 +1729,26 @@
                     localStorage.setItem(`quiz_rate_english_${studentKey}`, eRate);
                 }
             }
-            if (!isUserFound) { alert("生徒番号または氏名が登録されていません。"); loginBtn.disabled = false; loginBtn.innerText = "ログイン"; return; }
             
-            // 💡 クラウドから達成率データを確実（await）にダウンロードして端末へセット！
+            if (!isUserFound) { 
+                alert("生徒番号または氏名が登録されていません。"); 
+                loginBtn.disabled = false; 
+                loginBtn.innerText = "ログイン"; 
+                return; 
+            }
+            
+            // クラウドから達成率データを取得
             try {
                 const statsRes = await fetch(`${GAS_WEB_APP_URL}?action=get_perf_stats&studentId=${studentId}`);
-                const serverStats = await statsRes.json();
-                if (serverStats && Object.keys(serverStats).length > 0) {
-                    localStorage.setItem(`quiz_perf_stats_${studentKey}`, JSON.stringify(serverStats));
+                if (statsRes.ok) {
+                    const serverStats = await statsRes.json();
+                    if (serverStats && typeof serverStats === 'object' && Object.keys(serverStats).length > 0) {
+                        localStorage.setItem(`quiz_perf_stats_${studentKey}`, JSON.stringify(serverStats));
+                    }
                 }
-            } catch(e) { console.error("PerfStats load error:", e); }
+            } catch(e) { 
+                console.error("PerfStats load error:", e); 
+            }
 
             loadCombo();
             dailySummaryData = {};
@@ -1734,9 +1770,19 @@
             startLoadingTips(); 
             document.getElementById('loading-text').innerText = "認証に成功しました。同期を実行中...";
             showMainScreen();
-        } catch (error) { alert("同期に失敗しました。"); console.error(error); hideAllScreens(); document.getElementById('login-screen').style.display = 'block'; }
-    }
-    async function loadAllQuizData() {
+        } catch (error) { 
+            // 💡 具体的なエラー理由をアラートに表示！
+            alert(`同期に失敗しました。\n【エラー詳細】: ${error.message}`); 
+            console.error(error); 
+            hideAllScreens(); 
+            document.getElementById('login-screen').style.display = 'block'; 
+        } finally {
+            // 💡 成功・失敗にかかわらずボタンを押し直せる状態へ復元
+            loginBtn.disabled = false; 
+            loginBtn.innerText = "ログイン"; 
+        }
+    }   
+        async function loadAllQuizData() {
         document.getElementById('loading-text').innerText = "サーバーから最新の問題データを同期しています...";
         if (!loadingTipsInterval) startLoadingTips();
         try {
