@@ -1667,32 +1667,59 @@
 
     async function loginStudent() {
         isMainMenuBlocked = false;
-        const idInput = document.getElementById('student-id-input').value.trim(); const nameInput = document.getElementById('student-name-input').value.trim(); const loginBtn = document.getElementById('login-submit-btn');
+        const idInput = document.getElementById('student-id-input').value.trim(); 
+        const nameInput = document.getElementById('student-name-input').value.trim(); 
+        const loginBtn = document.getElementById('login-submit-btn');
         if (!idInput || !nameInput) { alert("生徒番号と氏名を入力してください。"); return; }
         loginBtn.disabled = true; loginBtn.innerText = "認証中...";
         try {
-            const response = await fetch(STUDENT_LIST_URL); const text = await response.text(); const lines = text.split("\n");
+            const response = await fetch(STUDENT_LIST_URL); 
+            const text = await response.text(); 
+            const lines = text.split("\n");
             let isUserFound = false; allStudentsList = []; 
             const cleanNameInput = nameInput.replace(/\s+/g, '');
             for (let i = 1; i < lines.length; i++) {
-                const line = lines[i].trim(); if (!line) continue; const currentCols = line.split("\t"); if (currentCols.length < 2) continue;
-                const sheetName = currentCols[1].trim(); const cleanSheetName = sheetName.replace(/\s+/g, '');
+                const line = lines[i].trim(); if (!line) continue; 
+                const currentCols = line.split("\t"); if (currentCols.length < 2) continue;
+                const sheetName = currentCols[1].trim(); 
+                const cleanSheetName = sheetName.replace(/\s+/g, '');
+                
                 const sRate = currentCols[3] ? parseInt(currentCols[3].trim()) : 1500;
                 const oRate = currentCols[4] ? parseInt(currentCols[4].trim()) : 1500;
                 const eRate = currentCols[5] ? parseInt(currentCols[5].trim()) : 1500;
-                allStudentsList.push({ id: currentCols[0].trim(), name: sheetName, grade: "生徒", scienceRate: currentCols[3]?parseInt(currentCols[3].trim()):1500, socialRate: currentCols[4]?parseInt(currentCols[4].trim()):1500, englishRate: currentCols[5]?parseInt(currentCols[5].trim()):1500, campus: currentCols[2]?currentCols[2].trim():"---" });
+
+                allStudentsList.push({ id: currentCols[0].trim(), name: sheetName, grade: "生徒", scienceRate: sRate, socialRate: oRate, englishRate: eRate, campus: currentCols[2]?currentCols[2].trim():"---" });
+                
                 if (Number(currentCols[0].trim()) === Number(idInput) && cleanSheetName === cleanNameInput) {
-                    studentId = currentCols[0].trim(); studentName = sheetName; studentGrade = "生徒"; studentCampus = currentCols[2]?currentCols[2].trim():"---"; studentKey = `${studentId}_${studentName}`; isUserFound = true;
-            localStorage.setItem(`quiz_rate_science_${studentKey}`, sRate);
-            localStorage.setItem(`quiz_rate_social_${studentKey}`, oRate);
-            localStorage.setItem(`quiz_rate_english_${studentKey}`, eRate);
+                    studentId = currentCols[0].trim(); 
+                    studentName = sheetName; 
+                    studentGrade = "生徒"; 
+                    studentCampus = currentCols[2]?currentCols[2].trim():"---"; 
+                    studentKey = `${studentId}_${studentName}`; 
+                    isUserFound = true;
+                    
+                    localStorage.setItem(`quiz_rate_science_${studentKey}`, sRate);
+                    localStorage.setItem(`quiz_rate_social_${studentKey}`, oRate);
+                    localStorage.setItem(`quiz_rate_english_${studentKey}`, eRate);
                 }
             }
             if (!isUserFound) { alert("生徒番号または氏名が登録されていません。"); loginBtn.disabled = false; loginBtn.innerText = "ログイン"; return; }
             
+            // 💡 クラウドから達成率データを確実（await）にダウンロードして端末へセット！
+            try {
+                const statsRes = await fetch(`${GAS_WEB_APP_URL}?action=get_perf_stats&studentId=${studentId}`);
+                const serverStats = await statsRes.json();
+                if (serverStats && Object.keys(serverStats).length > 0) {
+                    localStorage.setItem(`quiz_perf_stats_${studentKey}`, JSON.stringify(serverStats));
+                }
+            } catch(e) { console.error("PerfStats load error:", e); }
+
             loadCombo();
             dailySummaryData = {};
-            localStorage.setItem('quiz_saved_id', studentId); localStorage.setItem('quiz_saved_name', studentName); localStorage.setItem('quiz_saved_grade', studentGrade); localStorage.setItem('quiz_saved_campus', studentCampus); 
+            localStorage.setItem('quiz_saved_id', studentId); 
+            localStorage.setItem('quiz_saved_name', studentName); 
+            localStorage.setItem('quiz_saved_grade', studentGrade); 
+            localStorage.setItem('quiz_saved_campus', studentCampus); 
             
             ['science', 'social', 'english'].forEach(sub => {
                 let historyKey = `quiz_rate_history_${sub}_${studentKey}`;
@@ -1701,18 +1728,14 @@
                 }
             });
 
-            checkMonthlyReset(); hideAllScreens(); 
+            checkMonthlyReset(); 
+            hideAllScreens(); 
             document.getElementById('loading-screen').style.display = 'block'; 
             startLoadingTips(); 
             document.getElementById('loading-text').innerText = "認証に成功しました。同期を実行中...";
             showMainScreen();
         } catch (error) { alert("同期に失敗しました。"); console.error(error); hideAllScreens(); document.getElementById('login-screen').style.display = 'block'; }
     }
-
-    function showMainScreen() {
-        loadAllQuizData();
-    }
-
     async function loadAllQuizData() {
         document.getElementById('loading-text').innerText = "サーバーから最新の問題データを同期しています...";
         if (!loadingTipsInterval) startLoadingTips();
@@ -2526,6 +2549,7 @@
         sendRateToSpreadsheet(selectedSubject, myRate); 
         sendFieldSummaryToSpreadsheet(); 
         sendDataToGoogleForm();
+        sendPerfStatsToSpreadsheet();
     }
 
     function updateAllStudentBadges() {
@@ -3116,7 +3140,17 @@
         const url = `${GAS_WEB_APP_URL}?action=update_summary&studentId=${studentId}&summary=${encodeURIComponent(summaryStr)}`;
         fetch(url).catch(e => console.error("GAS summary log error:", e));
     }
+    function sendPerfStatsToSpreadsheet() {
+        if (!studentId) return;
+        const stats = localStorage.getItem(`quiz_perf_stats_${studentKey}`) || '{}';
+        const formData = new FormData();
+        formData.append('action', 'update_perf_stats');
+        formData.append('studentId', studentId);
+        formData.append('stats', stats);
 
+        fetch(GAS_WEB_APP_URL, { method: 'POST', body: formData, mode: 'no-cors' })
+            .catch(e => console.error("GAS perfStats update error:", e));
+    }
     function sendDataToGoogleForm() {
         if (!studentKey) return;
         const formData = new FormData();
