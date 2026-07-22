@@ -16,31 +16,35 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         /* 全体ベース（ダークメタリック） */
-        body { 
-            font-family: 'Helvetica Neue', Arial, 'Hiragino Kaku Gothic ProN', sans-serif; 
-            background-color: #0b0f19; 
-            display: flex; 
-            justify-content: center; 
-            align-items: center; 
-            height: 100vh; 
-            margin: 0; 
-            color: #f1f5f9;
-        }
-        
-        /* アプリ筐体（高級感のあるチタンフレーム×微発光エッジ） */
-        .quiz-container { 
-            background: linear-gradient(135deg, #090d16 0%, #111827 100%); 
-            border: 2px solid #1e293b;
-            border-radius: 16px; 
-            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6), 0 0 30px rgba(37, 99, 235, 0.1); 
-            width: 400px; 
-            height: 740px; 
-            text-align: center; 
-            box-sizing: border-box; 
-            position: relative; 
-            overflow: hidden; 
-        }
-        
+         /* ✨ 修正後（スマホ・iPad自動対応） */
+body { 
+    font-family: 'Helvetica Neue', Arial, 'Hiragino Kaku Gothic ProN', sans-serif; 
+    background-color: #0b0f19; 
+    display: flex; 
+    justify-content: center; 
+    align-items: center; 
+    min-height: 100vh; 
+    margin: 0; 
+    padding: 10px;
+    box-sizing: border-box;
+    color: #f1f5f9;
+}
+
+/* アプリ筐体（画面に合わせて可変） */
+.quiz-container { 
+    background: linear-gradient(135deg, #090d16 0%, #111827 100%); 
+    border: 2px solid #1e293b;
+    border-radius: 16px; 
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6), 0 0 30px rgba(37, 99, 235, 0.1); 
+    width: 100%;
+    max-width: 420px; 
+    height: 95vh;
+    max-height: 780px; 
+    text-align: center; 
+    box-sizing: border-box; 
+    position: relative; 
+    overflow: hidden; 
+}       
         .screen { 
             width: 100%; 
             height: 100%; 
@@ -742,6 +746,23 @@
             -webkit-background-clip: text !important;
             -webkit-text-fill-color: transparent !important;
             text-shadow: none !important;
+        }
+       @media (min-width: 600px) {
+            .quiz-container {
+                max-width: 520px;        /* 筐体の横幅を広げて見やすく */
+                max-height: 85vh;        /* iPad画面に合わせた高さ調整 */
+                border-radius: 20px;
+            }
+            .question {
+                font-size: 1.3rem;       /* 問題文の文字サイズをアップ */
+            }
+            .btn {
+                font-size: 1.05rem;      /* ボタンの押しやすさ向上 */
+                padding: 16px;
+            }
+            .menu-card {
+                height: 150px;           /* メニューカードの長さを拡大 */
+            }
         }
        </style>
 </head>
@@ -2043,7 +2064,25 @@
     function prepareModeFlow(section) {
         selectedSectionName = section;
         if (currentMode === "battle") {
-            if (getBattleRemainingCount() <= 0) { alert("本日の対戦上限（3回）に達しました。"); backToMainMenu(); return; }
+            let remaining = getBattleRemainingCount();
+            if (remaining <= 0) {
+                let tickets = parseInt(localStorage.getItem(`quiz_battle_tickets_${studentKey}`) || '0');
+                if (tickets > 0) {
+                    if (confirm(`本日の対戦上限（3回）に達しています。\n🎫対戦チケットを1枚使って回数を1回増やしますか？\n(所持チケット: ${tickets}枚)`)) {
+                        tickets--;
+                        localStorage.setItem(`quiz_battle_tickets_${studentKey}`, String(tickets));
+                        localStorage.setItem(`quiz_battle_count_${studentKey}`, String(remaining + 1));
+                        alert("対戦回数が1回回復しました！さあ、ライバルとのバトルに挑戦しよう！⚔️");
+                        updateAllStudentBadges();
+                    } else {
+                        return;
+                    }
+                } else {
+                    alert("本日の対戦上限（3回）に達しました。また明日挑戦してね！\n🎯ミッションをクリアすると対戦チケットが手に入るよ！"); 
+                    backToMainMenu(); 
+                    return; 
+                }
+            }
             hideAllScreens();
             document.getElementById('battle-field-name').innerText = section;
             document.getElementById('cmd-start-matching').style.display = 'block';
@@ -2053,7 +2092,6 @@
             document.getElementById('battle-match-screen').style.display = 'block';
         } else { startQuizWithSection(section); }
     }
-
     function triggerMatchingSequence() {
         document.getElementById('cmd-start-matching').style.display = 'none';
         document.getElementById('battle-match-back-btn').style.display = 'none';
@@ -2779,11 +2817,11 @@
         document.getElementById('result-stage-2').style.display = 'block';
         
         const countDisplay = document.getElementById('retry-battle-count-display');
-        // 💡 変更：特定のボタンの表示・非表示制御を無くし、HTML側で共通ボタンとして常時表示させます
         
         if (currentMode === "battle") {
             const remaining = getBattleRemainingCount();
-            countDisplay.innerText = `⚠️ 残り対戦回数: ${remaining}回`;
+            const tickets = parseInt(localStorage.getItem(`quiz_battle_tickets_${studentKey}`) || '0');
+            countDisplay.innerText = `⚠️ 残り対戦回数: ${remaining}回 / 🎫 ${tickets}枚`;
             countDisplay.style.display = "block";
         } else {
             countDisplay.style.display = "none";
@@ -2802,7 +2840,6 @@
         document.getElementById('result-stage2-rate-eng').style.color = dailyRateChangeEnglish > 0 ? '#10b981' : (dailyRateChangeEnglish < 0 ? '#ef4444' : '#cbd5e1');
         updateAllStudentBadges();
     }
-
     function retrySameSection() {
         if(selectedSectionName) { 
             if (currentMode === "battle") {
