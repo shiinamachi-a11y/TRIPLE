@@ -645,7 +645,105 @@
         .theme-cute #mission-list-weekly span {
             color: #7d6f62 !important;
         }
-    </style>
+   
+    /* ========================================================
+            ☰ メニューボタン＆ドロップダウン（右上固定・見切れ防止）
+        ======================================================== */
+        .menu-trigger-btn {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            padding: 6px 14px;
+            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+            border: 1px solid #3b82f6;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+            user-select: none;
+            z-index: 1001;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.4);
+            transition: all 0.2s ease;
+        }
+        .menu-trigger-btn:hover {
+            border-color: #60a5fa;
+            transform: translateY(-1px);
+            box-shadow: 0 6px 15px rgba(59, 130, 246, 0.3);
+        }
+        .menu-icon { font-size: 1.05rem; color: #60a5fa; font-weight: bold; line-height: 1; }
+        .menu-label { font-size: 0.75rem; font-weight: bold; color: #ffffff; letter-spacing: 0.5px; }
+
+        .menu-dropdown-box {
+            display: none;
+            position: absolute;
+            top: 52px;
+            right: 15px;
+            background: #0f172a;
+            border: 1px solid #3b82f6;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.7);
+            border-radius: 10px;
+            width: 200px;
+            z-index: 1000;
+            overflow: hidden;
+        }
+
+        /* 🌿 Cuteテーマ用：メニューボタン＆ドロップダウン上書き */
+        .theme-cute .menu-trigger-btn {
+            background: #ffffff !important;
+            border: 2px solid #ebdcc5 !important;
+            box-shadow: 0 3px 8px rgba(109, 84, 64, 0.15) !important;
+        }
+        .theme-cute .menu-trigger-btn:hover {
+            border-color: #f7b267 !important;
+            background: #fff9e8 !important;
+        }
+        .theme-cute .menu-icon { color: #b2733d !important; }
+        .theme-cute .menu-label { color: #6d5440 !important; }
+
+        .theme-cute .menu-dropdown-box {
+            background: #ffffff !important;
+            border: 2px solid #ebdcc5 !important;
+            box-shadow: 0 8px 20px rgba(109, 84, 64, 0.18) !important;
+        }
+        .theme-cute .menu-dropdown-box .menu-item {
+            color: #6d5440 !important;
+            border-bottom: 1px solid #f3e9dc !important;
+        }
+        .theme-cute .menu-dropdown-box .menu-item:hover {
+            background-color: #fff9e6 !important;
+            color: #b2733d !important;
+        }
+
+        /* 🏆 Cuteテーマ用：称号ポップアップの文字同化防止 */
+        .theme-cute .title-popup-card {
+            background: linear-gradient(135deg, #ffffff 0%, #fdf5e6 100%) !important;
+            border: 3px solid #f7b267 !important;
+            box-shadow: 0 15px 40px rgba(109, 84, 64, 0.3) !important;
+            color: #6d5440 !important;
+        }
+        .theme-cute .title-popup-card h3 {
+            color: #6d5440 !important;
+            text-shadow: none !important;
+        }
+        .theme-cute .popup-badge-glow {
+            color: #e76f51 !important;
+            font-weight: 800;
+        }
+        .theme-cute #popup-title-name {
+            color: #8b4513 !important;
+            text-shadow: 0 2px 4px rgba(251, 198, 135, 0.4) !important;
+        }
+        .theme-cute #popup-title-desc {
+            color: #7d6f62 !important;
+        }
+        .theme-cute .title-silver {
+            background: linear-gradient(90deg, #475569 0%, #0f172a 50%, #334155 100%) !important;
+            -webkit-background-clip: text !important;
+            -webkit-text-fill-color: transparent !important;
+            text-shadow: none !important;
+        }
+       </style>
 </head>
 <body>
 
@@ -804,19 +902,18 @@
 
     <!-- 詳細分野選択・弱点画面 -->
     <div id="section-screen" class="screen" style="display: none; position: relative;">
-        <div id="menu-trigger" style="position: absolute; top: -22px; left: -22px; width: 60px; height: 60px; display: flex; justify-content: center; align-items: center; cursor: pointer; user-select: none; z-index: 1001;" onclick="toggleSectionMenu(event)">
-            <span style="position: absolute; font-size: 2.4rem; color: #475569; opacity: 0.5; line-height: 1;">☰</span>
-            <span style="position: absolute; font-size: 0.65rem; font-weight: bold; color: #94a3b8; opacity: 0.7; margin-top: 2px;">メニュー</span>
+        <div id="menu-trigger" class="menu-trigger-btn" onclick="toggleSectionMenu(event)">
+            <span class="menu-icon">☰</span>
+            <span class="menu-label">メニュー</span>
         </div>
         
-        <div id="section-menu-dropdown" style="display: none; position: absolute; top: 32px; left: -15px; background: #0f172a; border: 1px solid #334155; box-shadow: 0 4px 12px rgba(0,0,0,0.5); border-radius: 8px; width: 190px; z-index: 1000; overflow: hidden;">
+        <div id="section-menu-dropdown" class="menu-dropdown-box">
             <div class="menu-item" onclick="handleMenuAction('main')">🏠 トップページに戻る</div>
             <div class="menu-item" onclick="handleMenuAction('subject')">📚 科目を選ぶ</div>
             <div class="menu-item" onclick="handleMenuAction('rate')">🏆 レートをみる</div>
             <div class="menu-item" onclick="handleMenuAction('report')">📊 成績を見る</div>
             <div class="menu-item" onclick="handleMenuAction('summary')">📝 本日の学習を振り返る</div>
         </div>
-
         <h2 style="margin-top: 10px;">分野・弱点診断 📊</h2>
         <div id="section-buttons" style="max-height: 460px; overflow-y: auto; padding-right: 5px; margin-bottom: 10px;"></div>
         <button class="btn back-btn" onclick="backToSubject()">戻る</button>
