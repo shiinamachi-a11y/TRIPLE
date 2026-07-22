@@ -1782,6 +1782,9 @@
             loginBtn.innerText = "ログイン"; 
         }
     }   
+        function showMainScreen() {
+        loadAllQuizData();
+    }
         async function loadAllQuizData() {
         document.getElementById('loading-text').innerText = "サーバーから最新の問題データを同期しています...";
         if (!loadingTipsInterval) startLoadingTips();
