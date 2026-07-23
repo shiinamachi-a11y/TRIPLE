@@ -2187,12 +2187,18 @@ body {
     let isFriendBattleMode = false;
 
     function triggerFriendMatchingSequence() {
+        // 💡 前回の対戦状態・部屋情報を完全にクリーンにする
+        currentRoomId = "";
+        isFriendBattleMode = true;
+        ghostCurrentQuestion = 0;
+        ghostCurrentScore = 0;
+        if (friendResultTimer) { clearInterval(friendResultTimer); friendResultTimer = null; }
+
         document.getElementById('cmd-start-matching').style.display = 'none';
         document.getElementById('cmd-friend-matching').style.display = 'none';
         document.getElementById('battle-match-back-btn').style.display = 'none';
         
-        const statusArea = document.getElementById('matching-status-area');
-        const statusTxt = document.getElementById('matching-status-text');
+        const statusArea = document.getElementById('matching-status-area');        const statusTxt = document.getElementById('matching-status-text');
         const progressFill = document.getElementById('matching-progress-fill');
         
         statusArea.style.display = 'block';
@@ -3629,28 +3635,7 @@ body {
     // アプリ起動時に保存されたテーマを読み込む
     initTheme();
     checkAutoLogin();
-   function submitMyResultAndWaitRival() {
-        hideAllScreens();
-        document.getElementById('friend-waiting-screen').style.display = 'block';
-
-        const myPayload = {
-            score: score,
-            totalTimeMs: roundTotalTimeMs,
-            ghostLog: currentPlayerRoundLogs
-        };
-
-        const submitUrl = `${GAS_WEB_APP_URL}?action=friend_submit_result&roomId=${currentRoomId}&studentId=${studentId}&resultJson=${encodeURIComponent(JSON.stringify(myPayload))}`;
-
-        fetch(submitUrl)
-        .then(() => {
-            // 送信完了後、相手が解き終わるまで2秒おきにチェック
-            if (friendResultTimer) clearInterval(friendResultTimer);
-            friendResultTimer = setInterval(checkRivalResult, 2000);
-        });
-    }
-
-    let waitingWaitCount = 0;
-
+ 
     function submitMyResultAndWaitRival() {
         hideAllScreens();
         document.getElementById('friend-waiting-screen').style.display = 'block';
