@@ -951,8 +951,8 @@ body {
                     <div style="font-size: 0.85rem; color: #94a3b8;">この分野で対戦を開始しますか？</div>
                 </div>
 
-                <button id="cmd-start-matching" class="btn nav-btn" style="background: linear-gradient(135deg, #5b21b6 0%, #4c1d95 100%); margin-top: 15px;" onclick="triggerMatchingSequence()">マッチングを開始する</button>
-                
+                <button id="cmd-start-matching" class="btn nav-btn" style="background: linear-gradient(135deg, #5b21b6 0%, #4c1d95 100%); margin-top: 15px;" onclick="triggerMatchingSequence()">通常マッチングを開始する</button>
+                <button id="cmd-friend-matching" class="btn nav-btn" style="background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%); margin-top: 10px;" onclick="triggerFriendMatchingSequence()">🤝 友達と対戦する (同分野・同時押し)</button>
                 <div id="matching-status-area" style="display: none; margin-top: 25px;">
                     <div class="loading" id="matching-status-text">対戦相手を探索中...</div>
                     <div class="progress-bar-bg" style="margin-top: 10px;"><div id="matching-progress-fill" class="progress-bar-fill" style="background-color: #a78bfa; width: 0%;"></div></div>
@@ -2086,6 +2086,7 @@ body {
             hideAllScreens();
             document.getElementById('battle-field-name').innerText = section;
             document.getElementById('cmd-start-matching').style.display = 'block';
+            if (document.getElementById('cmd-friend-matching')) document.getElementById('cmd-friend-matching').style.display = 'block';
             document.getElementById('matching-status-area').style.display = 'none';
             document.getElementById('matched-rival-card').style.display = 'none';
             document.getElementById('battle-match-back-btn').style.display = 'block';
@@ -2165,6 +2166,65 @@ body {
             
             document.getElementById('rival-profile-rate').innerText = myRate;
             rivalCard.style.display = 'block';
+        });
+    }
+    function triggerFriendMatchingSequence() {
+        document.getElementById('cmd-start-matching').style.display = 'none';
+        document.getElementById('cmd-friend-matching').style.display = 'none';
+        document.getElementById('battle-match-back-btn').style.display = 'none';
+        
+        const statusArea = document.getElementById('matching-status-area');
+        const statusTxt = document.getElementById('matching-status-text');
+        const progressFill = document.getElementById('matching-progress-fill');
+        
+        statusArea.style.display = 'block';
+        statusTxt.innerText = "🤝 友達からの接続を待機中 (有効時間: 30秒)...";
+        progressFill.style.width = "0%";
+
+        const myRate = parseInt(localStorage.getItem(`quiz_rate_${selectedSubject}_${studentKey}`) || '1500');
+
+        let progressVal = 0;
+        let animationInterval = setInterval(() => {
+            progressVal += 5; 
+            progressFill.style.width = progressVal + "%";
+
+            if (progressVal >= 100) {
+                clearInterval(animationInterval);
+                fetchFriendGhostAndReveal(myRate);
+            }
+        }, 150); // 約3秒間の検索アニメーション
+    }
+
+    function fetchFriendGhostAndReveal(myRate) {
+        const url = `${GAS_WEB_APP_URL}?action=get_friend_battle&studentId=${studentId}&myRate=${myRate}&subject=${selectedSubject}&section=${encodeURIComponent(selectedSectionName)}`;
+        
+        fetch(url)
+        .then(res => res.json())
+        .then(data => {
+            document.getElementById('matching-status-area').style.display = 'none';
+            
+            if (data && data.success) {
+                // 🎯 友達とのマッチング成功！
+                activeGhostData = data.ghostData;
+                const rivalCard = document.getElementById('matched-rival-card');
+                rivalCard.children[1].innerHTML = `<span style="color:#fbbf24; font-size:1.2rem; font-weight:800;">🤝 友達: ${activeGhostData.name}</span><br><span style="font-size:1rem; color:#ffffff; display:inline-block; margin-top:5px;">とマッチング成功！</span>`;
+                document.getElementById('rival-profile-rate').innerText = activeGhostData.rate;
+                rivalCard.style.display = 'block';
+            } else {
+                // ❌ 30秒以内に友達が見つからなかった場合 -> マッチング不可のアラートを出して開始画面へ戻す
+                alert("⚠️ 30秒以内に同じ分野で待機している友達が見つかりませんでした。\n通常の対戦画面に戻ります。");
+                document.getElementById('cmd-start-matching').style.display = 'block';
+                document.getElementById('cmd-friend-matching').style.display = 'block';
+                document.getElementById('battle-match-back-btn').style.display = 'block';
+            }
+        })
+        .catch(err => {
+            console.error("友達マッチングエラー:", err);
+            alert("通信エラーが発生しました。通常の対戦画面に戻ります。");
+            document.getElementById('matching-status-area').style.display = 'none';
+            document.getElementById('cmd-start-matching').style.display = 'block';
+            document.getElementById('cmd-friend-matching').style.display = 'block';
+            document.getElementById('battle-match-back-btn').style.display = 'block';
         });
     }
 
