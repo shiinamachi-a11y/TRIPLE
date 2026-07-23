@@ -1037,6 +1037,19 @@ body {
         </div>
     </div>
 
+    <!-- ⏳ 友達の対戦終了待機画面 -->
+    <div id="friend-waiting-screen" class="screen" style="display: none;">
+        <div class="flex-center">
+            <div>
+                <h2>⌛ 対戦終了待ち</h2>
+                <div class="score-box" style="text-align: center; padding: 30px 15px;">
+                    <div class="cyber-spinner" style="margin: 0 auto 20px auto; width: 40px; height: 40px;"></div>
+                    <div style="font-size: 1.1rem; font-weight: bold; color: #ffffff;">あなたが解き終わりました！</div>
+                    <p style="font-size: 0.9rem; color: #94a3b8; margin-top: 10px;">友達が10問解き終わるのを待っています...<br>そのまま少々お待ちください ⏳</p>
+                </div>
+            </div>
+        </div>
+    </div>
     <!-- 結果画面（2段階スプリットUI） -->
     <div id="result-screen" class="screen" style="display: none;">
         
@@ -2168,6 +2181,11 @@ body {
             rivalCard.style.display = 'block';
         });
     }
+    let currentRoomId = "";
+    let friendPollTimer = null;
+    let friendResultTimer = null;
+    let isFriendBattleMode = false;
+
     function triggerFriendMatchingSequence() {
         document.getElementById('cmd-start-matching').style.display = 'none';
         document.getElementById('cmd-friend-matching').style.display = 'none';
@@ -2178,56 +2196,92 @@ body {
         const progressFill = document.getElementById('matching-progress-fill');
         
         statusArea.style.display = 'block';
-        statusTxt.innerText = "🤝 友達からの接続を待機中 (有効時間: 30秒)...";
+        statusTxt.innerText = "🤝 友達からの接続を探索中 (有効時間: 30秒)...";
+        progressFill.style.width = "0%";
+
+        const myRate = parseInt(localStorage.getItem(`quiz_rate_${selectedSubject}_${studentKey}`) || '1500');
+        
+        let pollCount = 0;
+        const maxPolls = 15; // 2秒×15回 ＝ 30秒間ポーリング
+
+        if (friendPollTimer) clearInterval(friendPollTimer);
+
+        function doPoll() {
+            pollCount++;
+            progressFill.style.width = Math.min(100, Math.round((pollCount / maxPolls) * 100)) + "%";
+
+            const url = `${GAS_WEB_APP_URL}?action=friend_poll&studentId=${studentId}&studentName=${encodeURIComponent(studentName)}&myRate=${myRate}&subject=${selectedSubject}&section=${encodeURIComponent(selectedSectionName)}`;
+
+            fetch(url)
+            .then(res => res.json())
+            .then(data => {
+                if (data.status === "MATCHED") {
+                    clearInterval(friendPollTimer);
+                    friendPollTimer = null;
+                    currentRoomId = data.roomId;
+                    isFriendBattleMode = true;
+
+                    activeGhostData = {
+                        id: data.rival.id,
+                        name: data.rival.name,
+                        rate: data.rival.rate,
+                        ghostLog: [] // 後で本物データに差し替えます
+                    };
+
+                    statusArea.style.display = 'none';
+                    const rivalCard = document.getElementById('matched-rival-card');
+                    rivalCard.children[1].innerHTML = `<span style="color:#fbbf24; font-size:1.2rem; font-weight:800;">🤝 友達: ${activeGhostData.name}</span><br><span style="font-size:1rem; color:#ffffff; display:inline-block; margin-top:5px;">とリアルタイムマッチング成功！</span>`;
+                    document.getElementById('rival-profile-rate').innerText = activeGhostData.rate;
+                    rivalCard.style.display = 'block';
+                } else if (pollCount >= maxPolls) {
+                    clearInterval(friendPollTimer);
+                    friendPollTimer = null;
+                    statusArea.style.display = 'none';
+                    alert("⚠️ 30秒以内に同じ分野で待機している友達が見つかりませんでした。\n対戦確認画面に戻ります。");
+                    document.getElementById('cmd-start-matching').style.display = 'block';
+                    document.getElementById('cmd-friend-matching').style.display = 'block';
+                    document.getElementById('battle-match-back-btn').style.display = 'block';
+                }
+            })
+            .catch(err => {
+                console.error("Poll Error:", err);
+            });
+        }
+
+        doPoll();
+        friendPollTimer = setInterval(doPoll, 2000); // 2秒おきにGASに確認
+    }
+
+    // 💡 通常対戦ボタンを押したときは友達モードをOFFにする
+    function triggerMatchingSequence() {
+        isFriendBattleMode = false;
+        currentRoomId = "";
+        // （既存のtriggerMatchingSequence処理のまま）
+        document.getElementById('cmd-start-matching').style.display = 'none';
+        if(document.getElementById('cmd-friend-matching')) document.getElementById('cmd-friend-matching').style.display = 'none';
+        document.getElementById('battle-match-back-btn').style.display = 'none';
+        const statusArea = document.getElementById('matching-status-area');
+        const statusTxt = document.getElementById('matching-status-text');
+        const progressFill = document.getElementById('matching-progress-fill');
+        
+        statusArea.style.display = 'block';
+        statusTxt.innerText = "対戦データベースをサンプリング中...";
         progressFill.style.width = "0%";
 
         const myRate = parseInt(localStorage.getItem(`quiz_rate_${selectedSubject}_${studentKey}`) || '1500');
 
         let progressVal = 0;
         let animationInterval = setInterval(() => {
-            progressVal += 5; 
-            progressFill.style.width = progressVal + "%";
+            progressVal += 10; progressFill.style.width = progressVal + "%";
+            if (progressVal === 40) statusTxt.innerText = `同レート帯（${myRate}±50）を探索中...`;
+            if (progressVal === 80) statusTxt.innerText = "10問の詳細ラップタイムを取得中...";
 
             if (progressVal >= 100) {
                 clearInterval(animationInterval);
-                fetchFriendGhostAndReveal(myRate);
+                fetchGhostAndReveal(myRate);
             }
-        }, 150); // 約3秒間の検索アニメーション
+        }, 150);
     }
-
-    function fetchFriendGhostAndReveal(myRate) {
-        const url = `${GAS_WEB_APP_URL}?action=get_friend_battle&studentId=${studentId}&myRate=${myRate}&subject=${selectedSubject}&section=${encodeURIComponent(selectedSectionName)}`;
-        
-        fetch(url)
-        .then(res => res.json())
-        .then(data => {
-            document.getElementById('matching-status-area').style.display = 'none';
-            
-            if (data && data.success) {
-                // 🎯 友達とのマッチング成功！
-                activeGhostData = data.ghostData;
-                const rivalCard = document.getElementById('matched-rival-card');
-                rivalCard.children[1].innerHTML = `<span style="color:#fbbf24; font-size:1.2rem; font-weight:800;">🤝 友達: ${activeGhostData.name}</span><br><span style="font-size:1rem; color:#ffffff; display:inline-block; margin-top:5px;">とマッチング成功！</span>`;
-                document.getElementById('rival-profile-rate').innerText = activeGhostData.rate;
-                rivalCard.style.display = 'block';
-            } else {
-                // ❌ 30秒以内に友達が見つからなかった場合 -> マッチング不可のアラートを出して開始画面へ戻す
-                alert("⚠️ 30秒以内に同じ分野で待機している友達が見つかりませんでした。\n通常の対戦画面に戻ります。");
-                document.getElementById('cmd-start-matching').style.display = 'block';
-                document.getElementById('cmd-friend-matching').style.display = 'block';
-                document.getElementById('battle-match-back-btn').style.display = 'block';
-            }
-        })
-        .catch(err => {
-            console.error("友達マッチングエラー:", err);
-            alert("通信エラーが発生しました。通常の対戦画面に戻ります。");
-            document.getElementById('matching-status-area').style.display = 'none';
-            document.getElementById('cmd-start-matching').style.display = 'block';
-            document.getElementById('cmd-friend-matching').style.display = 'block';
-            document.getElementById('battle-match-back-btn').style.display = 'block';
-        });
-    }
-
     function startActualBattleQuiz() { startQuizWithSection(selectedSectionName); }
 
     function startQuizWithSection(section) {
@@ -2514,11 +2568,14 @@ body {
                     hideAllScreens();
                     document.getElementById('review-start-screen').style.display = 'block';
                     saveSuspendedSession(false);
+                } else if (currentMode === "battle" && isFriendBattleMode && currentRoomId) {
+                    // 🤝 友達対戦の場合は、自分の実データを送信して相手の終了を待つ！
+                    submitMyResultAndWaitRival();
                 } else {
                     showFinalResult(); 
                 }
-            } 
-        } else {
+            }      
+           } else {
             reviewQuestionIndex++;
             if (reviewQuestionIndex < reviewQuizData.length) {
                 saveSuspendedSession(false);
@@ -3565,6 +3622,45 @@ body {
     // アプリ起動時に保存されたテーマを読み込む
     initTheme();
     checkAutoLogin();
+   function submitMyResultAndWaitRival() {
+        hideAllScreens();
+        document.getElementById('friend-waiting-screen').style.display = 'block';
+
+        const myPayload = {
+            score: score,
+            totalTimeMs: roundTotalTimeMs,
+            ghostLog: currentPlayerRoundLogs
+        };
+
+        const submitUrl = `${GAS_WEB_APP_URL}?action=friend_submit_result&roomId=${currentRoomId}&studentId=${studentId}&resultJson=${encodeURIComponent(JSON.stringify(myPayload))}`;
+
+        fetch(submitUrl)
+        .then(() => {
+            // 送信完了後、相手が解き終わるまで2秒おきにチェック
+            if (friendResultTimer) clearInterval(friendResultTimer);
+            friendResultTimer = setInterval(checkRivalResult, 2000);
+        });
+    }
+
+    function checkRivalResult() {
+        const checkUrl = `${GAS_WEB_APP_URL}?action=friend_check_result&roomId=${currentRoomId}&studentId=${studentId}`;
+
+        fetch(checkUrl)
+        .then(res => res.json())
+        .then(data => {
+            if (data.ready && data.rivalData) {
+                clearInterval(friendResultTimer);
+                friendResultTimer = null;
+
+                // 🎯 相手が実際に解いたリアルなデータ（正誤＆タイム）をセット！
+                ghostCurrentScore = data.rivalData.score;
+                activeGhostData.ghostLog = data.rivalData.ghostLog;
+                
+                // 本当の実データ同士で結果画面を表示！
+                showFinalResult();
+            }
+        });
+    }
 </script>
 </body>
 </html>
