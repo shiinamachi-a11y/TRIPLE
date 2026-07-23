@@ -2375,12 +2375,17 @@ body {
         maxCombo = currentCombo;
         if (currentMode === "battle" && activeGhostData) {
             ghostCurrentQuestion = 0; ghostCurrentScore = 0;
-            document.getElementById('vs-live-panel').style.display = 'block';
-            updateLiveVSUI(); startGhostSimulationLoop(); 
+            if (!isFriendBattleMode && activeGhostData.ghostLog && activeGhostData.ghostLog.length > 0) {
+                document.getElementById('vs-live-panel').style.display = 'block';
+                updateLiveVSUI(); 
+                startGhostSimulationLoop(); 
+            } else {
+                // 友達対戦の時はライブパネルを非表示にしてJSエラーを防ぐ
+                document.getElementById('vs-live-panel').style.display = 'none';
+            }
         } else {
             document.getElementById('vs-live-panel').style.display = 'none';
-        }
-        
+        }        
         saveSuspendedSession(false);
         showQuestion();
     }
@@ -2660,8 +2665,10 @@ body {
             };
 
             const playerPoints = calculateBattlePoints(currentPlayerRoundLogs);
-            const ghostPoints = calculateBattlePoints(activeGhostData.ghostLog.slice(0, ghostCurrentQuestion));
-
+            
+            // 友達対戦の場合は ghostCurrentQuestion ではなく 10問全ログを対象にする
+            const targetGhostLogs = isFriendBattleMode ? activeGhostData.ghostLog : activeGhostData.ghostLog.slice(0, ghostCurrentQuestion);
+            const ghostPoints = calculateBattlePoints(targetGhostLogs);
             isPlayerWin = playerPoints > ghostPoints;
             const ghostTotalTime = activeGhostData.ghostLog.slice(0, ghostCurrentQuestion).reduce((sum, item) => sum + item.timeMs, 0);
             if (playerPoints === ghostPoints) {
@@ -3642,7 +3649,43 @@ body {
         });
     }
 
+    let waitingWaitCount = 0;
+
+    function submitMyResultAndWaitRival() {
+        hideAllScreens();
+        document.getElementById('friend-waiting-screen').style.display = 'block';
+        waitingWaitCount = 0;
+
+        const myPayload = {
+            score: score,
+            totalTimeMs: roundTotalTimeMs,
+            ghostLog: currentPlayerRoundLogs
+        };
+
+        const submitUrl = `${GAS_WEB_APP_URL}?action=friend_submit_result&roomId=${currentRoomId}&studentId=${studentId}&resultJson=${encodeURIComponent(JSON.stringify(myPayload))}`;
+
+        fetch(submitUrl)
+        .then(() => {
+            if (friendResultTimer) clearInterval(friendResultTimer);
+            friendResultTimer = setInterval(checkRivalResult, 2000);
+        });
+    }
+
     function checkRivalResult() {
+        waitingWaitCount++;
+        
+        // 💡 40秒（20回チェック）経過しても相手が来ない場合の非常脱出処理
+        if (waitingWaitCount > 20) {
+            clearInterval(friendResultTimer);
+            friendResultTimer = null;
+            alert("⚠️ 相手からの応答が確認できませんでした。\n相手棄権として不戦勝処理を行います。");
+            ghostCurrentScore = 0;
+            activeGhostData.ghostLog = Array.from({length:10}, () => ({isCorrect: false, timeMs: 5000}));
+            ghostCurrentQuestion = 10;
+            showFinalResult();
+            return;
+        }
+
         const checkUrl = `${GAS_WEB_APP_URL}?action=friend_check_result&roomId=${currentRoomId}&studentId=${studentId}`;
 
         fetch(checkUrl)
@@ -3652,15 +3695,13 @@ body {
                 clearInterval(friendResultTimer);
                 friendResultTimer = null;
 
-                // 🎯 相手が実際に解いたリアルなデータ（正誤＆タイム）をセット！
                 ghostCurrentScore = data.rivalData.score;
                 activeGhostData.ghostLog = data.rivalData.ghostLog;
+                ghostCurrentQuestion = 10; // 集計フラグを10に固定
                 
-                // 本当の実データ同士で結果画面を表示！
                 showFinalResult();
             }
         });
-    }
-</script>
+    }</script>
 </body>
 </html>
